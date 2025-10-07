@@ -123,7 +123,8 @@ export default function MemberList() {
                     const firstNameFound = cell.firstName.toLowerCase().includes(searchTerm);
                     const lastNameFound = cell.lastName.toLowerCase().includes(searchTerm);
                     const typeFound = cell.membershipType?.toLowerCase().includes(searchTerm);
-                    return (firstNameFound || lastNameFound || typeFound);
+                    const phoneNumberFound = cell.phoneNumber.includes(searchTerm);
+                    return (firstNameFound || lastNameFound || typeFound || phoneNumberFound);
                 });
             setCells(newCells);
         }

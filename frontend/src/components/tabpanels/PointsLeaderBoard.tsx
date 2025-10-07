@@ -36,7 +36,7 @@ export default function PointsLeaderboard() {
         }
         memberBills = memberBills.sort((billA, billB) => billB.pointsEarned - billA.pointsEarned);
         memberBills = memberBills.filter((bill) => (bill.pointsEarned > 0));
-        memberBills = memberBills.slice(0, 50);
+        // memberBills = memberBills.slice(0, 50);
         setAllBillsData(memberBills as Bill[]);
         setFilteredBills(memberBills as Bill[]);
     }
