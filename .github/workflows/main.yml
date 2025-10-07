@@ -5,6 +5,8 @@ on:
         - main
       paths:
         - src/**
+        - package*.json
+        - Dockerfile
   workflow_dispatch:
 env:
   NODE_VERSION: "22"
