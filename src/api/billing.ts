@@ -435,7 +435,14 @@ billing.post('/webhook/incoming', async (req: Request, res: Response) => {
         const orderUpdate = req.body;
         const paymentData = orderUpdate.data.object.payment;
         const squareOrderId = paymentData.order_id;
+        logger.info(`Got webhook for square order ID ${squareOrderId}`);
         const ourBill = await getBillByOrderId(squareOrderId);
+        if (!ourBill) {
+            logger.info(`Square order ID ${squareOrderId} does not have an associated bill so ignoring it`);
+            logger.info(JSON.stringify(paymentData));
+            res.json({});
+            return;
+        }
         logger.info(`Payment webhook incoming for ${squareOrderId}`);
         logger.info(orderUpdate);
         // verify payment amount, status

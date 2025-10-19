@@ -90,6 +90,9 @@ export default function SignUpList(props: SignupListProps) {
     const [signupEvent, setSignupEvent] = useState<Event>();
     const [allJobsCount, setAllJobsCount] = useState<number>(0);
     const [signupsCount, setSignupsCount] = useState<number>(0);
+    const [pointsJobCount, setPointsJobCount] = useState<number>(0);
+    const [paidJobsCount, setPaidJobCount] = useState<number>(0);
+    const [payout, setPayout] = useState<number>(0);
 
     const { state } = useContext(UserContext);
 
@@ -101,6 +104,16 @@ export default function SignUpList(props: SignupListProps) {
         const filledJobs = eventJobs.filter(
             (signup : any) => signup.member !== null,
         );
+        const paidJobs = eventJobs.filter(
+            (signup: any) => signup.paid,
+        );
+        let payoutSum = 0;
+        paidJobs.forEach((job: any) => {
+            payoutSum += job.cashPayout;
+        });
+        setPayout(payoutSum);
+        setPointsJobCount(filledJobs.length - paidJobs.length);
+        setPaidJobCount(paidJobs.length);
         setSignupsCount(filledJobs.length);
     }
 
@@ -208,7 +221,24 @@ export default function SignUpList(props: SignupListProps) {
                     subHeaderWrap
                     striped
                     customStyles={customStyles}
+                    conditionalRowStyles={
+                        [
+                            {
+                                when: (row:any) => row.paid,
+                                style: {
+                                    fontStyle: 'italic',
+                                },
+                            },
+                        ]
+                    }
                 />
+                {
+                    (state.user?.memberType === 'Admin') && (
+                        <Box mt={1} mb={1}>
+                            {` (${pointsJobCount} jobs awarded points, ${paidJobsCount} jobs paid $${payout})`}
+                        </Box>
+                    )
+                }
             </Box>
         </div>
     );
