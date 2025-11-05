@@ -17,22 +17,41 @@ export function App() {
     const location = useLocation();
     useEffect(() => {
         async function updateState(token: string) {
-            const user = await me(token);
-            update({ loggedIn: true, token, user, storedUser: undefined });
-        }
-        if (!state.loggedIn && !location.pathname.includes('apply')) {
-            const hash = location.hash.split('#id_token=')[1];
-            if (hash) {
-                const token = hash.split('&')[0];
-                updateState(token);
-            } else {
+            try {
+                const user = await me(token);
+                update({ loggedIn: true, token, user, storedUser: undefined });
+                // Clean up URL hash after extracting token
+                if (window.location.hash.includes('#id_token=')) {
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+            } catch (error) {
+                // If token is invalid, clear it and redirect to login
+                localStorage.removeItem('trackboss_auth_token');
+                update({ loggedIn: false, token: '', user: undefined, storedUser: undefined });
                 // this is the only reasonable way to do this other than repeated string concatenation
                 // eslint-disable-next-line max-len
                 const authTarget = `${process.env.REACT_APP_AUTH_URL}/login?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
                 window.location.href = authTarget;
             }
         }
-    }, [state]);
+        if (!state.loggedIn && !location.pathname.includes('apply')) {
+            // First check if there's a token in the URL hash (from Cognito redirect)
+            const hash = location.hash.split('#id_token=')[1];
+            if (hash) {
+                const token = hash.split('&')[0];
+                updateState(token);
+            } else if (state.token) {
+                // If no hash but we have a stored token, try to verify it
+                updateState(state.token);
+            } else {
+                // No token at all, redirect to login
+                // this is the only reasonable way to do this other than repeated string concatenation
+                // eslint-disable-next-line max-len
+                const authTarget = `${process.env.REACT_APP_AUTH_URL}/login?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
+                window.location.href = authTarget;
+            }
+        }
+    }, [state.loggedIn, state.token, location.pathname, location.hash, update]);
 
     return (
         <Routes>
