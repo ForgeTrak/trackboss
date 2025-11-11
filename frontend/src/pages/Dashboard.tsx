@@ -20,6 +20,8 @@ import { Link } from '../../../src/typedefs/link';
 import { getLinks } from '../controller/links';
 import { Bill } from '../../../src/typedefs/bill';
 import { UserContext } from '../contexts/UserContext';
+import { getDefaultSettingsByName } from '../controller/defaultSettings';
+import SimpleAlertModal from '../components/modals/SimpleAlertModal';
 
 async function getEventCardPropsLocal(token: string): Promise<any | undefined> {
     const nowString = getTodaysDate();
@@ -47,6 +49,14 @@ function Dashboard() {
     // eslint-disable-next-line no-unused-vars
     const [dashboardLinks, setDashboardLinks] = useState<Link[]>([]);
     const [lastBill, setLastBill] = useState<Bill>();
+    // eslint-disable-next-line no-unused-vars
+    const [showDashboardPopup, setShowDashboardPopup] = useState<boolean>();
+
+    async function getDashboardPopupSetting() {
+        const popupEnabled = await getDefaultSettingsByName(state.token, 'DASHBOARD_POPUP');
+        const popupEnabledSetting = (popupEnabled.settingValue === 'true');
+        setShowDashboardPopup(popupEnabledSetting);
+    }
 
     const allowsSignIn = (
         ((eventCardProps?.eventType === 'work day') || (eventCardProps?.eventType === 'meeting')) &&
@@ -98,6 +108,7 @@ function Dashboard() {
             await loadTrackStatuses();
             await loadLinks();
             await loadBills();
+            await getDashboardPopupSetting();
         }
         getData();
     }, []);
@@ -115,8 +126,19 @@ function Dashboard() {
         await loadTrackStatuses();
     }
 
+    const infoMessage = `The PRA Board's refusal to enter into a support contract is causing an immediate crisis. 
+        Trackboss is no longer receiving security updates, meaning the security of your data cannot 
+        be guaranteed. Furthermore, any system crash will render the application permanently inaccessible
+        until the Board authorizes the agreement.
+    `;
     return (
         <ChakraProvider theme={theme}>
+            <SimpleAlertModal
+                isOpen={showDashboardPopup || false}
+                title="⚠️ URGENT: SECURITY RISK"
+                message={infoMessage}
+                onClose={() => setShowDashboardPopup(false)}
+            />
             <VStack align="left" spacing="2em">
                 <Header title="Track Boss Dashboard" activeButtonId={1} />
                 {
