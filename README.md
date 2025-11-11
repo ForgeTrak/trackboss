@@ -35,3 +35,7 @@ Additionally, the following values are optional:
 
 ## Releases
 For all pushes to main, release builds are automatically created via a GitHub Actions Workflow. These artifacts can always be accessed via the Actions tab in the repository. For more details, see [this documentation](https://docs.github.com/en/actions/managing-workflow-runs/downloading-workflow-artifacts). Additionally, production artifacts can also be found at [nightly.link](nightly.link/Squeaky-Training-Wheels/clubmanager-2.0/workflows/main.yml/main). These links bypass the requirement for being logged into GitHub to obtain an artifact, and will always point to the most recent run of the workflow.
+
+## Licensing
+This project is licensed under the Business Source License 1.1.
+For commercial use, contact ForgeTrak, LLC
