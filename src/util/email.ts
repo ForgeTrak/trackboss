@@ -6,6 +6,7 @@ import { getBoardMemberList } from '../database/boardMember';
 import { Bill } from '../typedefs/bill';
 import { Member } from '../typedefs/member';
 import { getEnvironmentParameter } from './environmentWrapper';
+import { calculateBillingYear } from './dateHelper';
 
 async function getEmailById(purpose: string) {
     const values = [purpose];
@@ -76,7 +77,7 @@ export async function sendAppConfirmationEmail(application: any) {
     confirmEmail.text = confirmEmail.text.replace(/appId/, application.id);
 
     confirmEmail.to = application.email;
-    const boardMembers = await getBoardMemberList((new Date().getFullYear().toString()));
+    const boardMembers = await getBoardMemberList(`${calculateBillingYear()}`);
     boardMembers.forEach((member) => confirmEmail.bcc.push(member.email || ''));
     await sendTextEmail(confirmEmail);
     logger.info(`application emails sent for application ${application.id}`);

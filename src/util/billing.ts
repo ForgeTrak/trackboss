@@ -167,7 +167,7 @@ export async function runBillingCompleteCurrent(membershipList: Membership[], me
     return billsBillsBills;
 }
 
-export async function generateSquareLinks(billingYear: number, membershipId: number) {
+export async function generateSquareLinks(billingYear: number, membershipId?: number) {
     const billingFilters : any = {
         year: Number(billingYear),
     };
@@ -175,9 +175,10 @@ export async function generateSquareLinks(billingYear: number, membershipId: num
         billingFilters.membershipId = Number(membershipId);
     }
     const billingList: Bill[] = await getBillList(billingFilters);
-
+    logger.info('Billing Job - starting Square link generation.');
     // I don't care if this is slower, I would actualy prefer it so I don't hit Square's rate limits.
     // This runs once a year so who cares how fast it is anyway?
+    let linkCount = 0;
     // eslint-disable-next-line no-restricted-syntax
     for (const bill of billingList) {
         // no need to create checkout links for anyone who owes zero.  It's pointless.
@@ -187,11 +188,14 @@ export async function generateSquareLinks(billingYear: number, membershipId: num
             const paymentInfo = await createPaymentLink(bill);
             bill.squareLink = paymentInfo.squareUrl;
             bill.squareOrderId = paymentInfo.squareOrderId;
-            console.log(`${bill.billId} - ${bill.squareLink}`);
+            logger.info(`${bill.billId} - ${bill.squareLink}`);
             // slow down sally, you're moving too fast.....
             // eslint-disable-next-line no-await-in-loop
             await addSquareAttributes(bill);
+            linkCount += 1;
+            logger.info(`Billing Job - Generated square id ${bill.squareOrderId} for bill ${bill.billId} ${linkCount}`);
         }
+        logger.info(`Billing Job - Generated square links for ${linkCount} bills`);
     }
     return billingList;
 }
