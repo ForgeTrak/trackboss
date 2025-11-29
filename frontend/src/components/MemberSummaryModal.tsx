@@ -416,7 +416,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                             () => {
                                                                 navigateToMyAccount();
                                                                 // Sign in as the selected user (to sign them up for events), and store the original user as storedUser
-                                                                update({ loggedIn: true, token: state.token, user: selectedMember, storedUser: state.user });
+                                                                update({ loggedIn: true, token: state.token, user: selectedMember, storedUser: state.user, isInitializing: false });
                                                             }
                                                         }
                                                     >

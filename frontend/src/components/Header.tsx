@@ -72,6 +72,7 @@ export default function Header(props:pageProps) {
                                         token: state.token,
                                         user: originalUser,
                                         storedUser: undefined,
+                                        isInitializing: false,
                                     });
                                 }
                             }

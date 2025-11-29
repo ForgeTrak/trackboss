@@ -6,6 +6,7 @@ interface UserContextInterface {
     token: string,
     user: Member | undefined,
     storedUser: Member | undefined,
+    isInitializing: boolean,
 }
 
 const TOKEN_STORAGE_KEY = 'trackboss_auth_token';
@@ -15,6 +16,7 @@ export const initialUserContext: UserContextInterface = {
     token: '',
     user: undefined,
     storedUser: undefined,
+    isInitializing: true,
 };
 
 // Initialize state from localStorage if token exists
@@ -24,6 +26,7 @@ const getInitialState = (): UserContextInterface => {
         return {
             ...initialUserContext,
             token: storedToken,
+            isInitializing: true,
             // Note: loggedIn will be set to true after token is verified in App.tsx
         };
     }

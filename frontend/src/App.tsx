@@ -19,7 +19,7 @@ export function App() {
     // Helper function to redirect to login
     const redirectToLogin = useCallback(() => {
         localStorage.removeItem('trackboss_auth_token');
-        update({ loggedIn: false, token: '', user: undefined, storedUser: undefined });
+        update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
         const authTarget = `${process.env.REACT_APP_AUTH_URL}/login?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
@@ -27,10 +27,13 @@ export function App() {
     }, [update]);
 
     // Helper function to verify token and update state
-    async function updateState(token: string) {
+    const updateState = useCallback(async (token: string) => {
+        // Set initializing to true while we verify the token
+        update((prev) => ({ ...prev, isInitializing: true }));
         try {
             const user = await me(token);
-            update({ loggedIn: true, token, user, storedUser: undefined });
+            // Token is valid, set loggedIn to true and isInitializing to false
+            update({ loggedIn: true, token, user, storedUser: undefined, isInitializing: false });
             // Clean up URL hash after extracting token
             if (window.location.hash.includes('#id_token=')) {
                 window.history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -44,11 +47,11 @@ export function App() {
                 redirectToLogin();
             }
         }
-    }
+    }, [update, redirectToLogin]);
 
     // Effect to handle initial authentication and token validation
     useEffect(() => {
-        if (!state.loggedIn && !location.pathname.includes('apply')) {
+        if (!state.loggedIn && state.isInitializing && !location.pathname.includes('apply')) {
             // First check if there's a token in the URL hash (from Cognito redirect)
             const hash = location.hash.split('#id_token=')[1];
             if (hash) {
@@ -62,7 +65,15 @@ export function App() {
                 redirectToLogin();
             }
         }
-    }, [state.loggedIn, state.token, location.pathname, location.hash, update, redirectToLogin]);
+    }, [
+        state.loggedIn,
+        state.token,
+        state.isInitializing,
+        location.pathname,
+        location.hash,
+        updateState,
+        redirectToLogin,
+    ]);
 
     // Effect to periodically validate token when user is logged in
     // eslint-disable-next-line consistent-return
@@ -83,6 +94,12 @@ export function App() {
             return () => clearInterval(validationInterval);
         }
     }, [state.loggedIn, state.token, location.pathname, update, redirectToLogin]);
+
+    // Don't render routes until authentication is complete (either logged in or redirected)
+    // This prevents components from making API calls with invalid/empty tokens
+    if (state.isInitializing && !location.pathname.includes('apply')) {
+        return null; // or a loading spinner if desired
+    }
 
     return (
         <Routes>
