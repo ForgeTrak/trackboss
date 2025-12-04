@@ -20,7 +20,7 @@ import DataSearchBox from '../input/DataSearchBox';
 import WrappedSwitchInput from '../input/WrappedSwitchInput';
 import BillingStatsDisplay from './BillingStatsDisplay';
 import dataTableStyles from './DataTableStyles';
-import getYearsForBillingDisplay from '../../util/billing';
+import { calculateBillingYear, getYearsForBillingDisplay } from '../../util/billing';
 import YearsDropDown from './YearsDropDown';
 
 export default function DuesAndWaiversList() {
@@ -37,16 +37,16 @@ export default function DuesAndWaiversList() {
     const [filterPaperwork, setFilterPaperwork] = useState<boolean>(false);
     const [filterPaid, setFilterPaid] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<string>('');
-    const [applicationYear, setApplicationYear] = useState<number>(new Date().getFullYear() - 1);
+    const [selectedYear, setSelectedYear] = useState<number>(calculateBillingYear());
     const [yearsList, setYearsList] = useState<number[]>([]);
-    const [initialYear, setInitialYear] = useState<number>(new Date().getFullYear() - 1);
+    const [initialYear, setInitialYear] = useState<number>(calculateBillingYear());
 
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     async function getMembershipBillData() {
         let memberBills : Bill[] = [];
         try {
-            memberBills = await getBills(state.token, applicationYear) as Bill[];
+            memberBills = await getBills(state.token, selectedYear) as Bill[];
         } catch (error) {
             // console.log(error);
         }
@@ -90,7 +90,7 @@ export default function DuesAndWaiversList() {
     useEffect(() => {
         getMembershipBillData();
         getYearsForBillingDisplay(setInitialYear, setYearsList);
-    }, [applicationYear]);
+    }, [selectedYear]);
 
     useEffect(() => {
         if (searchTerm === '') {
@@ -168,7 +168,7 @@ export default function DuesAndWaiversList() {
                     years={yearsList}
                     initialYear={initialYear}
                     header="Billing data"
-                    setYear={setApplicationYear}
+                    setYear={setSelectedYear}
                 />
             </Center>
             <StatGroup>

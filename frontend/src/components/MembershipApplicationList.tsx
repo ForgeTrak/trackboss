@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsPrinter } from 'react-icons/bs';
 
-import getYearsForBillingDisplay from '../util/billing';
+import { getYearsForBillingDisplay, calculateApplicationYear } from '../util/billing';
 import { MembershipApplication } from '../../../src/typedefs/membershipApplication';
 import { UserContext } from '../contexts/UserContext';
 import { getMembershipApplicationListExcel, getMembershipApplications } from '../controller/membershipApplication';
@@ -85,9 +85,9 @@ export default function MembershipApplicationList() {
     const [showAccepted, setShowAccepted] = useState<boolean>(false);
     const [showReview, setShowReview] = useState<boolean>(false);
     const [showRejected, setShowRejected] = useState<boolean>(false);
-    const [applicationYear, setApplicationYear] = useState<number>(new Date().getFullYear());
+    const [applicationYear, setApplicationYear] = useState<number>(calculateApplicationYear());
     const [yearsList, setYearsList] = useState<number[]>([]);
-    const [initialYear, setInitialYear] = useState<number>(new Date().getFullYear());
+    const [initialYear, setInitialYear] = useState<number>(calculateApplicationYear());
 
     const { isOpen, onClose, onOpen } = useDisclosure(
         { onClose: () => setDirty((olDirtyGotYaMoney) => !olDirtyGotYaMoney) },

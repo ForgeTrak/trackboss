@@ -15,7 +15,7 @@ import {
 } from '../../controller/billing';
 import DataSearchBox from '../input/DataSearchBox';
 import dataTableStyles from '../shared/DataTableStyles';
-import getYearsForBillingDisplay from '../../util/billing';
+import { getYearsForBillingDisplay } from '../../util/billing';
 import YearsDropDown from '../shared/YearsDropDown';
 
 export default function PointsLeaderboard() {
