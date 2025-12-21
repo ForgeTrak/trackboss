@@ -15,7 +15,8 @@ export default function startBillingJob() {
             const generatedBills = await runBillingComplete(billingYear, membershipList);
             logger.debug(JSON.stringify(generatedBills));
             // in November, generate billing links for next year
-            if (new Date().getMonth() === 10) {
+            const month = new Date().getMonth() + 1;
+            if ((month >= 11) || (month <= 2)) {
                 await generateSquareLinks(billingYear);
             }
         } else {
