@@ -259,7 +259,7 @@ export class DeployStack extends Stack {
         encryption: s3.BucketEncryption.S3_MANAGED,
         publicReadAccess: false,
     });
-    /*
+    
     const fn = new lambda.DockerImageFunction(this, 'DbBackupFn', {
         code: lambda.DockerImageCode.fromImageAsset('../../../lambda/backup'),
         memorySize: 1024,
@@ -275,7 +275,7 @@ export class DeployStack extends Stack {
             PREFIX: 'db-backups/',
         },
       });
-    */
+    
     
   }
 
