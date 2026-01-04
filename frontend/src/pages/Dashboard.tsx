@@ -81,6 +81,7 @@ function Dashboard() {
             try {
                 setEventCardProps(await getEventCardPropsLocal(state.token));
             } catch (error) {
+                // eslint-disable-next-line no-console
                 console.error(error);
             }
             if (state.user) {

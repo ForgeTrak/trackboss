@@ -1,8 +1,5 @@
-import { App, CfnOutput, Duration, Stack, StackProps, Tags } from 'aws-cdk-lib';
-import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
+import { App, CfnOutput, Duration, RemovalPolicy, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
-import { aws_ecs as ecs } from 'aws-cdk-lib';
-import { aws_elasticloadbalancingv2 as elbv2 } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
 import { aws_certificatemanager as acm } from 'aws-cdk-lib';
 import { aws_route53 as route53 } from 'aws-cdk-lib';
@@ -15,6 +12,7 @@ import { aws_lambda_event_sources as lambdaEventSources } from 'aws-cdk-lib';
 import { DatabaseInstanceEngine, MysqlEngineVersion } from 'aws-cdk-lib/aws-rds';
 import { aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
 import { SecretValue } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
 import * as apprunner from '@aws-cdk/aws-apprunner-alpha';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
@@ -123,7 +121,7 @@ export class DeployStack extends Stack {
     
     // inbound handling for text messages
     const inboundMemberCommLambda = new lambda.Function(this, 'inboundMemberCommHandler', {
-        runtime: lambda.Runtime.NODEJS_16_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         tracing: lambda.Tracing.ACTIVE,
         code: lambda.Code.fromAsset('../../../lambda'),
         handler: 'messageProcessor.handler',
@@ -250,5 +248,34 @@ export class DeployStack extends Stack {
     appRunnerCognitoPolicy.addActions('cognito-idp:AdminUpdateUserAttributes');
     appRunnerCognitoPolicy.addResources(cognitoPool.userPoolArn);
     appRunnerRole.addToPolicy(appRunnerCognitoPolicy);
+
+    const databackupBucket = new s3.Bucket(this, 'forgeTrakDataBackup', {
+        bucketName: 'forgetrak-data-backup',
+        // lifecycle rules are somewhat flippant, but this is a backup of
+        // data that is already in RDS Backups and easily re-creatable
+        removalPolicy: RemovalPolicy.DESTROY,
+        autoDeleteObjects: true,
+        versioned: true,
+        encryption: s3.BucketEncryption.S3_MANAGED,
+        publicReadAccess: false,
+    });
+    const fn = new lambda.DockerImageFunction(this, 'DbBackupFn', {
+        code: lambda.DockerImageCode.fromImageAsset('../../../lambda/backup'),
+        memorySize: 1024,
+        timeout: Duration.minutes(10),
+        vpc,
+        allowPublicSubnet: true,
+        environment: {
+            DB_HOST: rdsInstance.dbInstanceEndpointAddress,
+            DB_NAME: 'pradb',
+            DB_USER: '',
+            DB_PASSWORD: '',
+            BUCKET: databackupBucket.bucketName,
+            PREFIX: 'db-backups/',
+        },
+      });
+
+    
   }
+
 }
