@@ -260,23 +260,24 @@ export class DeployStack extends Stack {
         publicReadAccess: false,
     });
     
-    const fn = new lambda.DockerImageFunction(this, 'DbBackupFn', {
+    const dataBackupLambda = new lambda.DockerImageFunction(this, 'DbBackupFn', {
         code: lambda.DockerImageCode.fromImageAsset('../../../lambda/backup'),
         memorySize: 1024,
         timeout: Duration.minutes(10),
         vpc,
         allowPublicSubnet: true,
         environment: {
-            DB_HOST: rdsInstance.dbInstanceEndpointAddress,
+            DB_HOST: rdsInstance.instanceEndpoint.hostname,
             DB_NAME: 'pradb',
             DB_USER: '',
-            DB_PASSWORD: '',
+            DB_PASS: '',
             BUCKET: databackupBucket.bucketName,
             PREFIX: 'db-backups/',
         },
       });
     
-    
+      databackupBucket.grantWrite(dataBackupLambda);
+      databackupBucket.grantReadWrite(dataBackupLambda);
   }
 
 }
