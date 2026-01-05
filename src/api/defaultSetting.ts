@@ -9,6 +9,8 @@ import {
     updateDefaultSetting,
 } from '../database/defaultSettings';
 import { checkHeader, validateAdminAccess } from '../util/auth';
+import getBackupFile from '../util/s3';
+
 import logger from '../logger';
 
 const defaultSetting = Router();
@@ -98,6 +100,26 @@ defaultSetting.delete('/:id', async (req: Request, res: Response) => {
         await deleteDefaultSetting(Number(req.params.id));
         res.status(200);
         res.send('deleted default setting');
+    } catch (error: any) {
+        logger.error(`Error at path ${req.path}`);
+        logger.error(error);
+        res.status(500);
+        res.send(error);
+    }
+});
+
+defaultSetting.get('/admin/databackup', async (req: Request, res: Response) => {
+    try {
+        const authorization = req.query.id as string;
+        const headerCheck = checkHeader(`Bearer ${authorization}`);
+        if (!headerCheck.valid) {
+            res.status(401);
+        } else {
+            const dataBackupBuffer = await getBackupFile();
+            res.setHeader('Content-Disposition', 'attachment; filename=databackup.sql.gz');
+            res.setHeader('Content-Type', 'application/gzip');
+            res.send(dataBackupBuffer);
+        }
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
         logger.error(error);

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    Box, Text, Input, SimpleGrid, useToast,
+    Box, Text, Input, Link, SimpleGrid, useToast,
 } from '@chakra-ui/react';
 import { UserContext } from '../../contexts/UserContext';
 import { DefaultSetting } from '../../../../src/typedefs/defaultSetting';
@@ -39,71 +39,83 @@ function SiteSettings() {
     }
 
     return (
-        <SimpleGrid columns={2} spacing={5} maxWidth={700}>
-            {
-                // eslint-disable-next-line arrow-body-style
-                defaultSettings?.map((setting) => {
-                    let settingInput;
-                    if (setting.settingType === 'boolean') {
-                        const newValue = invertBooleanString(setting.settingValue);
-                        settingInput = (
-                            <WrappedSwitchInput
-                                maxWidth={150}
-                                defaultChecked={setting.settingValue === 'true'}
-                                wrapperText={setting.settingDisplayName}
-                                toastMessage={`Flipped setting ${setting.settingDisplayName}`}
-                                onSwitchChange={
-                                    async () => {
-                                        const updatedSetting = {
-                                            settingId: setting.settingId,
-                                            settingName: setting.settingName,
-                                            settingType: setting.settingType,
-                                            settingValue: newValue,
-                                            settingDisplayName: setting.settingDisplayName,
-                                        };
-                                        await updateDefaultSetting(state.token, updatedSetting);
-                                    }
-                                }
-                            />
-                        );
-                    } else if (setting.settingType === 'string') {
-                        settingInput = (
-                            <Box maxWidth={250}>
-                                <Text size="sm">{setting.settingDisplayName}</Text>
-                                <Input
-                                    variant="outline"
-                                    colorScheme="orange"
-                                    placeholder={setting.settingValue}
-                                    onChange={
-                                        async (e) => {
+        <Box>
+            <SimpleGrid columns={2} spacing={5} maxWidth={700}>
+                {
+                    // eslint-disable-next-line arrow-body-style
+                    defaultSettings?.map((setting) => {
+                        let settingInput;
+                        if (setting.settingType === 'boolean') {
+                            const newValue = invertBooleanString(setting.settingValue);
+                            settingInput = (
+                                <WrappedSwitchInput
+                                    maxWidth={150}
+                                    defaultChecked={setting.settingValue === 'true'}
+                                    wrapperText={setting.settingDisplayName}
+                                    toastMessage={`Flipped setting ${setting.settingDisplayName}`}
+                                    onSwitchChange={
+                                        async () => {
                                             const updatedSetting = {
                                                 settingId: setting.settingId,
                                                 settingName: setting.settingName,
                                                 settingType: setting.settingType,
-                                                settingValue: e.target.value,
+                                                settingValue: newValue,
                                                 settingDisplayName: setting.settingDisplayName,
                                             };
                                             await updateDefaultSetting(state.token, updatedSetting);
-                                            toast({
-                                                containerStyle: {
-                                                    background: 'orange',
-                                                },
-                                                // eslint-disable-next-line max-len
-                                                description: `${setting.settingDisplayName} set to ${e.target.value}`,
-                                                status: 'success',
-                                                duration: 2000,
-                                                isClosable: true,
-                                            });
                                         }
                                     }
                                 />
-                            </Box>
-                        );
-                    }
-                    return settingInput;
-                })
+                            );
+                        } else if (setting.settingType === 'string') {
+                            settingInput = (
+                                <Box maxWidth={250}>
+                                    <Text size="sm">{setting.settingDisplayName}</Text>
+                                    <Input
+                                        variant="outline"
+                                        colorScheme="orange"
+                                        placeholder={setting.settingValue}
+                                        onChange={
+                                            async (e) => {
+                                                const updatedSetting = {
+                                                    settingId: setting.settingId,
+                                                    settingName: setting.settingName,
+                                                    settingType: setting.settingType,
+                                                    settingValue: e.target.value,
+                                                    settingDisplayName: setting.settingDisplayName,
+                                                };
+                                                await updateDefaultSetting(state.token, updatedSetting);
+                                                toast({
+                                                    containerStyle: {
+                                                        background: 'orange',
+                                                    },
+                                                    // eslint-disable-next-line max-len
+                                                    description: `${setting.settingDisplayName} set to ${e.target.value}`,
+                                                    status: 'success',
+                                                    duration: 2000,
+                                                    isClosable: true,
+                                                });
+                                            }
+                                        }
+                                    />
+                                </Box>
+                            );
+                        }
+                        return settingInput;
+                    })
+                }
+            </SimpleGrid>
+            {
+                (state.user?.memberType === 'Admin') && (
+                    <Link
+                        href={`${process.env.REACT_APP_API_URL}/api/defaultSettings/admin/dataBackup?id=${state.token}`}
+                        mt={4}
+                    >
+                        Download all data as mysql compatible restore file
+                    </Link>
+                )
             }
-        </SimpleGrid>
+        </Box>
     );
 }
 export default SiteSettings;
