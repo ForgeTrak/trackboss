@@ -3,13 +3,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
     Button, Grid, GridItem, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, Text, useDisclosure, useToast,
+    ModalOverlay, Text, useDisclosure,
 } from '@chakra-ui/react';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
 import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import Select from 'react-select';
+import { useAppToast } from '../../hooks/useAppToast';
 import { UserContext } from '../../contexts/UserContext';
 
 import { Member, PatchMemberRequest } from '../../../../src/typedefs/member';
@@ -35,7 +36,7 @@ export default function EditMemberModal(props: EditMemberModalProps) {
         onOpen,
         onClose,
     } = useDisclosure();
-    const toast = useToast();
+    const toast = useAppToast();
     const [streetAddress, setStreetAddress] = useState<string>(selectedMember.address);
     const [city, setCity] = useState<string>(selectedMember.city);
     const [memberAddressState, setMemberAddressState] = useState<string>(selectedMember.state);
@@ -329,16 +330,9 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                                         await updateMembership(state.token, selectedMember.membershipId, membershipUpdate);
                                     }
                                     props.refreshMemberFunction();
-                                    toast({
-                                        containerStyle: {
-                                            background: 'orange',
-                                        },
-                                        // eslint-disable-next-line max-len
+                                    toast.success({
                                         title: 'Member info updated',
                                         description: `${JSON.stringify(selectedMember)}`,
-                                        status: 'success',
-                                        duration: 5000,
-                                        isClosable: true,
                                     });
                                     onClose();
                                 }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
     Box, Button, Divider, Heading, Input, Modal, ModalContent, ModalFooter, ModalOverlay,
-    NumberInput, NumberInputField, SimpleGrid, Text, useToast,
+    NumberInput, NumberInputField, SimpleGrid, Text,
 } from '@chakra-ui/react';
+import { useAppToast } from '../../hooks/useAppToast';
 import { createEventJob } from '../../controller/eventJob';
 import { createJobType } from '../../controller/jobType';
 import { JobType, PostNewJobTypeRequest } from '../../../../src/typedefs/jobType';
@@ -28,7 +29,7 @@ export default function AddJobTypeModal(props: alertProps) {
     const [mealTicketValue, setMealTicketValue] = useState<boolean>(false);
     const [count, setCount] = useState<number>(1);
     const [sortOrder, setSortOrder] = useState<number>(99);
-    const toast = useToast();
+    const toast = useAppToast();
     return (
         <Modal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <ModalOverlay />
@@ -153,15 +154,9 @@ export default function AddJobTypeModal(props: alertProps) {
                                     jobTypeId: newJobType.jobTypeId,
                                     count,
                                 });
-                                toast({
-                                    containerStyle: {
-                                        background: 'orange',
-                                    },
+                                toast.success({
                                     title: `${newJobType.title} added. (job Type id ${newJobType.jobTypeId}`,
                                     description: JSON.stringify(newEventJob),
-                                    status: 'success',
-                                    duration: 5000,
-                                    isClosable: true,
                                 });
                                 props.addAction();
                                 props.onClose();

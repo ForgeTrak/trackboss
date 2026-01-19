@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    Box, Text, Input, Link, SimpleGrid, useToast,
+    Box, Text, Input, Link, SimpleGrid,
 } from '@chakra-ui/react';
+import { useAppToast } from '../../hooks/useAppToast';
 import { UserContext } from '../../contexts/UserContext';
 import { DefaultSetting } from '../../../../src/typedefs/defaultSetting';
 import { getDefaultSettingsList, updateDefaultSetting } from '../../controller/defaultSettings';
@@ -11,7 +12,7 @@ function SiteSettings() {
     const { state } = useContext(UserContext);
     const [defaultSettings, setDefaultSettings] = useState<DefaultSetting[]>();
 
-    const toast = useToast();
+    const toast = useAppToast();
 
     async function getSettingsData() {
         let allSettings : DefaultSetting[] = [];
@@ -85,15 +86,10 @@ function SiteSettings() {
                                                     settingDisplayName: setting.settingDisplayName,
                                                 };
                                                 await updateDefaultSetting(state.token, updatedSetting);
-                                                toast({
-                                                    containerStyle: {
-                                                        background: 'orange',
-                                                    },
+                                                toast.success({
                                                     // eslint-disable-next-line max-len
                                                     description: `${setting.settingDisplayName} set to ${e.target.value}`,
-                                                    status: 'success',
                                                     duration: 2000,
-                                                    isClosable: true,
                                                 });
                                             }
                                         }

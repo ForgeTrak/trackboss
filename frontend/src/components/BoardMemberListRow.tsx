@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ExpanderComponentProps } from 'react-data-table-component';
-import { Box, useToast } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import { useAppToast } from '../hooks/useAppToast';
 import MemberSelector from './shared/MemberSelector';
 import { BoardMember, PatchBoardMemberRequest } from '../../../src/typedefs/boardMember';
 import { updateBoardMember } from '../controller/boardMember';
@@ -16,7 +17,7 @@ interface BoardMemberRowProps extends ExpanderComponentProps<BoardMember> {
 export default function BoardMemberListRow(props:BoardMemberRowProps) {
     const { state } = useContext(UserContext);
     const [selectedOption, setSelectedOption] = useState<any>();
-    const toast = useToast();
+    const toast = useAppToast();
 
     useEffect(() => {
         async function updateBoardMemberRow() {
@@ -29,15 +30,8 @@ export default function BoardMemberListRow(props:BoardMemberRowProps) {
                 try {
                     await updateBoardMember(state.token, props.data.boardId, updateBoard);
                 } catch (error) {
-                    toast({
-                        containerStyle: {
-                            background: 'orange',
-                        },
-                        // eslint-disable-next-line max-len
+                    toast.error({
                         title: `Unable to change board member ${props.data.title}`,
-                        status: 'error',
-                        duration: 5000,
-                        isClosable: true,
                     });
                 }
                 if (props.updateCallback) {
