@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import moment from 'moment';
 import { Calendar, DateLocalizer, momentLocalizer, SlotInfo, Views } from 'react-big-calendar';
-import { useDisclosure, Box, Button } from '@chakra-ui/react';
+import { Box, Button } from '@chakra-ui/react';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import SelectedEventModal from './SelectedEventModal';
 import FamilySignUpModal from './FamilySignUpModal';
@@ -19,9 +20,9 @@ const localizer: DateLocalizer = momentLocalizer(moment);
 
 export default function EventCalendar() {
     const { state } = useContext(UserContext);
-    const { onClose: onViewEventClose, isOpen: isViewEventOpen, onOpen: onViewEventOpen } = useDisclosure();
-    const { onClose: onSignUpClose, isOpen: isSignUpOpen } = useDisclosure();
-    const { onClose: onCreateClose, isOpen: isCreateOpen, onOpen: onCreateOpen } = useDisclosure();
+    const { onClose: onViewEventClose, isOpen: isViewEventOpen, onOpen: onViewEventOpen } = useAppDisclosure();
+    const { onClose: onSignUpClose, isOpen: isSignUpOpen } = useAppDisclosure();
+    const { onClose: onCreateClose, isOpen: isCreateOpen, onOpen: onCreateOpen } = useAppDisclosure();
 
     const [selectedEvent, setSelectedEvent] = useState<Event | Job>();
     const [familyMembers, setFamilyMembers] = useState<any>();

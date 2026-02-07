@@ -1,9 +1,10 @@
 import {
-    Box, Button, Input, NumberInput, NumberInputField, SimpleGrid, Text, useDisclosure,
+    Box, Button, Input, NumberInput, NumberInputField, SimpleGrid, Text,
 } from '@chakra-ui/react';
 import React, { useContext, useState } from 'react';
 import { BsTrashFill } from 'react-icons/bs';
 import { useAppToast } from '../hooks/useAppToast';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 
 import { EventJob } from '../../../src/typedefs/eventJob';
 import { UserContext } from '../contexts/UserContext';
@@ -41,7 +42,7 @@ function SignupSheetJobsRow(props: any) {
     const [sortOrder, setSortOrder] = useState<number>(data.sortOrder);
     const [jobDayNumber, setJobDayNumber] = useState<number>(data.jobDayNumber);
     const [dirty, setDirty] = useState<boolean>(false);
-    const { onClose, isOpen, onOpen } = useDisclosure();
+    const { onClose, isOpen, onOpen } = useAppDisclosure();
 
     const jobCopy = JSON.parse(JSON.stringify(data));
 

@@ -2,9 +2,10 @@
 /* eslint-disable react/no-unused-prop-types */
 import _ from 'lodash';
 import moment from 'moment';
-import { Heading, VStack, useDisclosure } from '@chakra-ui/react';
+import { Heading, VStack } from '@chakra-ui/react';
 import React, { createRef, RefObject, useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { Job } from '../../../src/typedefs/job';
 import { UserContext } from '../contexts/UserContext';
 import { getJobList, modifyJobPoints, deleteJob, removeSignup } from '../controller/job';
@@ -74,7 +75,7 @@ export default function WorkPointsHistory() {
     const [workPointsEarned, setWorkPointsEarned] = useState<number>(0);
     const [workPointsThreshold, setWorkPointsThreshold] = useState<number>(0);
     const [selectedJob, setSelectedJob] = useState<Job>();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useAppDisclosure();
 
     const { state } = useContext(UserContext);
 

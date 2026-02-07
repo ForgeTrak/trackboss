@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    Box, Button, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, VStack, useDisclosure,
+    Box, Button, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, VStack,
 } from '@chakra-ui/react';
 import { BsChevronDown } from 'react-icons/bs';
 import _ from 'lodash';
 import DataTable, { Media } from 'react-data-table-component';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
+
 import { UserContext } from '../contexts/UserContext';
 import { getJobTypeListEventType } from '../controller/jobType';
 import { getEventTypeList } from '../controller/eventType';
@@ -25,13 +27,13 @@ function EventSignupSheet() {
         isOpen: isAddEventTypeOpen,
         onOpen: onAddEventTypeOpen,
         onClose: onAddEventTypeClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
 
     const {
         isOpen: isAddJobTypeOpen,
         onOpen: onAddJobTypeOpen,
         onClose: onAddJobTypeClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
 
     async function getEventTypeData() {
         if (selectedEventType) {

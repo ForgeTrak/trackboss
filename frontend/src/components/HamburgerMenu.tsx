@@ -5,7 +5,6 @@ import {
     DrawerOverlay,
     DrawerContent,
     Button,
-    useDisclosure,
     IconButton,
     VStack,
     StackDivider,
@@ -20,6 +19,8 @@ import { HiUsers, HiCog } from 'react-icons/hi';
 import { IoIosArrowBack } from 'react-icons/io';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
+
 interface pageProps {
     activeButtonId: number,
     admin: boolean,
@@ -27,7 +28,7 @@ interface pageProps {
 }
 
 export default function HamburgerMenu(props: pageProps) {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useAppDisclosure();
     const history = useNavigate();
     const activeButtonStyle = {
         bg: 'orange',

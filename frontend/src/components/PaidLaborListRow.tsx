@@ -2,9 +2,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ExpanderComponentProps } from 'react-data-table-component';
 import _ from 'lodash';
-import { Box, Button, ButtonGroup, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup } from '@chakra-ui/react';
 import { BsTrash2, BsFillTelephoneFill } from 'react-icons/bs';
 
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { updatePaidLabor, deletePaidLabor, createPaidLabor } from '../controller/paidLabor';
 import { UserContext } from '../contexts/UserContext';
 import { PaidLabor } from '../../../src/typedefs/paidLabor';
@@ -17,7 +18,7 @@ interface PaidLaborRowProps extends ExpanderComponentProps<PaidLabor> {
 
 export default function PaidLaborListRow(props: PaidLaborRowProps) {
     const { state } = useContext(UserContext);
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useAppDisclosure();
 
     return (
         <Box>

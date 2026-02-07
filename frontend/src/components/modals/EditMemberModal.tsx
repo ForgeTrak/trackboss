@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
     Button, Grid, GridItem, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, Text, useDisclosure,
+    ModalOverlay, Text,
 } from '@chakra-ui/react';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
@@ -11,6 +11,7 @@ import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import Select from 'react-select';
 import { useAppToast } from '../../hooks/useAppToast';
+import { useAppDisclosure } from '../../hooks/useAppDisclosure';
 import { UserContext } from '../../contexts/UserContext';
 
 import { Member, PatchMemberRequest } from '../../../../src/typedefs/member';
@@ -35,7 +36,7 @@ export default function EditMemberModal(props: EditMemberModalProps) {
         isOpen,
         onOpen,
         onClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
     const toast = useAppToast();
     const [streetAddress, setStreetAddress] = useState<string>(selectedMember.address);
     const [city, setCity] = useState<string>(selectedMember.city);

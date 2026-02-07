@@ -1,6 +1,7 @@
-import { Heading, HStack, Text, useDisclosure, VStack } from '@chakra-ui/react';
+import { Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { Bill } from '../../../src/typedefs/bill';
 import { UserContext } from '../contexts/UserContext';
 import { getBillsForMembership } from '../controller/billing';
@@ -11,7 +12,7 @@ export default function DuesAndWaivers() {
     const [allBills, setAllBills] = useState<Bill[]>();
     const [selectedBill, setSelectedBill] = useState<Bill>();
 
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useAppDisclosure();
 
     async function getMembershipBillData() {
         const membershipId = state.user?.membershipId || -1;

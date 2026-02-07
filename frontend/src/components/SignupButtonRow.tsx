@@ -1,11 +1,12 @@
 import {
     Button, ButtonGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
-    SimpleGrid, useDisclosure,
+    SimpleGrid,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import { BsCurrencyDollar, BsTrash2 } from 'react-icons/bs';
 import moment from 'moment-timezone';
 
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { signupForJob, removeSignup, setPaidState } from '../controller/job';
 import { UserContext } from '../contexts/UserContext';
 import MemberSelector from './shared/MemberSelector';
@@ -24,13 +25,13 @@ export default function SignupButtonRow(props: any) {
         isOpen: isNonMemberOpen,
         onOpen: onNonMemberOpen,
         onClose: onNonMemberClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
 
     const {
         isOpen: isEditPointsOpen,
         onOpen: onEditPointsOpen,
         onClose: onEditPointsClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
 
     const [jobId] = useState(props.data.jobId);
 
