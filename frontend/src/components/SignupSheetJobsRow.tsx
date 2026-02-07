@@ -1,8 +1,10 @@
 import {
-    Box, Button, Input, NumberInput, NumberInputField, SimpleGrid, Text, useDisclosure, useToast,
+    Box, Button, Input, NumberInput, NumberInputField, SimpleGrid, Text, useDisclosure,
 } from '@chakra-ui/react';
 import React, { useContext, useState } from 'react';
 import { BsTrashFill } from 'react-icons/bs';
+import { useAppToast } from '../hooks/useAppToast';
+
 import { EventJob } from '../../../src/typedefs/eventJob';
 import { UserContext } from '../contexts/UserContext';
 import { getEventJob, updateEventJob, deleteEventJob } from '../controller/eventJob';
@@ -29,7 +31,7 @@ function SignupSheetJobsRow(props: any) {
     // this is a JobType we just refer to it like an any to keep TS happy.
     let { data } = props;
 
-    const toast = useToast();
+    const toast = useAppToast();
 
     const [description, setDescription] = useState<string>(data.title);
     const [pointValue, setPointValue] = useState<number>(data.pointValue);
@@ -165,16 +167,10 @@ function SignupSheetJobsRow(props: any) {
                             await updateJobType(state.token, jobCopy.jobTypeId, jobCopy);
                         }
                         setDirty(false);
-                        toast({
-                            containerStyle: {
-                                background: 'orange',
-                            },
+                        toast.success({
                             // eslint-disable-next-line max-len
                             title: `${jobCopy.title} updated. (Job Type ID ${jobCopy.jobTypeId} user ${state.user?.email})`,
                             description: JSON.stringify(jobCopy),
-                            status: 'success',
-                            duration: 5000,
-                            isClosable: true,
                         });
                         // call back to EventSignupSheet to clean it up.
                         props.refreshData();

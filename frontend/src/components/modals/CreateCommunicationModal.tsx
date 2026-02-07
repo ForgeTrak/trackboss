@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import {
     Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Button, Checkbox, CheckboxGroup, Divider,
     Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Select,
-    Text, useToast,
+    Text,
 } from '@chakra-ui/react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useAppToast } from '../../hooks/useAppToast';
 
 import { MembershipTag } from '../../../../src/typedefs/membershipTag';
 import { createCommunication } from '../../controller/communication';
@@ -62,7 +63,7 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
         );
         return tagCheckBox;
     });
-    const toast = useToast();
+    const toast = useAppToast();
 
     return (
         <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
@@ -190,15 +191,9 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                                 setSelectedTags([]);
                                 setTotalCount(0);
                                 props.addAction();
-                                toast({
-                                    containerStyle: {
-                                        background: 'orange',
-                                    },
+                                toast.success({
                                     title: 'Member communication queued for sending.',
                                     description: `Subject: ${communication.subject} via ${communication.mechanism}`,
-                                    status: 'success',
-                                    duration: 5000,
-                                    isClosable: true,
                                 });
                                 props.onClose();
                             }

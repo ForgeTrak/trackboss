@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { ChakraProvider, Center, SimpleGrid, VStack, useToast } from '@chakra-ui/react';
+import { ChakraProvider, Center, SimpleGrid, VStack } from '@chakra-ui/react';
+import { useAppToast } from '../hooks/useAppToast';
 import theme from '../theme';
 import Header from '../components/Header';
 import WorkPointsCard from '../components/WorkPointsCard';
@@ -39,7 +40,7 @@ async function getWorkPointsPercentage(token: string, membershipId: number) {
 
 function Dashboard() {
     const { state } = useContext(UserContext);
-    const toast = useToast();
+    const toast = useAppToast();
     const [eventCardProps, setEventCardProps] = useState<any>();
     const [percent, setPercent] = useState<number>(0);
     const [gateCode, setGateCode] = useState<string>('');
@@ -159,16 +160,9 @@ function Dashboard() {
                                                 // eslint-disable-next-line no-console
                                                 console.error(error);
                                             }
-                                            toast({
-                                                containerStyle: {
-                                                    background: 'orange',
-                                                },
-                                                // eslint-disable-next-line max-len
+                                            toast.success({
                                                 title: 'Signed in!',
                                                 description: `You've been signed into ${eventCardProps.title}`,
-                                                status: 'success',
-                                                duration: 5000,
-                                                isClosable: true,
                                             });
                                         }
                                     }

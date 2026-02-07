@@ -21,7 +21,6 @@ import {
     UnorderedList,
     ListItem,
     ButtonGroup,
-    useToast,
     Switch,
     Tag,
     TagLabel,
@@ -33,6 +32,7 @@ import Select from 'react-select';
 import { BsTags } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import { useAppToast } from '../hooks/useAppToast';
 import { Member } from '../../../src/typedefs/member';
 import { Bike } from '../../../src/typedefs/bike';
 import { getMember, getMembersByMembership, resetMemberPassword, updateMember } from '../controller/member';
@@ -49,7 +49,7 @@ interface modalProps {
 }
 
 export default function MemberSummaryModal(props: modalProps) {
-    const toast = useToast();
+    const toast = useAppToast();
     const navigate = useNavigate();
     const navigateToMyAccount = () => {
         const path = '/settings';
@@ -434,13 +434,17 @@ export default function MemberSummaryModal(props: modalProps) {
                                                         onClick={
                                                             async () => {
                                                                 const res = await resetMemberPassword(state.token, selectedMember.memberId);
-                                                                toast({
-                                                                    variant: 'subtle',
-                                                                    title: `${selectedMember.email} set to "${res.value}"`,
-                                                                    status: res ? 'success' : 'error',
-                                                                    duration: 10000,
-                                                                    isClosable: true,
-                                                                });
+                                                                if (res) {
+                                                                    toast.success({
+                                                                        title: `${selectedMember.email} set to "${res.value}"`,
+                                                                        duration: 10000,
+                                                                    });
+                                                                } else {
+                                                                    toast.error({
+                                                                        title: `Failed to reset password for ${selectedMember.email}`,
+                                                                        duration: 10000,
+                                                                    });
+                                                                }
                                                             }
                                                         }
                                                     >
@@ -462,13 +466,17 @@ export default function MemberSummaryModal(props: modalProps) {
                                                             onClick={
                                                                 async () => {
                                                                     const res = await deactivateMember(deactivationReason);
-                                                                    toast({
-                                                                        variant: 'subtle',
-                                                                        title: res ? 'Member Deactivated.' : 'Action Failed',
-                                                                        status: res ? 'success' : 'error',
-                                                                        duration: 3000,
-                                                                        isClosable: true,
-                                                                    });
+                                                                    if (res) {
+                                                                        toast.success({
+                                                                            title: 'Member Deactivated.',
+                                                                            duration: 3000,
+                                                                        });
+                                                                    } else {
+                                                                        toast.error({
+                                                                            title: 'Action Failed',
+                                                                            duration: 3000,
+                                                                        });
+                                                                    }
                                                                 }
                                                             }
                                                         >

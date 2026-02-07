@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unused-prop-types */
 import _ from 'lodash';
 import moment from 'moment';
-import { Heading, VStack, useDisclosure, useToast } from '@chakra-ui/react';
+import { Heading, VStack, useDisclosure } from '@chakra-ui/react';
 import React, { createRef, RefObject, useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { Job } from '../../../src/typedefs/job';
@@ -141,7 +141,6 @@ export default function WorkPointsHistory() {
         (state.storedUser?.memberType === 'Admin' || state.user?.memberType === 'Admin') &&
         (userActive)
     );
-    const toast = useToast();
     return (
         <VStack bg="white">
             <YearsDropDown

@@ -3,8 +3,9 @@ import React, { useContext } from 'react';
 import {
     Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
-    NumberInputStepper, SimpleGrid, useToast,
+    NumberInputStepper, SimpleGrid,
 } from '@chakra-ui/react';
+import { useAppToast } from '../../hooks/useAppToast';
 import { Job } from '../../../../src/typedefs/job';
 import { modifyJobPoints, removeSignup } from '../../controller/job';
 import { UserContext } from '../../contexts/UserContext';
@@ -20,7 +21,7 @@ interface EditPointsModalProps {
 export default function ExportPointsModal(props: EditPointsModalProps) {
     const { selectedJob } = props;
     const { state } = useContext(UserContext);
-    const toast = useToast();
+    const toast = useAppToast();
 
     return (
         <Modal closeOnOverlayClick={false} isOpen={props.isOpen} onClose={props.onClose}>
@@ -40,17 +41,9 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
                                     // eslint-disable-next-line max-len
                                     await modifyJobPoints(state.token, selectedJob.jobId, parseFloat(changeValue) || 0);
                                     props.refreshPoints();
-                                    toast({
-                                        containerStyle: {
-                                            background: 'orange',
-                                        },
-                                        // eslint-disable-next-line max-len
+                                    toast.success({
                                         title: 'Points updated!',
-                                        // eslint-disable-next-line max-len
                                         description: `${selectedJob.member} ${selectedJob.title}, ${changeValue}`,
-                                        status: 'success',
-                                        duration: 5000,
-                                        isClosable: true,
                                     });
                                 }
                             }
@@ -80,17 +73,9 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
                             async () => {
                                 await removeSignup(state.token, selectedJob?.jobId || 0);
                                 props.refreshPoints();
-                                toast({
-                                    containerStyle: {
-                                        background: 'red',
-                                    },
-                                    // eslint-disable-next-line max-len
+                                toast.error({
                                     title: 'Entry removed',
-                                    // eslint-disable-next-line max-len
                                     description: `${selectedJob?.member} ${selectedJob?.title}, ${selectedJob?.jobId}`,
-                                    status: 'success',
-                                    duration: 5000,
-                                    isClosable: true,
                                 });
                                 props.onClose();
                             }

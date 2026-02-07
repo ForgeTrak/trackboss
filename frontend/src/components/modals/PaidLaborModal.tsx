@@ -3,10 +3,10 @@ import _ from 'lodash';
 
 import {
     Button, Divider, Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Text,
-    useToast,
 } from '@chakra-ui/react';
 import PhoneInput from 'react-phone-number-input/input';
 
+import { useAppToast } from '../../hooks/useAppToast';
 import { PaidLabor } from '../../../../src/typedefs/paidLabor';
 import { createPaidLabor, updatePaidLabor } from '../../controller/paidLabor';
 
@@ -26,7 +26,7 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
     const [phone, setPhone] = useState<string>();
     const [email, setEmail] = useState<string>('');
 
-    const toast = useToast();
+    const toast = useAppToast();
 
     const chakraStyleForNonChakra = {
         width: '70%',
@@ -150,16 +150,10 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
                                     // It's new, so add it to the back end, yay!
                                     await createPaidLabor(state.token, laborerEntry);
                                 }
-                                toast({
-                                    containerStyle: {
-                                        background: 'orange',
-                                    },
-                                    // eslint-disable-next-line max-len
+                                toast.success({
                                     title: 'Paid labor info updated',
                                     description: `${JSON.stringify(laborerEntry)}`,
-                                    status: 'success',
                                     duration: 2500,
-                                    isClosable: true,
                                 });
                                 props.onClose();
                             }

@@ -3,11 +3,12 @@ import {
     Button,
     IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
-    NumberInputStepper, useDisclosure, useToast, VStack,
+    NumberInputStepper, useDisclosure, VStack,
 } from '@chakra-ui/react';
 import { BsPlus } from 'react-icons/bs';
 import moment from 'moment';
 import DatePicker from 'react-date-picker';
+import { useAppToast } from '../hooks/useAppToast';
 import { createJobType } from '../controller/jobType';
 import { JobType, PostNewJobTypeRequest } from '../../../src/typedefs/jobType';
 import { Job, PostNewJobRequest } from '../../../src/typedefs/job';
@@ -34,7 +35,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
     const [dirty, setDirty] = useState<boolean>(false);
     const [workDate, setWorkDate] = useState<any>(new Date());
     const [selectedOption, setSelectedOption] = useState<any>();
-    const toast = useToast();
+    const toast = useAppToast();
     let addButton =
         (
             <IconButton
@@ -167,16 +168,9 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                                     setPointValue(0);
                                     setDescription('');
                                     onClose();
-                                    toast({
-                                        containerStyle: {
-                                            background: 'orange',
-                                        },
-                                        // eslint-disable-next-line max-len
+                                    toast.success({
                                         title: 'Points entry created!',
                                         description: `${JSON.stringify(createdJob)}`,
-                                        status: 'success',
-                                        duration: 5000,
-                                        isClosable: true,
                                     });
                                 }
                             }
