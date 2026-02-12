@@ -17,39 +17,39 @@ export default function DeleteAlert(props: alertProps) {
     return (
         <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
-                    textAlign="center"
+                textAlign="center"
+            >
+                Are you sure?
+            </Heading>
+            <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
+            <Divider />
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
+                        }
+                    }
                 >
-                    Are you sure?
-                </Heading>
-                <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
-                <Divider />
-                <AppModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
-                            }
+                    Cancel
+                </Button>
+                <Button
+                    color="red"
+                    variant="ghost"
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.removeMethod();
+                            props.onClose();
                         }
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        color="red"
-                        variant="ghost"
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.removeMethod();
-                                props.onClose();
-                            }
-                        }
-                    >
-                        Delete
-                    </Button>
-                </AppModalFooter>
+                    }
+                >
+                    Delete
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

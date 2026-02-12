@@ -4,12 +4,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
     Button, Grid, GridItem, Input, Text,
 } from '@chakra-ui/react';
-import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
 import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import Select from 'react-select';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 import { useAppToast } from '../../hooks/useAppToast';
 import { useAppDisclosure } from '../../hooks/useAppDisclosure';
 import { UserContext } from '../../contexts/UserContext';
@@ -81,268 +81,268 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                 Edit
             </Button>
             <AppModal isOpen={isOpen} onClose={onClose}>
-                    <AppModalCloseButton />
-                    <AppModalHeader>
-                        {`Edit member info - ${selectedMember.firstName} ${props.member.lastName}`}
-                    </AppModalHeader>
-                    <AppModalBody>
-                        <Grid
-                            templateRows={`repeat(${rowCount}, 1fr)`}
-                            templateColumns="repeat(2, 1fr)"
-                            columnGap={1}
-                            rowGap={1}
-                        >
-                            <GridItem colSpan={1}>
-                                <Text>First Name</Text>
-                                <Input
-                                    value={firstName}
-                                    size="md"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setFirstName(e.target.value);
-                                        }
+                <AppModalCloseButton />
+                <AppModalHeader>
+                    {`Edit member info - ${selectedMember.firstName} ${props.member.lastName}`}
+                </AppModalHeader>
+                <AppModalBody>
+                    <Grid
+                        templateRows={`repeat(${rowCount}, 1fr)`}
+                        templateColumns="repeat(2, 1fr)"
+                        columnGap={1}
+                        rowGap={1}
+                    >
+                        <GridItem colSpan={1}>
+                            <Text>First Name</Text>
+                            <Input
+                                value={firstName}
+                                size="md"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setFirstName(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={1}>
-                                <Text>Last Name</Text>
-                                <Input
-                                    value={lastName}
-                                    size="md"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setLastName(e.target.value);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={1}>
+                            <Text>Last Name</Text>
+                            <Input
+                                value={lastName}
+                                size="md"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setLastName(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2} display={!props.isFamilyMember ? 'block' : 'none'}>
-                                <Text>Membership Type</Text>
-                                <MembershipTypeSelector
-                                    isAdmin={state.user?.memberType === 'Admin'}
-                                    currentType={selectedMember.membershipType}
-                                    setSelectedOption={
-                                        (mt: number) => {
-                                            setMembershipType(mt);
-                                            setDirty(true);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2} display={!props.isFamilyMember ? 'block' : 'none'}>
+                            <Text>Membership Type</Text>
+                            <MembershipTypeSelector
+                                isAdmin={state.user?.memberType === 'Admin'}
+                                currentType={selectedMember.membershipType}
+                                setSelectedOption={
+                                    (mt: number) => {
+                                        setMembershipType(mt);
+                                        setDirty(true);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={1}>
-                                <Text>DOB</Text>
-                                <DatePicker
-                                    onChange={
-                                        (date:any) => {
-                                            setBirthDate(date);
-                                            setDirty(true);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={1}>
+                            <Text>DOB</Text>
+                            <DatePicker
+                                onChange={
+                                    (date:any) => {
+                                        setBirthDate(date);
+                                        setDirty(true);
                                     }
-                                    value={birthdate instanceof Date && !Number.isNaN(birthdate.getTime()) ? birthdate : null}
-                                    required
-                                    maxDate={new Date()}
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2} display={!props.isFamilyMember ? 'block' : 'none'}>
-                                <Text>Street Address</Text>
-                                <Input
-                                    value={streetAddress}
-                                    size="md"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setStreetAddress(e.target.value);
-                                        }
+                                }
+                                value={birthdate instanceof Date && !Number.isNaN(birthdate.getTime()) ? birthdate : null}
+                                required
+                                maxDate={new Date()}
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2} display={!props.isFamilyMember ? 'block' : 'none'}>
+                            <Text>Street Address</Text>
+                            <Input
+                                value={streetAddress}
+                                size="md"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setStreetAddress(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={1} display={!props.isFamilyMember ? 'block' : 'none'}>
-                                <Text>City</Text>
-                                <Input
-                                    value={city}
-                                    size="md"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setCity(e.target.value);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={1} display={!props.isFamilyMember ? 'block' : 'none'}>
+                            <Text>City</Text>
+                            <Input
+                                value={city}
+                                size="md"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setCity(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem display={!props.isFamilyMember ? 'block' : 'none'}>
-                                <Text>State</Text>
-                                <Input
-                                    value={memberAddressState}
-                                    size="md"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setMemberAddressState(e.target.value);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem display={!props.isFamilyMember ? 'block' : 'none'}>
+                            <Text>State</Text>
+                            <Input
+                                value={memberAddressState}
+                                size="md"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setMemberAddressState(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem display={!props.isFamilyMember ? 'block' : 'none'}>
-                                <Text>Zip</Text>
-                                <Input
-                                    value={zip}
-                                    size="md"
-                                    width="auto"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            setZip(e.target.value);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem display={!props.isFamilyMember ? 'block' : 'none'}>
+                            <Text>Zip</Text>
+                            <Input
+                                value={zip}
+                                size="md"
+                                width="auto"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        setZip(e.target.value);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2} display={props.hasEmail ? 'block' : 'none'}>
-                                <Text>email (Changing this changes the login email too)</Text>
-                                <Text color="red" size="xs" hidden={emailValid}>
-                                    email must be a valid email address
-                                </Text>
-                                <Input
-                                    size="md"
-                                    value={email}
-                                    onChange={
-                                        (e) => {
-                                            const typedEmail = e.target.value;
-                                            setEmailValid(isEmail(typedEmail));
-                                            setEmail(typedEmail);
-                                            setDirty(emailValid);
-                                        }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2} display={props.hasEmail ? 'block' : 'none'}>
+                            <Text>email (Changing this changes the login email too)</Text>
+                            <Text color="red" size="xs" hidden={emailValid}>
+                                email must be a valid email address
+                            </Text>
+                            <Input
+                                size="md"
+                                value={email}
+                                onChange={
+                                    (e) => {
+                                        const typedEmail = e.target.value;
+                                        setEmailValid(isEmail(typedEmail));
+                                        setEmail(typedEmail);
+                                        setDirty(emailValid);
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2}>
-                                <Text>Phone</Text>
-                                <Input
-                                    value={phoneNumber}
-                                    size="md"
-                                    minLength={12}
-                                    maxLength={12}
-                                    pattern="^\+1\d{10}$"
-                                    onChange={
-                                        (e) => {
-                                            setDirty(true);
-                                            const typedPhoneNumber = e.target.value;
-                                            if (typedPhoneNumber) {
-                                                if (!typedPhoneNumber.startsWith('+1')) {
-                                                    setPhoneNumber(`+1${typedPhoneNumber}`);
-                                                } else {
-                                                    setPhoneNumber(typedPhoneNumber);
-                                                }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2}>
+                            <Text>Phone</Text>
+                            <Input
+                                value={phoneNumber}
+                                size="md"
+                                minLength={12}
+                                maxLength={12}
+                                pattern="^\+1\d{10}$"
+                                onChange={
+                                    (e) => {
+                                        setDirty(true);
+                                        const typedPhoneNumber = e.target.value;
+                                        if (typedPhoneNumber) {
+                                            if (!typedPhoneNumber.startsWith('+1')) {
+                                                setPhoneNumber(`+1${typedPhoneNumber}`);
+                                            } else {
+                                                setPhoneNumber(typedPhoneNumber);
                                             }
                                         }
                                     }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2}>
-                                <Text>Dependent Status</Text>
-                                <Select
-                                    isDisabled={selectedMember.memberType.toLowerCase() === 'membership admin'}
-                                    placeholder={selectedMember.dependentStatus}
-                                    options={
-                                        [
-                                            { value: 'Primary', label: 'Primary member' },
-                                            { value: 'Spouse/Partner', label: 'Spouse/Partner' },
-                                            { value: 'Child', label: 'Child' },
-                                            { value: 'Disabled Adult', label: 'Disabled Adult' },
-                                        ]
-                                    }
-                                    onChange={
-                                        (e) => {
-                                            setDependentStatus(e?.value || '');
-                                            setDirty(true);
-                                        }
-                                    }
-                                />
-                                <WrappedSwitchInput
-                                    defaultChecked={isEligibleDependent}
-                                    locked={(selectedMember?.dependentStatus !== 'Child')}
-                                    maxWidth={200}
-                                    wrapperText="Eligible Dependent?"
-                                    onSwitchChange={
-                                        () => {
-                                            setIsEligibleDependent(!isEligibleDependent);
-                                            setDirty(true);
-                                        }
-                                    }
-                                />
-                            </GridItem>
-                            <GridItem colSpan={2} display={props.hasEmail ? 'block' : 'none'}>
-                                <WrappedSwitchInput
-                                    wrapperText="Subscribed to communications"
-                                    defaultChecked={subscribed}
-                                    maxWidth={200}
-                                    onSwitchChange={
-                                        () => {
-                                            setSubscribed(!subscribed);
-                                            setDirty(true);
-                                        }
-                                    }
-                                />
-                            </GridItem>
-                        </Grid>
-                    </AppModalBody>
-                    <AppModalFooter>
-                        <Button
-                            mr={4}
-                            backgroundColor="orange"
-                            isDisabled={!dirty}
-                            color="white"
-                            onClick={
-                                async () => {
-                                    selectedMember.address = streetAddress;
-                                    selectedMember.city = city;
-                                    selectedMember.state = memberAddressState;
-                                    selectedMember.zip = zip;
-                                    selectedMember.email = email;
-                                    selectedMember.phoneNumber = phoneNumber;
-                                    if (!phoneNumber.startsWith('+1')) {
-                                        setPhoneNumber(`+1${phoneNumber}`);
-                                    }
-                                    const memberUpdate : PatchMemberRequest = {
-                                        firstName,
-                                        lastName,
-                                        email,
-                                        phoneNumber,
-                                        birthdate: moment(birthdate).format('YYYY-MM-DD'),
-                                        modifiedBy: state.user?.memberId || 0,
-                                        subscribed,
-                                        dependentStatus,
-                                        isEligibleDependent,
-                                    };
-                                    await updateMember(state.token, selectedMember.memberId, memberUpdate);
-                                    if (!props.isFamilyMember) {
-                                        const membershipUpdate: PatchMembershipRequest = {
-                                            membershipTypeId: membershipType,
-                                            address: streetAddress,
-                                            city,
-                                            state: memberAddressState,
-                                            zip,
-                                            modifiedBy: state.user?.memberId || 0,
-                                        };
-                                        // eslint-disable-next-line max-len
-                                        await updateMembership(state.token, selectedMember.membershipId, membershipUpdate);
-                                    }
-                                    props.refreshMemberFunction();
-                                    toast.success({
-                                        title: 'Member info updated',
-                                        description: `${JSON.stringify(selectedMember)}`,
-                                    });
-                                    onClose();
                                 }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2}>
+                            <Text>Dependent Status</Text>
+                            <Select
+                                isDisabled={selectedMember.memberType.toLowerCase() === 'membership admin'}
+                                placeholder={selectedMember.dependentStatus}
+                                options={
+                                    [
+                                        { value: 'Primary', label: 'Primary member' },
+                                        { value: 'Spouse/Partner', label: 'Spouse/Partner' },
+                                        { value: 'Child', label: 'Child' },
+                                        { value: 'Disabled Adult', label: 'Disabled Adult' },
+                                    ]
+                                }
+                                onChange={
+                                    (e) => {
+                                        setDependentStatus(e?.value || '');
+                                        setDirty(true);
+                                    }
+                                }
+                            />
+                            <WrappedSwitchInput
+                                defaultChecked={isEligibleDependent}
+                                locked={(selectedMember?.dependentStatus !== 'Child')}
+                                maxWidth={200}
+                                wrapperText="Eligible Dependent?"
+                                onSwitchChange={
+                                    () => {
+                                        setIsEligibleDependent(!isEligibleDependent);
+                                        setDirty(true);
+                                    }
+                                }
+                            />
+                        </GridItem>
+                        <GridItem colSpan={2} display={props.hasEmail ? 'block' : 'none'}>
+                            <WrappedSwitchInput
+                                wrapperText="Subscribed to communications"
+                                defaultChecked={subscribed}
+                                maxWidth={200}
+                                onSwitchChange={
+                                    () => {
+                                        setSubscribed(!subscribed);
+                                        setDirty(true);
+                                    }
+                                }
+                            />
+                        </GridItem>
+                    </Grid>
+                </AppModalBody>
+                <AppModalFooter>
+                    <Button
+                        mr={4}
+                        backgroundColor="orange"
+                        isDisabled={!dirty}
+                        color="white"
+                        onClick={
+                            async () => {
+                                selectedMember.address = streetAddress;
+                                selectedMember.city = city;
+                                selectedMember.state = memberAddressState;
+                                selectedMember.zip = zip;
+                                selectedMember.email = email;
+                                selectedMember.phoneNumber = phoneNumber;
+                                if (!phoneNumber.startsWith('+1')) {
+                                    setPhoneNumber(`+1${phoneNumber}`);
+                                }
+                                const memberUpdate : PatchMemberRequest = {
+                                    firstName,
+                                    lastName,
+                                    email,
+                                    phoneNumber,
+                                    birthdate: moment(birthdate).format('YYYY-MM-DD'),
+                                    modifiedBy: state.user?.memberId || 0,
+                                    subscribed,
+                                    dependentStatus,
+                                    isEligibleDependent,
+                                };
+                                await updateMember(state.token, selectedMember.memberId, memberUpdate);
+                                if (!props.isFamilyMember) {
+                                    const membershipUpdate: PatchMembershipRequest = {
+                                        membershipTypeId: membershipType,
+                                        address: streetAddress,
+                                        city,
+                                        state: memberAddressState,
+                                        zip,
+                                        modifiedBy: state.user?.memberId || 0,
+                                    };
+                                        // eslint-disable-next-line max-len
+                                    await updateMembership(state.token, selectedMember.membershipId, membershipUpdate);
+                                }
+                                props.refreshMemberFunction();
+                                toast.success({
+                                    title: 'Member info updated',
+                                    description: `${JSON.stringify(selectedMember)}`,
+                                });
+                                onClose();
                             }
-                        >
-                            Save
-                        </Button>
-                        <Button backgroundColor="white" onClick={onClose}>
-                            Close
-                        </Button>
-                    </AppModalFooter>
+                        }
+                    >
+                        Save
+                    </Button>
+                    <Button backgroundColor="white" onClick={onClose}>
+                        Close
+                    </Button>
+                </AppModalFooter>
             </AppModal>
         </>
     );

@@ -8,7 +8,7 @@ import {
     ModalFooter as ChakraModalFooter,
     ModalCloseButton as ChakraModalCloseButton,
     ModalProps,
-    ModalContentProps,
+    ResponsiveValue,
 } from '@chakra-ui/react';
 
 /**
@@ -30,6 +30,22 @@ import {
  *   </AppModal>
  */
 
+type SpaceValue = ResponsiveValue<string | number>;
+
+interface ContentStyleProps {
+    padding?: SpaceValue;
+    p?: SpaceValue;
+    pb?: SpaceValue;
+    pt?: SpaceValue;
+    pl?: SpaceValue;
+    pr?: SpaceValue;
+    m?: SpaceValue;
+    mb?: SpaceValue;
+    mt?: SpaceValue;
+    ml?: SpaceValue;
+    mr?: SpaceValue;
+}
+
 interface AppModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -37,7 +53,7 @@ interface AppModalProps {
     size?: ModalProps['size'];
     isCentered?: boolean;
     closeOnOverlayClick?: boolean;
-    contentProps?: ModalContentProps;
+    contentProps?: ContentStyleProps;
 }
 
 export default function AppModal({
@@ -58,7 +74,19 @@ export default function AppModal({
             closeOnOverlayClick={closeOnOverlayClick}
         >
             <ModalOverlay />
-            <ModalContent {...contentProps}>
+            <ModalContent
+                padding={contentProps?.padding}
+                p={contentProps?.p}
+                pb={contentProps?.pb}
+                pt={contentProps?.pt}
+                pl={contentProps?.pl}
+                pr={contentProps?.pr}
+                m={contentProps?.m}
+                mb={contentProps?.mb}
+                mt={contentProps?.mt}
+                ml={contentProps?.ml}
+                mr={contentProps?.mr}
+            >
                 {children}
             </ModalContent>
         </Modal>

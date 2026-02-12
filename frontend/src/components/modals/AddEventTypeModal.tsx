@@ -20,53 +20,53 @@ export default function AddEventTypeModal(props: alertProps) {
     return (
         <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
-                    textAlign="center"
+                textAlign="center"
+            >
+                Add an event type
+            </Heading>
+            <Divider />
+            <Box m={4}>
+                <Input
+                    placeholder="Event Type Name"
+                    onChange={
+                        (event) => {
+                            setNewEventType(event.target.value);
+                        }
+                    }
+                />
+            </Box>
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
+                        }
+                    }
                 >
-                    Add an event type
-                </Heading>
-                <Divider />
-                <Box m={4}>
-                    <Input
-                        placeholder="Event Type Name"
-                        onChange={
-                            (event) => {
-                                setNewEventType(event.target.value);
-                            }
+                    Cancel
+                </Button>
+                <Button
+                    color="red"
+                    variant="ghost"
+                    size="lg"
+                    onClick={
+                        async () => {
+                            const eventType: PostNewEventTypeRequest = {
+                                modifiedBy: props.userId,
+                                type: newEventType,
+                            };
+                            await createEventType(props.token, eventType);
+                            props.addAction();
+                            props.onClose();
                         }
-                    />
-                </Box>
-                <AppModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
-                            }
-                        }
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        color="red"
-                        variant="ghost"
-                        size="lg"
-                        onClick={
-                            async () => {
-                                const eventType: PostNewEventTypeRequest = {
-                                    modifiedBy: props.userId,
-                                    type: newEventType,
-                                };
-                                await createEventType(props.token, eventType);
-                                props.addAction();
-                                props.onClose();
-                            }
-                        }
-                    >
-                        Save
-                    </Button>
-                </AppModalFooter>
+                    }
+                >
+                    Save
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

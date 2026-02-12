@@ -7,10 +7,10 @@ import {
     Select, Stat, StatGroup, StatHelpText, StatLabel,
     StatNumber, Text, VStack,
 } from '@chakra-ui/react';
-import AppModal from '../AppModal';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsCashCoin, BsPrinter } from 'react-icons/bs';
+import AppModal from '../AppModal';
 import { Bill } from '../../../../src/typedefs/bill';
 import { UserContext } from '../../contexts/UserContext';
 
@@ -271,148 +271,148 @@ export default function DuesAndWaiversList() {
                 defaultSortFieldId={1}
             />
             <AppModal isCentered size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ padding: 3 }}>
-                    <Heading>
-                        {`Billing detail for ${selectedBill?.membershipAdmin} - ${selectedBill?.year}`}
-                    </Heading>
-                    <Text size="x-small">{`Bill ID: ${selectedBill?.billId}`}</Text>
-                    <BillingStatsDisplay bill={selectedBill} />
-                    <WrappedSwitchInput
-                        wrapperText="Contacted and renewing?"
-                        // eslint-disable-next-line max-len
-                        defaultChecked={(selectedBill?.contactedAndRenewing) || (selectedBill?.curYearPaid && selectedBill.curYearIns) || false}
-                        onSwitchChange={
-                            async () => {
-                                // eslint-disable-next-line no-empty
-                                if (selectedBill?.billId) {
-                                    await markContactedAndRenewing(state.token, selectedBill?.billId);
-                                    getMembershipBillData();
-                                }
+                <Heading>
+                    {`Billing detail for ${selectedBill?.membershipAdmin} - ${selectedBill?.year}`}
+                </Heading>
+                <Text size="x-small">{`Bill ID: ${selectedBill?.billId}`}</Text>
+                <BillingStatsDisplay bill={selectedBill} />
+                <WrappedSwitchInput
+                    wrapperText="Contacted and renewing?"
+                    // eslint-disable-next-line max-len
+                    defaultChecked={(selectedBill?.contactedAndRenewing) || (selectedBill?.curYearPaid && selectedBill.curYearIns) || false}
+                    onSwitchChange={
+                        async () => {
+                            // eslint-disable-next-line no-empty
+                            if (selectedBill?.billId) {
+                                await markContactedAndRenewing(state.token, selectedBill?.billId);
+                                getMembershipBillData();
                             }
                         }
-                        toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} tagged as renewing.`}
-                        maxWidth={400}
-                    />
-                    <WrappedSwitchInput
-                        wrapperText="Mark (or unmark) as paid"
-                        defaultChecked={selectedBill?.curYearPaid || false}
-                        onSwitchChange={
-                            async () => {
-                                if (selectedBill?.billId) {
-                                    await payBill(state.token, selectedBill?.billId, paymentMethod);
-                                    await markContactedAndRenewing(state.token, selectedBill?.billId);
-                                    getMembershipBillData();
-                                }
+                    }
+                    toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} tagged as renewing.`}
+                    maxWidth={400}
+                />
+                <WrappedSwitchInput
+                    wrapperText="Mark (or unmark) as paid"
+                    defaultChecked={selectedBill?.curYearPaid || false}
+                    onSwitchChange={
+                        async () => {
+                            if (selectedBill?.billId) {
+                                await payBill(state.token, selectedBill?.billId, paymentMethod);
+                                await markContactedAndRenewing(state.token, selectedBill?.billId);
+                                getMembershipBillData();
                             }
                         }
-                        toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} marked as paid.`}
-                        maxWidth={400}
-                    />
-                    {
-                        selectedBill?.curYearPaid && selectedBill.paymentMethod && (
-                            <a href={`${selectedBill.squareLink}`} target="_blank" rel="noreferrer">
-                                {`Paid via ${selectedBill?.paymentMethod}`}
-                            </a>
-                        )
                     }
-                    {
-                        !selectedBill?.curYearPaid && (
-                            <Box maxWidth={175}>
-                                <Select
-                                    placeholder="Payment Method"
-                                    size="sm"
-                                    onChange={
-                                        (event) => {
-                                            setPaymentMethod(event.target.value);
-                                        }
-                                    }
-                                >
-                                    <option value="Cash">Cash</option>
-                                    <option value="Check">Check</option>
-                                    <option value="PayPal">PayPal</option>
-                                    <option value="Square">Square</option>
-                                </Select>
-                            </Box>
-                        )
-                    }
-                    <WrappedSwitchInput
-                        wrapperText="Mark (or unmark) as insurance submitted"
-                        defaultChecked={selectedBill?.curYearIns || false}
-                        onSwitchChange={
-                            async () => {
-                                if (selectedBill?.billId) {
-                                    await attestInsurance(state.token, selectedBill?.billId);
-                                    getMembershipBillData();
-                                    if (selectedBill.amount === 0) {
-                                        await markContactedAndRenewing(state.token, selectedBill?.billId);
+                    toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} marked as paid.`}
+                    maxWidth={400}
+                />
+                {
+                    selectedBill?.curYearPaid && selectedBill.paymentMethod && (
+                        <a href={`${selectedBill.squareLink}`} target="_blank" rel="noreferrer">
+                            {`Paid via ${selectedBill?.paymentMethod}`}
+                        </a>
+                    )
+                }
+                {
+                    !selectedBill?.curYearPaid && (
+                        <Box maxWidth={175}>
+                            <Select
+                                placeholder="Payment Method"
+                                size="sm"
+                                onChange={
+                                    (event) => {
+                                        setPaymentMethod(event.target.value);
                                     }
                                 }
+                            >
+                                <option value="Cash">Cash</option>
+                                <option value="Check">Check</option>
+                                <option value="PayPal">PayPal</option>
+                                <option value="Square">Square</option>
+                            </Select>
+                        </Box>
+                    )
+                }
+                <WrappedSwitchInput
+                    wrapperText="Mark (or unmark) as insurance submitted"
+                    defaultChecked={selectedBill?.curYearIns || false}
+                    onSwitchChange={
+                        async () => {
+                            if (selectedBill?.billId) {
+                                await attestInsurance(state.token, selectedBill?.billId);
+                                getMembershipBillData();
+                                if (selectedBill.amount === 0) {
+                                    await markContactedAndRenewing(state.token, selectedBill?.billId);
+                                }
                             }
                         }
-                        locked={selectedBill?.curYearIns}
-                        toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} paperwork complete.`}
-                        maxWidth={400}
-                    />
-                    <HStack mt={2} mr={3}>
-                        <Button
-                            rightIcon={<BsCashCoin />}
-                            colorScheme="orange"
-                            isDisabled={selectedBill?.curYearPaid}
-                            onClick={
-                                async () => {
-                                    await payBill(state.token, selectedBill?.billId || 0, 'Discounted');
-                                    await getMembershipBillData();
-                                    onClose();
-                                }
-                            }
-                        >
-                            Discount 100%
-                        </Button>
-                        <Button
-                            rightIcon={<BsCashCoin />}
-                            colorScheme="orange"
-                            isDisabled={selectedBill?.curYearPaid}
-                            onClick={
-                                async () => {
-                                    await discountBill(state.token, selectedBill?.billId || 0);
-                                    await getMembershipBillData();
-                                    onClose();
-                                }
-                            }
-                        >
-                            Discount 50%
-                        </Button>
-                    </HStack>
-                    <Text
-                        fontSize="sm"
-                    >
-                        Once insurance is attested, this checkbox locks so contact support if you need to undo it.
-                    </Text>
-                    <Alert status="warning">
-                        <Link fontSize="sm" href={`sms:${selectedBill?.phone}`} isExternal>
-                            {`Text at ${selectedBill?.phone}`}
-                        </Link>
-                        <Link fontSize="sm" href={`mailto:${selectedBill?.membershipAdminEmail}`} isExternal>
-                            {`Email at ${selectedBill?.membershipAdminEmail}`}
-                        </Link>
-                        <Link fontSize="sm" href={`tel:${selectedBill?.phone}`} isExternal>
-                            {`Call at ${selectedBill?.phone}`}
-                        </Link>
-                    </Alert>
+                    }
+                    locked={selectedBill?.curYearIns}
+                    toastMessage={`${selectedBill?.firstName} ${selectedBill?.lastName} paperwork complete.`}
+                    maxWidth={400}
+                />
+                <HStack mt={2} mr={3}>
                     <Button
-                        mt={10}
-                        variant="outline"
-                        size="lg"
-                        bgColor="orange.300"
-                        width={150}
-                        color="white"
+                        rightIcon={<BsCashCoin />}
+                        colorScheme="orange"
+                        isDisabled={selectedBill?.curYearPaid}
                         onClick={
-                            () => {
+                            async () => {
+                                await payBill(state.token, selectedBill?.billId || 0, 'Discounted');
+                                await getMembershipBillData();
                                 onClose();
                             }
                         }
                     >
-                        Close
+                        Discount 100%
                     </Button>
+                    <Button
+                        rightIcon={<BsCashCoin />}
+                        colorScheme="orange"
+                        isDisabled={selectedBill?.curYearPaid}
+                        onClick={
+                            async () => {
+                                await discountBill(state.token, selectedBill?.billId || 0);
+                                await getMembershipBillData();
+                                onClose();
+                            }
+                        }
+                    >
+                        Discount 50%
+                    </Button>
+                </HStack>
+                <Text
+                    fontSize="sm"
+                >
+                    Once insurance is attested, this checkbox locks so contact support if you need to undo it.
+                </Text>
+                <Alert status="warning">
+                    <Link fontSize="sm" href={`sms:${selectedBill?.phone}`} isExternal>
+                        {`Text at ${selectedBill?.phone}`}
+                    </Link>
+                    <Link fontSize="sm" href={`mailto:${selectedBill?.membershipAdminEmail}`} isExternal>
+                        {`Email at ${selectedBill?.membershipAdminEmail}`}
+                    </Link>
+                    <Link fontSize="sm" href={`tel:${selectedBill?.phone}`} isExternal>
+                        {`Call at ${selectedBill?.phone}`}
+                    </Link>
+                </Alert>
+                <Button
+                    mt={10}
+                    variant="outline"
+                    size="lg"
+                    bgColor="orange.300"
+                    width={150}
+                    color="white"
+                    onClick={
+                        () => {
+                            onClose();
+                        }
+                    }
+                >
+                    Close
+                </Button>
             </AppModal>
         </VStack>
     );

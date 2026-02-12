@@ -39,70 +39,70 @@ export default function EditBikesModal(props: modalProps) {
     return (
         <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading pl={2} pr={2} textAlign="center">
-                    Edit this bike
-                </Heading>
-                <Text fontSize="2xl" textAlign="center">
-                    Current Bike Info:
-                    {' '}
-                    {`${bike?.year}, ${bike?.make} ${bike?.model}`}
-                </Text>
-                <Divider mb={5} />
-                <AppModalCloseButton />
-                <VStack
-                    align="left"
-                    mr={5}
-                    ml={5}
+                Edit this bike
+            </Heading>
+            <Text fontSize="2xl" textAlign="center">
+                Current Bike Info:
+                {' '}
+                {`${bike?.year}, ${bike?.make} ${bike?.model}`}
+            </Text>
+            <Divider mb={5} />
+            <AppModalCloseButton />
+            <VStack
+                align="left"
+                mr={5}
+                ml={5}
+            >
+                <Input
+                    variant="outline"
+                    placeholder="Bike year"
+                    value={bikeYear}
+                    onChange={handleEditedBikeYear}
+                    size="md"
+                />
+                <Input
+                    variant="outline"
+                    placeholder="Bike Make"
+                    value={bikeMake}
+                    onChange={handleEditedBikeMake}
+                    size="md"
+                />
+                <Input
+                    variant="outline"
+                    placeholder="Bike Model"
+                    value={bikeModel}
+                    onChange={handleEditedBikeModel}
+                    size="md"
+                />
+            </VStack>
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
+                        }
+                    }
                 >
-                    <Input
-                        variant="outline"
-                        placeholder="Bike year"
-                        value={bikeYear}
-                        onChange={handleEditedBikeYear}
-                        size="md"
-                    />
-                    <Input
-                        variant="outline"
-                        placeholder="Bike Make"
-                        value={bikeMake}
-                        onChange={handleEditedBikeMake}
-                        size="md"
-                    />
-                    <Input
-                        variant="outline"
-                        placeholder="Bike Model"
-                        value={bikeModel}
-                        onChange={handleEditedBikeModel}
-                        size="md"
-                    />
-                </VStack>
-                <AppModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
-                            }
+                    Close
+                </Button>
+                <Button
+                    color="green"
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.editBike(props.bikeToEdit, bikeYear, bikeMake, bikeModel);
+                            props.onClose();
                         }
-                    >
-                        Close
-                    </Button>
-                    <Button
-                        color="green"
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.editBike(props.bikeToEdit, bikeYear, bikeMake, bikeModel);
-                                props.onClose();
-                            }
-                        }
-                    >
-                        Save
-                    </Button>
-                </AppModalFooter>
+                    }
+                >
+                    Save
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

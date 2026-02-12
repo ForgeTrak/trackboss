@@ -40,78 +40,78 @@ export default function EditBikesModal(props: modalProps) {
             </Heading>
             <Divider mb={5} />
             <AppModalCloseButton />
-                <VStack
-                    align="left"
-                    mr={5}
-                    ml={5}
+            <VStack
+                align="left"
+                mr={5}
+                ml={5}
+            >
+                <NumberInput
+                    variant="outline"
+                    defaultValue={maxModelYear}
+                    min={minModelYear}
+                    max={maxModelYear}
                 >
-                    <NumberInput
-                        variant="outline"
-                        defaultValue={maxModelYear}
-                        min={minModelYear}
-                        max={maxModelYear}
-                    >
-                        <NumberInputField onChange={handleEditedBikeYear} />
-                        <NumberInputStepper>
-                            <NumberIncrementStepper />
-                            <NumberDecrementStepper />
-                        </NumberInputStepper>
-                    </NumberInput>
-                    <Select
-                        variant="outline"
-                        placeholder="Bike Make"
-                        onChange={handleEditedBikeMake}
-                        size="md"
-                    >
-                        <option value="Beta">Beta</option>
-                        <option value="Cobra">Cobra</option>
-                        <option value="Gas Gas">Gas Gas</option>
-                        <option value="GPX">GPX</option>
-                        <option value="Honda">Honda</option>
-                        <option value="Husqvarna">Husqvarna</option>
-                        <option value="Kawasaki">Kawasaki</option>
-                        <option value="KTM">KTM</option>
-                        <option value="Other">Other</option>
-                        <option value="Pitster Pro">Pitster Pro</option>
-                        <option value="Suzuki">Suzuki</option>
-                        <option value="Yamaha">Yamaha</option>
-                    </Select>
-                    <Input
-                        variant="outline"
-                        placeholder="Bike Model"
-                        value={bikeModel}
-                        onChange={handleEditedBikeModel}
-                        size="md"
-                    />
-                </VStack>
-                <AppModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
-                            }
+                    <NumberInputField onChange={handleEditedBikeYear} />
+                    <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
+                <Select
+                    variant="outline"
+                    placeholder="Bike Make"
+                    onChange={handleEditedBikeMake}
+                    size="md"
+                >
+                    <option value="Beta">Beta</option>
+                    <option value="Cobra">Cobra</option>
+                    <option value="Gas Gas">Gas Gas</option>
+                    <option value="GPX">GPX</option>
+                    <option value="Honda">Honda</option>
+                    <option value="Husqvarna">Husqvarna</option>
+                    <option value="Kawasaki">Kawasaki</option>
+                    <option value="KTM">KTM</option>
+                    <option value="Other">Other</option>
+                    <option value="Pitster Pro">Pitster Pro</option>
+                    <option value="Suzuki">Suzuki</option>
+                    <option value="Yamaha">Yamaha</option>
+                </Select>
+                <Input
+                    variant="outline"
+                    placeholder="Bike Model"
+                    value={bikeModel}
+                    onChange={handleEditedBikeModel}
+                    size="md"
+                />
+            </VStack>
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
                         }
-                    >
-                        Close
-                    </Button>
-                    <Button
-                        color="green"
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.addBike(bikeYear, bikeMake, bikeModel);
-                                props.onClose();
-                            }
+                    }
+                >
+                    Close
+                </Button>
+                <Button
+                    color="green"
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.addBike(bikeYear, bikeMake, bikeModel);
+                            props.onClose();
                         }
-                    >
-                        Save
-                    </Button>
-                </AppModalFooter>
+                    }
+                >
+                    Save
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

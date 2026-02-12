@@ -145,21 +145,21 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
 
     return (
         <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
-                <Heading m={3}>
-                    {`${billingYear + 1} PRA bill and attestation`}
-                </Heading>
-                <Box m={3}>
-                    <Box mb={2}>
-                        Your dues are listed below.  You can pay via mail, in person, or via the Paypal button.
-                        If your dues are $0 no payment options are presented as we just need attestation of insurance.
-                    </Box>
-                    <BillingStatsDisplay bill={props.viewBill} />
-                    {renewalAttestationComponent}
+            <Heading m={3}>
+                {`${billingYear + 1} PRA bill and attestation`}
+            </Heading>
+            <Box m={3}>
+                <Box mb={2}>
+                    Your dues are listed below.  You can pay via mail, in person, or via the Paypal button.
+                    If your dues are $0 no payment options are presented as we just need attestation of insurance.
                 </Box>
-                <Divider />
-                <AppModalFooter>
-                    {renewalPaymentComponent}
-                </AppModalFooter>
+                <BillingStatsDisplay bill={props.viewBill} />
+                {renewalAttestationComponent}
+            </Box>
+            <Divider />
+            <AppModalFooter>
+                {renewalPaymentComponent}
+            </AppModalFooter>
         </AppModal>
     );
 }

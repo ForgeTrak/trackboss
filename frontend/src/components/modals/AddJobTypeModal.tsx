@@ -34,137 +34,137 @@ export default function AddJobTypeModal(props: alertProps) {
     return (
         <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
-                    textAlign="center"
-                >
-                    Add a &nbsp;
-                    {props.eventType}
+                textAlign="center"
+            >
+                Add a &nbsp;
+                {props.eventType}
                     &nbsp; job
-                </Heading>
-                <Divider />
-                <SimpleGrid columns={[2, 3, 3]} spacing={2} m={3}>
-                    <Box maxWidth={250}>
-                        <Text fontSize="sm">Description</Text>
-                        <Input
+            </Heading>
+            <Divider />
+            <SimpleGrid columns={[2, 3, 3]} spacing={2} m={3}>
+                <Box maxWidth={250}>
+                    <Text fontSize="sm">Description</Text>
+                    <Input
+                        onChange={
+                            (event) => {
+                                setDescription(event.target.value);
+                            }
+                        }
+                    />
+                </Box>
+                <Box maxWidth={100}>
+                    <Text fontSize="sm">Point Value</Text>
+                    <NumberInput min={0} max={30} step={0.25}>
+                        <NumberInputField
                             onChange={
                                 (event) => {
-                                    setDescription(event.target.value);
+                                    setPointValue(parseFloat(event.target.value));
                                 }
                             }
                         />
-                    </Box>
-                    <Box maxWidth={100}>
-                        <Text fontSize="sm">Point Value</Text>
-                        <NumberInput min={0} max={30} step={0.25}>
-                            <NumberInputField
-                                onChange={
-                                    (event) => {
-                                        setPointValue(parseFloat(event.target.value));
-                                    }
+                    </NumberInput>
+                </Box>
+                <Box maxWidth={100}>
+                    <Text fontSize="sm">Cash Payout</Text>
+                    <NumberInput min={0} max={750} step={10} defaultValue={cashValue}>
+                        <NumberInputField
+                            onChange={
+                                (event) => {
+                                    setCashValue(parseFloat(event.target.value));
                                 }
-                            />
-                        </NumberInput>
-                    </Box>
-                    <Box maxWidth={100}>
-                        <Text fontSize="sm">Cash Payout</Text>
-                        <NumberInput min={0} max={750} step={10} defaultValue={cashValue}>
-                            <NumberInputField
-                                onChange={
-                                    (event) => {
-                                        setCashValue(parseFloat(event.target.value));
-                                    }
-                                }
-                            />
-                        </NumberInput>
-                    </Box>
-                    <Box maxWidth={140}>
-                        <Text fontSize="sm">Job Day</Text>
-                        <DaysOfWeekSelect
-                            defaultDay={6}
-                            onDayChange={setJobDayNumber}
+                            }
                         />
-                    </Box>
-                    <WrappedSwitchInput
-                        wrapperText="Meal Ticket?"
-                        defaultChecked={mealTicketValue}
-                        onSwitchChange={setMealTicketValue}
-                        maxWidth={100}
+                    </NumberInput>
+                </Box>
+                <Box maxWidth={140}>
+                    <Text fontSize="sm">Job Day</Text>
+                    <DaysOfWeekSelect
+                        defaultDay={6}
+                        onDayChange={setJobDayNumber}
                     />
-                    <Box maxWidth={100}>
-                        <Text fontSize="sm">Positions</Text>
-                        <NumberInput min={1} max={300} step={1} defaultValue={count}>
-                            <NumberInputField
-                                onChange={
-                                    (event) => {
-                                        setCount(parseInt(event.target.value, 10));
-                                    }
+                </Box>
+                <WrappedSwitchInput
+                    wrapperText="Meal Ticket?"
+                    defaultChecked={mealTicketValue}
+                    onSwitchChange={setMealTicketValue}
+                    maxWidth={100}
+                />
+                <Box maxWidth={100}>
+                    <Text fontSize="sm">Positions</Text>
+                    <NumberInput min={1} max={300} step={1} defaultValue={count}>
+                        <NumberInputField
+                            onChange={
+                                (event) => {
+                                    setCount(parseInt(event.target.value, 10));
                                 }
-                            />
-                        </NumberInput>
-                    </Box>
-                    <Box maxWidth={100}>
-                        <Text fontSize="sm">Display Order</Text>
-                        <NumberInput min={1} max={300} step={1} defaultValue={sortOrder}>
-                            <NumberInputField
-                                onChange={
-                                    (event) => {
-                                        setSortOrder(parseInt(event.target.value, 10));
-                                    }
+                            }
+                        />
+                    </NumberInput>
+                </Box>
+                <Box maxWidth={100}>
+                    <Text fontSize="sm">Display Order</Text>
+                    <NumberInput min={1} max={300} step={1} defaultValue={sortOrder}>
+                        <NumberInputField
+                            onChange={
+                                (event) => {
+                                    setSortOrder(parseInt(event.target.value, 10));
                                 }
-                            />
-                        </NumberInput>
-                        <Text fontSize="xs">(default is 99, bottom of the list for the day)</Text>
-                    </Box>
-                </SimpleGrid>
-                <AppModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
                             }
+                        />
+                    </NumberInput>
+                    <Text fontSize="xs">(default is 99, bottom of the list for the day)</Text>
+                </Box>
+            </SimpleGrid>
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
                         }
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        color="red"
-                        variant="ghost"
-                        size="lg"
-                        onClick={
-                            async () => {
-                                // First, create the job type.
-                                const uiJobType : PostNewJobTypeRequest = {
-                                    title: description as string,
-                                    cashValue,
-                                    pointValue,
-                                    sortOrder,
-                                    online: true,
-                                    reserved: false,
-                                    jobDayNumber,
-                                    mealTicket: mealTicketValue,
-                                    modifiedBy: props.userId,
-                                };
-                                const newJobType = await createJobType(props.token, uiJobType) as JobType;
-                                // now, associate the job type to the event type
-                                const newEventJob = await createEventJob(props.token, {
-                                    eventTypeId: props.eventTypeId,
-                                    jobTypeId: newJobType.jobTypeId,
-                                    count,
-                                });
-                                toast.success({
-                                    title: `${newJobType.title} added. (job Type id ${newJobType.jobTypeId}`,
-                                    description: JSON.stringify(newEventJob),
-                                });
-                                props.addAction();
-                                props.onClose();
-                            }
+                    }
+                >
+                    Cancel
+                </Button>
+                <Button
+                    color="red"
+                    variant="ghost"
+                    size="lg"
+                    onClick={
+                        async () => {
+                            // First, create the job type.
+                            const uiJobType : PostNewJobTypeRequest = {
+                                title: description as string,
+                                cashValue,
+                                pointValue,
+                                sortOrder,
+                                online: true,
+                                reserved: false,
+                                jobDayNumber,
+                                mealTicket: mealTicketValue,
+                                modifiedBy: props.userId,
+                            };
+                            const newJobType = await createJobType(props.token, uiJobType) as JobType;
+                            // now, associate the job type to the event type
+                            const newEventJob = await createEventJob(props.token, {
+                                eventTypeId: props.eventTypeId,
+                                jobTypeId: newJobType.jobTypeId,
+                                count,
+                            });
+                            toast.success({
+                                title: `${newJobType.title} added. (job Type id ${newJobType.jobTypeId}`,
+                                description: JSON.stringify(newEventJob),
+                            });
+                            props.addAction();
+                            props.onClose();
                         }
-                    >
-                        Save
-                    </Button>
-                </AppModalFooter>
+                    }
+                >
+                    Save
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

@@ -28,64 +28,64 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
             <AppModalHeader>{`Edit points for ${props.memberName} - ${selectedJob.title}`}</AppModalHeader>
             <AppModalCloseButton />
             <AppModalBody pb={6}>
-                    <SimpleGrid columns={2}>
-                        <NumberInput
-                            min={0}
-                            max={30}
-                            defaultValue={props.selectedJob.pointsAwarded}
-                            step={0.25}
-                            onChange={
-                                async (changeValue) => {
-                                    // eslint-disable-next-line max-len
-                                    await modifyJobPoints(state.token, selectedJob.jobId, parseFloat(changeValue) || 0);
-                                    props.refreshPoints();
-                                    toast.success({
-                                        title: 'Points updated!',
-                                        description: `${selectedJob.member} ${selectedJob.title}, ${changeValue}`,
-                                    });
-                                }
-                            }
-                        >
-                            <NumberInputField
-                                placeholder="Points earned"
-                            />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
-                    </SimpleGrid>
-                </AppModalBody>
-
-                <AppModalFooter>
-                    <Button
-                        onClick={props.onClose}
-                        backgroundColor="orange"
-                        color="white"
-                        mr={3}
-                    >
-                        Save
-                    </Button>
-                    <Button
-                        onClick={
-                            async () => {
-                                await removeSignup(state.token, selectedJob?.jobId || 0);
+                <SimpleGrid columns={2}>
+                    <NumberInput
+                        min={0}
+                        max={30}
+                        defaultValue={props.selectedJob.pointsAwarded}
+                        step={0.25}
+                        onChange={
+                            async (changeValue) => {
+                                // eslint-disable-next-line max-len
+                                await modifyJobPoints(state.token, selectedJob.jobId, parseFloat(changeValue) || 0);
                                 props.refreshPoints();
-                                toast.error({
-                                    title: 'Entry removed',
-                                    description: `${selectedJob?.member} ${selectedJob?.title}, ${selectedJob?.jobId}`,
+                                toast.success({
+                                    title: 'Points updated!',
+                                    description: `${selectedJob.member} ${selectedJob.title}, ${changeValue}`,
                                 });
-                                props.onClose();
                             }
                         }
-                        backgroundColor="red"
-                        color="white"
-                        mr={3}
                     >
-                        Delete
-                    </Button>
-                    <Button onClick={props.onClose} backgroundColor="white">Cancel</Button>
-                </AppModalFooter>
+                        <NumberInputField
+                            placeholder="Points earned"
+                        />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                </SimpleGrid>
+            </AppModalBody>
+
+            <AppModalFooter>
+                <Button
+                    onClick={props.onClose}
+                    backgroundColor="orange"
+                    color="white"
+                    mr={3}
+                >
+                    Save
+                </Button>
+                <Button
+                    onClick={
+                        async () => {
+                            await removeSignup(state.token, selectedJob?.jobId || 0);
+                            props.refreshPoints();
+                            toast.error({
+                                title: 'Entry removed',
+                                description: `${selectedJob?.member} ${selectedJob?.title}, ${selectedJob?.jobId}`,
+                            });
+                            props.onClose();
+                        }
+                    }
+                    backgroundColor="red"
+                    color="white"
+                    mr={3}
+                >
+                    Delete
+                </Button>
+                <Button onClick={props.onClose} backgroundColor="white">Cancel</Button>
+            </AppModalFooter>
         </AppModal>
     );
 }

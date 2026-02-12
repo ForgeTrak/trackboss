@@ -22,45 +22,45 @@ export default function ViewCommunicationModal(props: ViewCommunicationModalProp
             </Heading>
             <Divider />
             <AppModalBody>
-                    <Grid columnGap={2} rowGap={2}>
-                        <GridItem colSpan={2}>
-                            <Text>Subject</Text>
-                            <Input
-                                size="md"
-                                disabled
-                                defaultValue={props.communication?.subject}
-                            />
-                        </GridItem>
-                        <GridItem colSpan={2}>
-                            <Text>Selected Tags</Text>
-                            <Input
-                                size="md"
-                                disabled
-                                defaultValue={props.communication?.selectedTags?.join(',')}
-                            />
-                        </GridItem>
-                        <GridItem colSpan={2}>
-                            <Text>Communication Type</Text>
-                            <Input
-                                size="md"
-                                disabled
-                                defaultValue={props.communication?.mechanism}
-                            />
-                        </GridItem>
-                        <GridItem colSpan={2}>
-                            <Text>Communication Content</Text>
-                            <div
-                                // eslint-disable-next-line react/no-danger
-                                dangerouslySetInnerHTML={{ __html: props.communication?.text || '' }}
-                            />
-                        </GridItem>
-                    </Grid>
-                </AppModalBody>
-                <AppModalFooter>
-                    <Button backgroundColor="white" onClick={props.onClose}>
-                        Close
-                    </Button>
-                </AppModalFooter>
+                <Grid columnGap={2} rowGap={2}>
+                    <GridItem colSpan={2}>
+                        <Text>Subject</Text>
+                        <Input
+                            size="md"
+                            disabled
+                            defaultValue={props.communication?.subject}
+                        />
+                    </GridItem>
+                    <GridItem colSpan={2}>
+                        <Text>Selected Tags</Text>
+                        <Input
+                            size="md"
+                            disabled
+                            defaultValue={props.communication?.selectedTags?.join(',')}
+                        />
+                    </GridItem>
+                    <GridItem colSpan={2}>
+                        <Text>Communication Type</Text>
+                        <Input
+                            size="md"
+                            disabled
+                            defaultValue={props.communication?.mechanism}
+                        />
+                    </GridItem>
+                    <GridItem colSpan={2}>
+                        <Text>Communication Content</Text>
+                        <div
+                            // eslint-disable-next-line react/no-danger
+                            dangerouslySetInnerHTML={{ __html: props.communication?.text || '' }}
+                        />
+                    </GridItem>
+                </Grid>
+            </AppModalBody>
+            <AppModalFooter>
+                <Button backgroundColor="white" onClick={props.onClose}>
+                    Close
+                </Button>
+            </AppModalFooter>
         </AppModal>
     );
 }
