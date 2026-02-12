@@ -13,7 +13,7 @@ interface appModalProps {
     // your data goes here.
     membershipApplication: MembershipApplication,
     isOpen: boolean,
-    // typically the chakra useDisclosure passed from the parent.
+    // typically the useAppDisclosure passed from the parent.
     onClose: () => void,
     // callback function for throwing data back to the parent.
     addAction: () => void,

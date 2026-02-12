@@ -5,7 +5,7 @@ import {
     Center,
     Heading, HStack, IconButton, Link, Modal, ModalContent, ModalOverlay,
     Select, Stat, StatGroup, StatHelpText, StatLabel,
-    StatNumber, Text, useDisclosure, VStack,
+    StatNumber, Text, VStack,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -13,6 +13,7 @@ import { BsCashCoin, BsPrinter } from 'react-icons/bs';
 import { Bill } from '../../../../src/typedefs/bill';
 import { UserContext } from '../../contexts/UserContext';
 
+import { useAppDisclosure } from '../../hooks/useAppDisclosure';
 import {
     attestInsurance, discountBill, getBillListExcel, getBills, markContactedAndRenewing, payBill,
 } from '../../controller/billing';
@@ -41,7 +42,7 @@ export default function DuesAndWaiversList() {
     const [yearsList, setYearsList] = useState<number[]>([]);
     const [initialYear, setInitialYear] = useState<number>(calculateBillingYear());
 
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useAppDisclosure();
 
     async function getMembershipBillData() {
         let memberBills : Bill[] = [];

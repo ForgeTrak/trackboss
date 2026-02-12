@@ -8,7 +8,6 @@ import {
     AccordionPanel,
     Box, Button, ChakraProvider, Divider, Image, Input, Link, SimpleGrid, Stat,
     StatHelpText, StatLabel, StatNumber, Text, VStack,
-    useDisclosure,
 } from '@chakra-ui/react';
 import { BsTrash2, BsPersonPlus } from 'react-icons/bs';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input/input';
@@ -20,7 +19,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 import theme from '../theme';
-
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { applicationExists } from '../controller/membershipApplication';
 import { memberExistsByEmail } from '../controller/member';
 import SimpleAlertModal from '../components/modals/SimpleAlertModal';
@@ -58,8 +57,8 @@ function ApplicationForm() {
     const [familyMembers, setFamilyMembers] = useState<any[]>([]);
 
     const [alertMsg, setAlertMsg] = useState<string>();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const { isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useAppDisclosure();
+    const { isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose } = useAppDisclosure();
     const [isEnabled, setIsEnabled] = useState<boolean>();
 
     const eightteenYearsAgo = moment().subtract(18, 'years').toDate();

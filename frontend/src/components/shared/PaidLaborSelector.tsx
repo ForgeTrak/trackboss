@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
-import { useDisclosure } from '@chakra-ui/react';
 import _ from 'lodash';
 
+import { useAppDisclosure } from '../../hooks/useAppDisclosure';
 import { UserContext } from '../../contexts/UserContext';
 import { getPaidLaborList, createPaidLabor } from '../../controller/paidLabor';
 import { PaidLabor } from '../../../../src/typedefs/paidLabor';
@@ -23,7 +23,7 @@ export default function PaidLaborSelector(props: PaidLaborSelectorProps) {
         isOpen: isCreateOpen,
         onOpen: onCreateOpen,
         onClose: onCreateClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
 
     const [eligibleMembers, setEligibleMembers] = useState<any[]>([]);
     const [refreshList, setRefreshList] = useState<boolean>();

@@ -3,12 +3,13 @@ import {
     Button,
     IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
-    NumberInputStepper, useDisclosure, VStack,
+    NumberInputStepper, VStack,
 } from '@chakra-ui/react';
 import { BsPlus } from 'react-icons/bs';
 import moment from 'moment';
 import DatePicker from 'react-date-picker';
 import { useAppToast } from '../hooks/useAppToast';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { createJobType } from '../controller/jobType';
 import { JobType, PostNewJobTypeRequest } from '../../../src/typedefs/jobType';
 import { Job, PostNewJobRequest } from '../../../src/typedefs/job';
@@ -29,7 +30,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
         isOpen,
         onOpen,
         onClose,
-    } = useDisclosure();
+    } = useAppDisclosure();
     const [description, setDescription] = useState<string>('');
     const [pointValue, setPointValue] = useState<number>(0);
     const [dirty, setDirty] = useState<boolean>(false);

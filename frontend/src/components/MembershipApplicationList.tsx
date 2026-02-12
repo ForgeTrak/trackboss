@@ -1,8 +1,9 @@
-import { Center, IconButton, useDisclosure } from '@chakra-ui/react';
+import { Center, IconButton } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsPrinter } from 'react-icons/bs';
 
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { getYearsForBillingDisplay, calculateApplicationYear } from '../util/billing';
 import { MembershipApplication } from '../../../src/typedefs/membershipApplication';
 import { UserContext } from '../contexts/UserContext';
@@ -89,7 +90,7 @@ export default function MembershipApplicationList() {
     const [yearsList, setYearsList] = useState<number[]>([]);
     const [initialYear, setInitialYear] = useState<number>(calculateApplicationYear());
 
-    const { isOpen, onClose, onOpen } = useDisclosure(
+    const { isOpen, onClose, onOpen } = useAppDisclosure(
         { onClose: () => setDirty((olDirtyGotYaMoney) => !olDirtyGotYaMoney) },
     );
     const [selectedApplication, setSelectedApplication] = useState<MembershipApplication>();

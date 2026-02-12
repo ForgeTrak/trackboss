@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, useDisclosure, VStack } from '@chakra-ui/react';
+import { Button, VStack } from '@chakra-ui/react';
 import DataTable from 'react-data-table-component';
 
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { MemberCommunication } from '../../../src/typedefs/memberCommunication';
 import { MembershipTag } from '../../../src/typedefs/membershipTag';
 
@@ -19,8 +20,8 @@ export default function CommunicationsList() {
     const [uniqueTags, setUniqueTags] = useState<MembershipTag[]>();
     const [selectedCommunication, setSelectedCommunication] = useState<MemberCommunication>();
 
-    const { isOpen, onClose, onOpen } = useDisclosure();
-    const { isOpen: isViewOpen, onClose: onViewClose, onOpen: onViewOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useAppDisclosure();
+    const { isOpen: isViewOpen, onClose: onViewClose, onOpen: onViewOpen } = useAppDisclosure();
 
     async function initCommunicationsData() {
         const allCommunicationsData = await getCommunications(state.token);

@@ -1,7 +1,9 @@
-import { Box, Button, Center, Input, InputGroup, InputLeftElement, VStack, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Center, Input, InputGroup, InputLeftElement, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsSearch } from 'react-icons/bs';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
+
 import { PaidLabor } from '../../../src/typedefs/paidLabor';
 import { UserContext } from '../contexts/UserContext';
 import PaidLaborListRow from './PaidLaborListRow';
@@ -69,7 +71,7 @@ export default function PaidLaborList() {
 
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const { isOpen: isCreateOpen, onClose: onCreateClose, onOpen: onCreateOpen } = useDisclosure();
+    const { isOpen: isCreateOpen, onClose: onCreateClose, onOpen: onCreateOpen } = useAppDisclosure();
 
     async function getPaidLaborData() {
         let paidLabor : PaidLabor[] = [];

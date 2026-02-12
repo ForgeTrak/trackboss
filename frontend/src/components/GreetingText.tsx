@@ -4,9 +4,9 @@ import {
     Heading,
     Highlight,
     Text,
-    useDisclosure,
     VStack,
 } from '@chakra-ui/react';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { Bill } from '../../../src/typedefs/bill';
 import DuesAndWaiversModal from './modals/DuesAndWaiversModal';
 import { UserContext } from '../contexts/UserContext';
@@ -21,7 +21,7 @@ interface pageProps {
 
 export default function Header(props: pageProps) {
     const { billYear, lastBill } = props;
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useAppDisclosure();
     const { state } = useContext(UserContext);
 
     const allDone = (lastBill?.curYearPaid && lastBill.curYearIns);

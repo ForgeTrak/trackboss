@@ -7,10 +7,10 @@ import {
     Button,
     UnorderedList,
     ListItem,
-    useDisclosure,
 } from '@chakra-ui/react';
 import moment from 'moment';
 import _ from 'lodash';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { GetMemberListResponse, Member } from '../../../src/typedefs/member';
 import { Bike, GetBikeListResponse } from '../../../src/typedefs/bike';
 import DeleteAlert from './DeleteAlert';
@@ -30,12 +30,12 @@ interface cardProps {
 
 export default function GeneralInfo(props: cardProps) {
     const { state } = useContext(UserContext);
-    const { onClose: onRemoveFamilyClose, isOpen: isRemoveFamilyOpen, onOpen: onRemoveFamilyOpen } = useDisclosure();
-    const { onClose: onAddFamilyClose, isOpen: isAddFamilyOpen, onOpen: onAddFamilyOpen } = useDisclosure();
+    const { onClose: onRemoveFamilyClose, isOpen: isRemoveFamilyOpen, onOpen: onRemoveFamilyOpen } = useAppDisclosure();
+    const { onClose: onAddFamilyClose, isOpen: isAddFamilyOpen, onOpen: onAddFamilyOpen } = useAppDisclosure();
 
-    const { onClose: onRemoveBikeClose, isOpen: isRemoveBikeOpen, onOpen: onRemoveBikeOpen } = useDisclosure();
-    const { onClose: onEditBikeClose, isOpen: isEditBikeOpen, onOpen: onEditBikeOpen } = useDisclosure();
-    const { onClose: onAddBikeClose, isOpen: isAddBikeOpen, onOpen: onAddBikeOpen } = useDisclosure();
+    const { onClose: onRemoveBikeClose, isOpen: isRemoveBikeOpen, onOpen: onRemoveBikeOpen } = useAppDisclosure();
+    const { onClose: onEditBikeClose, isOpen: isEditBikeOpen, onOpen: onEditBikeOpen } = useAppDisclosure();
+    const { onClose: onAddBikeClose, isOpen: isAddBikeOpen, onOpen: onAddBikeOpen } = useAppDisclosure();
 
     const [memberFamily, setMemberFamily] = useState<GetMemberListResponse>([]);
     const [memberBikes, setMemberBikes] = useState<GetBikeListResponse>([]);

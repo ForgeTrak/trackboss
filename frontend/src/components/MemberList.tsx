@@ -1,10 +1,11 @@
 import {
     Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel,
-    Center, HStack, SimpleGrid, Stat, StatLabel, StatNumber, useDisclosure,
+    Center, HStack, SimpleGrid, Stat, StatLabel, StatNumber,
 } from '@chakra-ui/react';
 import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { ErrorResponse } from '../../../src/typedefs/errorResponse';
 import { Member } from '../../../src/typedefs/member';
 import { MemberType } from '../../../src/typedefs/memberType';
@@ -48,7 +49,7 @@ export default function MemberList() {
     const { state } = useContext(UserContext);
     const [error, setError] = useState<ErrorResponse | undefined>(undefined);
     const [dirty, setDirty] = useState<boolean>(false);
-    const { onClose, isOpen, onOpen } = useDisclosure({ onClose: () => setDirty((oldDirty) => !oldDirty) });
+    const { onClose, isOpen, onOpen } = useAppDisclosure({ onClose: () => setDirty((oldDirty) => !oldDirty) });
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [showActive, setShowActive] = useState<boolean>(true);
     const columns: any = [
