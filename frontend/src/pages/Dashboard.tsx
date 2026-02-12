@@ -124,7 +124,7 @@ function Dashboard() {
     return (
         <ChakraProvider theme={theme}>
             <VStack align="left" spacing="2em">
-                <Header title="Track Boss Dashboard" activeButtonId={1} />
+                <Header title="Dashboard" activeButtonId={1} />
                 {
                     state.user && lastBill && (
                         <GreetingText
