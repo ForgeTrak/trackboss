@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalCloseButton,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     VStack,
     Input,
     Select,
@@ -17,6 +12,7 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
 } from '@chakra-ui/react';
+import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 
 interface modalProps {
   isOpen: boolean,
@@ -38,14 +34,12 @@ export default function EditBikesModal(props: modalProps) {
     const maxModelYear = thisYear + 1;
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading pl={2} pr={2} textAlign="center">
-                    Add New Bike
-                </Heading>
-                <Divider mb={5} />
-                <ModalCloseButton />
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading pl={2} pr={2} textAlign="center">
+                Add New Bike
+            </Heading>
+            <Divider mb={5} />
+            <AppModalCloseButton />
                 <VStack
                     align="left"
                     mr={5}
@@ -90,7 +84,7 @@ export default function EditBikesModal(props: modalProps) {
                         size="md"
                     />
                 </VStack>
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -117,8 +111,7 @@ export default function EditBikesModal(props: modalProps) {
                     >
                         Save
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

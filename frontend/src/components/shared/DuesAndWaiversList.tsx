@@ -3,10 +3,11 @@ import {
     Box,
     Button,
     Center,
-    Heading, HStack, IconButton, Link, Modal, ModalContent, ModalOverlay,
+    Heading, HStack, IconButton, Link,
     Select, Stat, StatGroup, StatHelpText, StatLabel,
     StatNumber, Text, VStack,
 } from '@chakra-ui/react';
+import AppModal from '../AppModal';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsCashCoin, BsPrinter } from 'react-icons/bs';
@@ -269,9 +270,7 @@ export default function DuesAndWaiversList() {
                 subHeaderWrap
                 defaultSortFieldId={1}
             />
-            <Modal isCentered size="lg" isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent padding={3}>
+            <AppModal isCentered size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ padding: 3 }}>
                     <Heading>
                         {`Billing detail for ${selectedBill?.membershipAdmin} - ${selectedBill?.year}`}
                     </Heading>
@@ -414,8 +413,7 @@ export default function DuesAndWaiversList() {
                     >
                         Close
                     </Button>
-                </ModalContent>
-            </Modal>
+            </AppModal>
         </VStack>
     );
 }

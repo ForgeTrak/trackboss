@@ -1,16 +1,11 @@
 import React, { useContext } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalCloseButton,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     SimpleGrid,
-
 } from '@chakra-ui/react';
+import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 import moment from 'moment';
 import { Member } from '../../../src/typedefs/member';
 import { PatchJobRequest } from '../../../src/typedefs/job';
@@ -49,12 +44,10 @@ export default function FamilySignUpModal(props: modalProps) {
     }
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading pl={2} pr={2} textAlign="left">Select member to sign up</Heading>
-                <Divider mb={5} />
-                <ModalCloseButton />
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading pl={2} pr={2} textAlign="left">Select member to sign up</Heading>
+            <Divider mb={5} />
+            <AppModalCloseButton />
                 <SimpleGrid spacing={2} columns={3}>
                     {
                         props.familyMembers.map((member) => (
@@ -78,7 +71,7 @@ export default function FamilySignUpModal(props: modalProps) {
                     }
                 </SimpleGrid>
                 <Divider />
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -91,8 +84,7 @@ export default function FamilySignUpModal(props: modalProps) {
                     >
                         Close
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

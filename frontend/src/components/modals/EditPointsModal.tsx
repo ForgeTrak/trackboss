@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 
 import {
-    Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
+    Button, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
     NumberInputStepper, SimpleGrid,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 import { useAppToast } from '../../hooks/useAppToast';
 import { Job } from '../../../../src/typedefs/job';
 import { modifyJobPoints, removeSignup } from '../../controller/job';
@@ -24,12 +24,10 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
     const toast = useAppToast();
 
     return (
-        <Modal closeOnOverlayClick={false} isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>{`Edit points for ${props.memberName} - ${selectedJob.title}`}</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb={6}>
+        <AppModal closeOnOverlayClick={false} isOpen={props.isOpen} onClose={props.onClose}>
+            <AppModalHeader>{`Edit points for ${props.memberName} - ${selectedJob.title}`}</AppModalHeader>
+            <AppModalCloseButton />
+            <AppModalBody pb={6}>
                     <SimpleGrid columns={2}>
                         <NumberInput
                             min={0}
@@ -57,9 +55,9 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
                             </NumberInputStepper>
                         </NumberInput>
                     </SimpleGrid>
-                </ModalBody>
+                </AppModalBody>
 
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         onClick={props.onClose}
                         backgroundColor="orange"
@@ -87,8 +85,7 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
                         Delete
                     </Button>
                     <Button onClick={props.onClose} backgroundColor="white">Cancel</Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

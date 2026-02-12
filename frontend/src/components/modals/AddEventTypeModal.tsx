@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
     Box,
-    Button, Divider, Heading, Input, Modal, ModalContent, ModalFooter, ModalOverlay,
+    Button, Divider, Heading, Input,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from '../AppModal';
 import { PostNewEventTypeRequest } from '../../../../src/typedefs/eventType';
 import { createEventType } from '../../controller/eventType';
 
@@ -17,10 +18,8 @@ interface alertProps {
 export default function AddEventTypeModal(props: alertProps) {
     const [newEventType, setNewEventType] = useState<string>('');
     return (
-        <Modal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                 >
                     Add an event type
@@ -36,7 +35,7 @@ export default function AddEventTypeModal(props: alertProps) {
                         }
                     />
                 </Box>
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -67,8 +66,7 @@ export default function AddEventTypeModal(props: alertProps) {
                     >
                         Save
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

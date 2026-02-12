@@ -2,15 +2,9 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalCloseButton,
     Button,
     Divider,
     Heading,
-    ModalBody,
-    ModalFooter,
     SimpleGrid,
     VStack,
     Text,
@@ -22,6 +16,7 @@ import {
     Box,
     AccordionPanel,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter } from './AppModal';
 import moment from 'moment';
 import { BsTrash2 } from 'react-icons/bs';
 import DateTimePicker from 'react-datetime-picker';
@@ -76,10 +71,8 @@ export default function SelectedEventModal(props: modalProps) {
     const [restrictSignups] = useState<boolean>(props.selectedEvent.restrictSignups);
 
     return (
-        <Modal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                     pl={2}
                     pt={2}
@@ -87,7 +80,7 @@ export default function SelectedEventModal(props: modalProps) {
                 >
                     {getEventMonthDaySpan(props.selectedEvent.start.toString(), props.selectedEvent.end.toString())}
                 </Heading>
-                <ModalBody>
+            <AppModalBody>
                     <Text fontSize="2xl" textAlign="center">
                         {props.selectedEvent.title}
                     </Text>
@@ -195,10 +188,10 @@ export default function SelectedEventModal(props: modalProps) {
                     <Text fontSize="x-small">
                         {`Event ID: ${props.selectedEvent.eventId}`}
                     </Text>
-                </ModalBody>
+                </AppModalBody>
                 <Divider />
-                <ModalCloseButton />
-                <ModalFooter>
+                <AppModalCloseButton />
+                <AppModalFooter>
                     <Link
                         to={`signups/${(moment(props.selectedEvent.start).toISOString()).split('T')[0]}/${props.selectedEvent.eventId}/${props.selectedEvent.eventType}`}
                         state={{ date: props.selectedEvent.start }}
@@ -256,8 +249,7 @@ export default function SelectedEventModal(props: modalProps) {
                             </Button>
                         )
                     }
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

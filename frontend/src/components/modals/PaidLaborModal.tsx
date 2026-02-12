@@ -2,8 +2,9 @@ import React, { useState, useContext } from 'react';
 import _ from 'lodash';
 
 import {
-    Button, Divider, Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Text,
+    Button, Divider, Grid, GridItem, Heading, Input, Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 import PhoneInput from 'react-phone-number-input/input';
 
 import { useAppToast } from '../../hooks/useAppToast';
@@ -43,16 +44,14 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
     const { state } = useContext(UserContext);
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                 >
                     Update Paid Laborer
                 </Heading>
                 <Divider />
-                <ModalBody>
+                <AppModalBody>
                     <Grid
                         templateRows="repeat(4, 1fr)"
                         templateColumns="repeat(2, 1fr)"
@@ -128,8 +127,8 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
                             />
                         </GridItem>
                     </Grid>
-                </ModalBody>
-                <ModalFooter>
+                </AppModalBody>
+                <AppModalFooter>
                     <Button
                         backgroundColor="orange"
                         color="white"
@@ -167,10 +166,8 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
                     >
                         Close
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }
 PaidLaborModal.defaultProps = {

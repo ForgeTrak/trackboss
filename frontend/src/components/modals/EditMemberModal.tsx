@@ -2,9 +2,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    Button, Grid, GridItem, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, Text,
+    Button, Grid, GridItem, Input, Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
 import DatePicker from 'react-date-picker';
@@ -80,14 +80,12 @@ export default function EditMemberModal(props: EditMemberModalProps) {
             >
                 Edit
             </Button>
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalCloseButton />
-                    <ModalHeader>
+            <AppModal isOpen={isOpen} onClose={onClose}>
+                    <AppModalCloseButton />
+                    <AppModalHeader>
                         {`Edit member info - ${selectedMember.firstName} ${props.member.lastName}`}
-                    </ModalHeader>
-                    <ModalBody>
+                    </AppModalHeader>
+                    <AppModalBody>
                         <Grid
                             templateRows={`repeat(${rowCount}, 1fr)`}
                             templateColumns="repeat(2, 1fr)"
@@ -288,8 +286,8 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                                 />
                             </GridItem>
                         </Grid>
-                    </ModalBody>
-                    <ModalFooter>
+                    </AppModalBody>
+                    <AppModalFooter>
                         <Button
                             mr={4}
                             backgroundColor="orange"
@@ -344,9 +342,8 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                         <Button backgroundColor="white" onClick={onClose}>
                             Close
                         </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                    </AppModalFooter>
+            </AppModal>
         </>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { UserContext, UserContextProvider } from './contexts/UserContext';
+import AppProvider from './components/AppProvider';
 import Dashboard from './pages/Dashboard';
 import MemberListPage from './pages/MemberListPage';
 import Settings from './pages/Settings';
@@ -118,8 +119,10 @@ export function App() {
 
 export function AppWrapper() {
     return (
-        <UserContextProvider>
-            <App />
-        </UserContextProvider>
+        <AppProvider>
+            <UserContextProvider>
+                <App />
+            </UserContextProvider>
+        </AppProvider>
     );
 }

@@ -2,8 +2,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
     Box,
-    Button, Divider, Heading, Modal, ModalContent, ModalFooter, ModalOverlay,
+    Button, Divider, Heading,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from '../AppModal';
 import { Bill } from '../../../../src/typedefs/bill';
 import { UserContext } from '../../contexts/UserContext';
 
@@ -143,9 +144,7 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
     }
 
     return (
-        <Modal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
+        <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
                 <Heading m={3}>
                     {`${billingYear + 1} PRA bill and attestation`}
                 </Heading>
@@ -158,11 +157,9 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
                     {renewalAttestationComponent}
                 </Box>
                 <Divider />
-                <ModalFooter>
+                <AppModalFooter>
                     {renewalPaymentComponent}
-                </ModalFooter>
-            </ModalContent>
-
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

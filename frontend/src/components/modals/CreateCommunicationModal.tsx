@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
     Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Button, Checkbox, CheckboxGroup, Divider,
-    Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Select,
-    Text,
+    Grid, GridItem, Heading, Input, Select, Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAppToast } from '../../hooks/useAppToast';
@@ -66,16 +66,14 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
     const toast = useAppToast();
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                 >
                     Communication to PRA membership
                 </Heading>
                 <Divider />
-                <ModalBody>
+                <AppModalBody>
                     <Grid columnGap={2} rowGap={2}>
                         <GridItem colSpan={2}>
                             <Text>Subject</Text>
@@ -156,8 +154,8 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                             </Text>
                         </GridItem>
                     </Grid>
-                </ModalBody>
-                <ModalFooter>
+                </AppModalBody>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -201,9 +199,8 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                     >
                         Send
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }
 CreateCommunicationModal.defaultProps = {

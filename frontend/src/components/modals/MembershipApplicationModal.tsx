@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 import React, { useState } from 'react';
 import {
-    Alert, AlertIcon, Button, Divider, Grid, GridItem, Heading, Link, ListItem, Modal, ModalContent, ModalFooter,
-    ModalOverlay, OrderedList, SimpleGrid, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, VStack,
+    Alert, AlertIcon, Button, Divider, Grid, GridItem, Heading, Link, ListItem, OrderedList, SimpleGrid, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, VStack,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from '../AppModal';
 import moment from 'moment';
 import { MembershipApplication } from '../../../../src/typedefs/membershipApplication';
 import NameAddressDisplay from '../shared/NameAddressDisplay';
@@ -30,9 +30,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
     const isAccepted = (membershipApplication.status === 'Accepted');
 
     return (
-        <Modal isCentered size="lg" isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent m={3}>
+        <AppModal isCentered size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ m: 3 }}>
                 <Heading ml={3}>
                     Application -
                     &nbsp;
@@ -129,7 +127,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                         application status.
                     </Alert>
                 </SimpleGrid>
-                <ModalFooter>
+                <AppModalFooter>
                     <Grid templateColumns="repeat(2, 2fr)" gap={3}>
                         <GridItem>
                             <Button
@@ -215,8 +213,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                             </Button>
                         </GridItem>
                     </Grid>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
     Button,
-    IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
+    IconButton, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
     NumberInputStepper, VStack,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 import { BsPlus } from 'react-icons/bs';
 import moment from 'moment';
 import DatePicker from 'react-date-picker';
@@ -70,12 +70,10 @@ export default function AddPointsModal(props: AddPointsModalProps) {
     return (
         <>
             {addButton}
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{`Add Points to ${props.memberName}`}</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
+            <AppModal isOpen={isOpen} onClose={onClose}>
+                <AppModalHeader>{`Add Points to ${props.memberName}`}</AppModalHeader>
+                <AppModalCloseButton />
+                <AppModalBody>
                         <VStack>
                             <MemberSelector
                                 isAdmin={false}
@@ -128,9 +126,9 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                                 maxDate={new Date()}
                             />
                         </VStack>
-                    </ModalBody>
+                </AppModalBody>
 
-                    <ModalFooter>
+                <AppModalFooter>
                         <Button
                             mr={4}
                             backgroundColor="orange"
@@ -181,9 +179,8 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                         <Button backgroundColor="white" onClick={onClose}>
                             Close
                         </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                </AppModalFooter>
+            </AppModal>
         </>
     );
 }

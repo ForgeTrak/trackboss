@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
     Button,
     Heading,
-    ModalFooter,
     Divider,
     Box,
     Input,
     Spinner,
     Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from '../AppModal';
 import DatePicker from 'react-date-picker';
 import Select from 'react-select';
 
@@ -44,9 +41,7 @@ export default function AddFamilyModal(props: modalProps) {
     const [dependentStatus, setDependentStatus] = useState<string>();
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
                 <Heading pl={2} pr={2} textAlign="center">
                     Add family member
                 </Heading>
@@ -165,7 +160,7 @@ export default function AddFamilyModal(props: modalProps) {
                         />
                     </Box>
                 </Box>
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         color="black"
                         variant="ghost"
@@ -227,8 +222,7 @@ export default function AddFamilyModal(props: modalProps) {
                     </Button>
                     <Text hidden={!isSaving}>{`Saving ${firstName}, please wait`}</Text>
                     <Spinner hidden={!isSaving} color="orange" />
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

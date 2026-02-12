@@ -1,9 +1,7 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
 import { BsTools } from 'react-icons/bs';
 import { FaMoneyCheck, FaTeamspeak } from 'react-icons/fa';
 
-import theme from '../theme';
 import Header from '../components/Header';
 import EventSignupSheet from '../components/EventSignupSheet';
 import PaidLaborList from '../components/PaidLaborList';
@@ -12,7 +10,7 @@ import SiteSettings from '../components/tabpanels/SiteSettings';
 
 function RaceAdministration() {
     return (
-        <ChakraProvider theme={theme}>
+        <>
             <Header title="Club Administration" activeButtonId={6} />
             <CustomTabPanel
                 tabs={
@@ -24,7 +22,7 @@ function RaceAdministration() {
                 }
                 panels={[<EventSignupSheet />, <PaidLaborList />, <SiteSettings />]}
             />
-        </ChakraProvider>
+        </>
     );
 }
 

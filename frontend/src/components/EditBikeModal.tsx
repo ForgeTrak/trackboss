@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalCloseButton,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     Text,
     VStack,
     Input,
-
 } from '@chakra-ui/react';
+import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 import { Bike } from '../../../src/typedefs/bike';
 
 interface modalProps {
@@ -42,10 +37,8 @@ export default function EditBikesModal(props: modalProps) {
     }, [props.bikeToEdit]);
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading pl={2} pr={2} textAlign="center">
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading pl={2} pr={2} textAlign="center">
                     Edit this bike
                 </Heading>
                 <Text fontSize="2xl" textAlign="center">
@@ -54,7 +47,7 @@ export default function EditBikesModal(props: modalProps) {
                     {`${bike?.year}, ${bike?.make} ${bike?.model}`}
                 </Text>
                 <Divider mb={5} />
-                <ModalCloseButton />
+                <AppModalCloseButton />
                 <VStack
                     align="left"
                     mr={5}
@@ -82,7 +75,7 @@ export default function EditBikesModal(props: modalProps) {
                         size="md"
                     />
                 </VStack>
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -109,8 +102,7 @@ export default function EditBikesModal(props: modalProps) {
                     >
                         Save
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

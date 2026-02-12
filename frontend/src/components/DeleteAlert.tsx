@@ -1,14 +1,11 @@
 import React from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from './AppModal';
 
 interface alertProps {
   isOpen: boolean,
@@ -18,17 +15,15 @@ interface alertProps {
 
 export default function DeleteAlert(props: alertProps) {
     return (
-        <Modal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                 >
                     Are you sure?
                 </Heading>
                 <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
                 <Divider />
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -54,8 +49,7 @@ export default function DeleteAlert(props: alertProps) {
                     >
                         Delete
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

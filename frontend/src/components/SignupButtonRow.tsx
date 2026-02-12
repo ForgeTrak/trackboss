@@ -1,7 +1,7 @@
 import {
-    Button, ButtonGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
-    SimpleGrid,
+    Button, ButtonGroup, SimpleGrid,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 import React, { useContext, useEffect, useState } from 'react';
 import { BsCurrencyDollar, BsTrash2 } from 'react-icons/bs';
 import moment from 'moment-timezone';
@@ -93,12 +93,10 @@ export default function SignupButtonRow(props: any) {
                         </>
                     )
                 }
-                <Modal isOpen={isNonMemberOpen} onClose={onNonMemberClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader>Add Non Member</ModalHeader>
-                        <ModalCloseButton />
-                        <ModalBody>
+                            <AppModal isOpen={isNonMemberOpen} onClose={onNonMemberClose}>
+                                        <AppModalHeader>Add Non Member</AppModalHeader>
+                                        <AppModalCloseButton />
+                                        <AppModalBody>
                             You can use this window to add a non member to a job.  Adding a member this way
                             will cause their points to not be counted for this job, so please use the Member dropdown
                             for that.  You can either select a name here, or type a new one (FirstName LastName).
@@ -108,9 +106,9 @@ export default function SignupButtonRow(props: any) {
                                 disabled={false}
                                 setSelectedOption={setSelectedPaidLaborOption}
                             />
-                        </ModalBody>
+                                        </AppModalBody>
 
-                        <ModalFooter>
+                                        <AppModalFooter>
                             <Button
                                 backgroundColor="orange.300"
                                 color="white"
@@ -130,9 +128,8 @@ export default function SignupButtonRow(props: any) {
                             <Button ml={3} color="white" onClick={onNonMemberClose}>
                                 Close
                             </Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
+                                        </AppModalFooter>
+                            </AppModal>
             </SimpleGrid>
         );
     } else {

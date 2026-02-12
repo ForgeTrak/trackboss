@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
     Button,
     Text,
     SimpleGrid,
@@ -17,6 +10,7 @@ import {
     Spinner,
     Center,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 import DateTimePicker from 'react-datetime-picker';
 import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'react-calendar/dist/Calendar.css';
@@ -71,12 +65,10 @@ export default function CreateEventModal(props: CreateEventModalProps) {
     return (
         <div>
             { error !== '' }
-            <Modal isCentered size="xl" isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader><Heading>Create New Event</Heading></ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
+            <AppModal isCentered size="xl" isOpen={isOpen} onClose={onClose}>
+                <AppModalHeader><Heading>Create New Event</Heading></AppModalHeader>
+                <AppModalCloseButton />
+                <AppModalBody>
                         {
                             isEventCreating ? (
                                 <Center>
@@ -157,8 +149,8 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                                 </SimpleGrid>
                             )
                         }
-                    </ModalBody>
-                    <ModalFooter>
+                </AppModalBody>
+                <AppModalFooter>
                         <Button
                             variant="ghost"
                             mr={3}
@@ -191,9 +183,8 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                         >
                             Create
                         </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                </AppModalFooter>
+            </AppModal>
         </div>
     );
 }

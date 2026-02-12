@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
-    Box, Button, Divider, Heading, Input, Modal, ModalContent, ModalFooter, ModalOverlay,
+    Box, Button, Divider, Heading, Input,
     NumberInput, NumberInputField, SimpleGrid, Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from '../AppModal';
 import { useAppToast } from '../../hooks/useAppToast';
 import { createEventJob } from '../../controller/eventJob';
 import { createJobType } from '../../controller/jobType';
@@ -31,10 +32,8 @@ export default function AddJobTypeModal(props: alertProps) {
     const [sortOrder, setSortOrder] = useState<number>(99);
     const toast = useAppToast();
     return (
-        <Modal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
+        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
                     textAlign="center"
                 >
                     Add a &nbsp;
@@ -116,7 +115,7 @@ export default function AddJobTypeModal(props: alertProps) {
                         <Text fontSize="xs">(default is 99, bottom of the list for the day)</Text>
                     </Box>
                 </SimpleGrid>
-                <ModalFooter>
+                <AppModalFooter>
                     <Button
                         variant="ghost"
                         mr={3}
@@ -165,8 +164,7 @@ export default function AddJobTypeModal(props: alertProps) {
                     >
                         Save
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }

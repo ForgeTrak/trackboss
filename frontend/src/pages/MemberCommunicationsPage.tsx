@@ -1,16 +1,15 @@
 import React from 'react';
-import { Box, ChakraProvider } from '@chakra-ui/react';
-import theme from '../theme';
+import { Box } from '@chakra-ui/react';
 import Header from '../components/Header';
 import CommunicationsList from '../components/CommunicationsList';
 
 function MemberCommunicationsPage() {
     return (
-        <ChakraProvider theme={theme}>
+        <>
             <Header title="Member Communications" activeButtonId={5} />
             <Box mt={0} pt={0} />
             <CommunicationsList />
-        </ChakraProvider>
+        </>
     );
 }
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-    Button, Divider, Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Text,
+    Button, Divider, Grid, GridItem, Heading, Input, Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 import { MemberCommunication } from '../../../../src/typedefs/memberCommunication';
 import 'react-quill/dist/quill.snow.css';
 
@@ -13,16 +14,14 @@ interface ViewCommunicationModalProps {
 
 export default function ViewCommunicationModal(props: ViewCommunicationModalProps) {
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
-                    textAlign="center"
-                >
-                    Communication to PRA membership
-                </Heading>
-                <Divider />
-                <ModalBody>
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
+                textAlign="center"
+            >
+                Communication to PRA membership
+            </Heading>
+            <Divider />
+            <AppModalBody>
                     <Grid columnGap={2} rowGap={2}>
                         <GridItem colSpan={2}>
                             <Text>Subject</Text>
@@ -56,14 +55,13 @@ export default function ViewCommunicationModal(props: ViewCommunicationModalProp
                             />
                         </GridItem>
                     </Grid>
-                </ModalBody>
-                <ModalFooter>
+                </AppModalBody>
+                <AppModalFooter>
                     <Button backgroundColor="white" onClick={props.onClose}>
                         Close
                     </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </AppModalFooter>
+        </AppModal>
     );
 }
 ViewCommunicationModal.defaultProps = {

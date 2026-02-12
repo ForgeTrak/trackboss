@@ -4,12 +4,6 @@
 import _ from 'lodash';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalCloseButton,
     Button,
     Text,
     SimpleGrid,
@@ -28,6 +22,7 @@ import {
     Input,
     Link,
 } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalHeader } from './AppModal';
 import Select from 'react-select';
 import { BsTags } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
@@ -138,19 +133,18 @@ export default function MemberSummaryModal(props: modalProps) {
     const viewingSelf = (state.user?.memberId === props.memberInfo.memberId);
 
     return (
-        <Modal
+        <AppModal
             size="xl"
             isOpen={props.isOpen}
             onClose={props.onClose}
+            contentProps={{ pb: 5 }}
         >
-            <ModalOverlay />
-            <ModalContent pb={5}>
-                <ModalHeader>
+            <AppModalHeader>
                     <Heading textAlign="center">Member Summary</Heading>
-                </ModalHeader>
+                </AppModalHeader>
                 <Divider />
-                <ModalCloseButton />
-                <ModalBody>
+                <AppModalCloseButton />
+                <AppModalBody>
                     { error !== '' }
                     {
                         selectedMember && bikes && (
@@ -534,8 +528,7 @@ export default function MemberSummaryModal(props: modalProps) {
                             </SimpleGrid>
                         )
                     }
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+                </AppModalBody>
+        </AppModal>
     );
 }
