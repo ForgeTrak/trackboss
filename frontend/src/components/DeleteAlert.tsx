@@ -1,14 +1,11 @@
 import React from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     Text,
 } from '@chakra-ui/react';
+import AppModal, { AppModalFooter } from './AppModal';
 
 interface alertProps {
   isOpen: boolean,
@@ -18,44 +15,41 @@ interface alertProps {
 
 export default function DeleteAlert(props: alertProps) {
     return (
-        <Modal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
-                    textAlign="center"
+        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
+                textAlign="center"
+            >
+                Are you sure?
+            </Heading>
+            <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
+            <Divider />
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.onClose();
+                        }
+                    }
                 >
-                    Are you sure?
-                </Heading>
-                <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
-                <Divider />
-                <ModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.onClose();
-                            }
+                    Cancel
+                </Button>
+                <Button
+                    color="red"
+                    variant="ghost"
+                    size="lg"
+                    onClick={
+                        () => {
+                            props.removeMethod();
+                            props.onClose();
                         }
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        color="red"
-                        variant="ghost"
-                        size="lg"
-                        onClick={
-                            () => {
-                                props.removeMethod();
-                                props.onClose();
-                            }
-                        }
-                    >
-                        Delete
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                    }
+                >
+                    Delete
+                </Button>
+            </AppModalFooter>
+        </AppModal>
     );
 }

@@ -6,7 +6,7 @@ import {
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
-    Box, Button, ChakraProvider, Divider, Image, Input, Link, SimpleGrid, Stat,
+    Box, Button, Divider, Image, Input, Link, SimpleGrid, Stat,
     StatHelpText, StatLabel, StatNumber, Text, VStack,
 } from '@chakra-ui/react';
 import { BsTrash2, BsPersonPlus } from 'react-icons/bs';
@@ -18,7 +18,6 @@ import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import _ from 'lodash';
 
-import theme from '../theme';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { applicationExists } from '../controller/membershipApplication';
 import { memberExistsByEmail } from '../controller/member';
@@ -81,7 +80,7 @@ function ApplicationForm() {
     });
 
     let applicationForm = (
-        <ChakraProvider theme={theme}>
+        <>
             <Box
                 mt={0}
                 pt={0}
@@ -520,7 +519,7 @@ function ApplicationForm() {
                     }
                 }
             />
-        </ChakraProvider>
+        </>
     );
     if (!isEnabled) {
         applicationForm = (

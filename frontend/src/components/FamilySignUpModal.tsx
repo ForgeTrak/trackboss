@@ -1,17 +1,12 @@
 import React, { useContext } from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalCloseButton,
     Button,
     Divider,
     Heading,
-    ModalFooter,
     SimpleGrid,
-
 } from '@chakra-ui/react';
 import moment from 'moment';
+import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 import { Member } from '../../../src/typedefs/member';
 import { PatchJobRequest } from '../../../src/typedefs/job';
 import { UserContext } from '../contexts/UserContext';
@@ -49,50 +44,47 @@ export default function FamilySignUpModal(props: modalProps) {
     }
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading pl={2} pr={2} textAlign="left">Select member to sign up</Heading>
-                <Divider mb={5} />
-                <ModalCloseButton />
-                <SimpleGrid spacing={2} columns={3}>
-                    {
-                        props.familyMembers.map((member) => (
-                            <Button
-                                key={member.memberId}
-                                onClick={
-                                    async () => {
-                                        const signUpPatch = await generateJobSignUpPatch(member.memberId);
-                                        if (signUpPatch) {
-                                            props.signUpForJob(signUpPatch);
-                                        }
-                                        props.onClose();
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading pl={2} pr={2} textAlign="left">Select member to sign up</Heading>
+            <Divider mb={5} />
+            <AppModalCloseButton />
+            <SimpleGrid spacing={2} columns={3}>
+                {
+                    props.familyMembers.map((member) => (
+                        <Button
+                            key={member.memberId}
+                            onClick={
+                                async () => {
+                                    const signUpPatch = await generateJobSignUpPatch(member.memberId);
+                                    if (signUpPatch) {
+                                        props.signUpForJob(signUpPatch);
                                     }
+                                    props.onClose();
                                 }
-                                m={3}
-                                _hover={{ bg: 'orange.100' }}
-                            >
-                                {`${member.firstName} ${member.lastName}`}
-                            </Button>
-                        ))
-                    }
-                </SimpleGrid>
-                <Divider />
-                <ModalFooter>
-                    <Button
-                        variant="ghost"
-                        mr={3}
-                        size="sm"
-                        onClick={
-                            () => {
-                                props.onClose();
                             }
+                            m={3}
+                            _hover={{ bg: 'orange.100' }}
+                        >
+                            {`${member.firstName} ${member.lastName}`}
+                        </Button>
+                    ))
+                }
+            </SimpleGrid>
+            <Divider />
+            <AppModalFooter>
+                <Button
+                    variant="ghost"
+                    mr={3}
+                    size="sm"
+                    onClick={
+                        () => {
+                            props.onClose();
                         }
-                    >
-                        Close
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                    }
+                >
+                    Close
+                </Button>
+            </AppModalFooter>
+        </AppModal>
     );
 }

@@ -2,9 +2,10 @@ import React, { useState, useContext } from 'react';
 import _ from 'lodash';
 
 import {
-    Button, Divider, Grid, GridItem, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, Text,
+    Button, Divider, Grid, GridItem, Heading, Input, Text,
 } from '@chakra-ui/react';
 import PhoneInput from 'react-phone-number-input/input';
+import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 
 import { useAppToast } from '../../hooks/useAppToast';
 import { PaidLabor } from '../../../../src/typedefs/paidLabor';
@@ -43,134 +44,130 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
     const { state } = useContext(UserContext);
 
     return (
-        <Modal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <Heading
-                    textAlign="center"
+        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <Heading
+                textAlign="center"
+            >
+                Update Paid Laborer
+            </Heading>
+            <Divider />
+            <AppModalBody>
+                <Grid
+                    templateRows="repeat(4, 1fr)"
+                    templateColumns="repeat(2, 1fr)"
+                    columnGap={1}
                 >
-                    Update Paid Laborer
-                </Heading>
-                <Divider />
-                <ModalBody>
-                    <Grid
-                        templateRows="repeat(4, 1fr)"
-                        templateColumns="repeat(2, 1fr)"
-                        columnGap={1}
-                    >
-                        <GridItem colSpan={1}>
-                            <Text>First Name</Text>
-                            <Input
-                                defaultValue={laborer?.firstName}
-                                value={firstName}
-                                size="md"
-                                onChange={
-                                    (e) => {
-                                        setFirstName(_.startCase(e.target.value));
-                                    }
+                    <GridItem colSpan={1}>
+                        <Text>First Name</Text>
+                        <Input
+                            defaultValue={laborer?.firstName}
+                            value={firstName}
+                            size="md"
+                            onChange={
+                                (e) => {
+                                    setFirstName(_.startCase(e.target.value));
                                 }
-                            />
-                        </GridItem>
-                        <GridItem colSpan={1}>
-                            <Text>Last Name</Text>
-                            <Input
-                                defaultValue={laborer?.lastName}
-                                value={lastName}
-                                size="md"
-                                onChange={
-                                    (e) => {
-                                        setLastName(_.startCase(e.target.value));
-                                    }
-                                }
-                            />
-                        </GridItem>
-                        <GridItem colSpan={1}>
-                            <Text>Business Name</Text>
-                            <Input
-                                defaultValue={laborer?.businessName}
-                                value={businessName}
-                                size="md"
-                                onChange={
-                                    (e) => {
-                                        setBusinessName(_.startCase(e.target.value));
-                                    }
-                                }
-                            />
-                        </GridItem>
-                        <GridItem colSpan={2}>
-                            <Text>Phone</Text>
-                            <Text size="xs">
-                                Phone must be ten digits and include area code. Number formatted automatically.
-                            </Text>
-                            <PhoneInput
-                                autocomplete="new-password"
-                                style={chakraStyleForNonChakra}
-                                placeHolder={laborer?.phoneNumber}
-                                defaultCountry="US"
-                                onChange={
-                                    (e) => {
-                                        setPhone(e);
-                                    }
-                                }
-                            />
-                        </GridItem>
-                        <GridItem colSpan={2}>
-                            <Text>email</Text>
-                            <Input
-                                size="md"
-                                defaultValue={laborer?.email}
-                                onChange={
-                                    (e) => {
-                                        const typedEmail = e.target.value;
-                                        setEmail(typedEmail);
-                                    }
-                                }
-                            />
-                        </GridItem>
-                    </Grid>
-                </ModalBody>
-                <ModalFooter>
-                    <Button
-                        backgroundColor="orange"
-                        color="white"
-                        onClick={
-                            async () => {
-                                const laborerEntry : PaidLabor = {
-                                    firstName: firstName || laborer?.firstName,
-                                    lastName: lastName || laborer?.lastName,
-                                    businessName: businessName || laborer?.businessName,
-                                    phoneNumber: phone || laborer?.phoneNumber,
-                                    email: email || laborer?.email,
-                                };
-                                if (editMode) {
-                                    // we are editing an existing entry so PUT it
-                                    laborerEntry.paidLaborId = laborer?.paidLaborId || 0;
-                                    await updatePaidLabor(state.token, laborerEntry);
-                                } else {
-                                    // It's new, so add it to the back end, yay!
-                                    await createPaidLabor(state.token, laborerEntry);
-                                }
-                                toast.success({
-                                    title: 'Paid labor info updated',
-                                    description: `${JSON.stringify(laborerEntry)}`,
-                                    duration: 2500,
-                                });
-                                props.onClose();
                             }
+                        />
+                    </GridItem>
+                    <GridItem colSpan={1}>
+                        <Text>Last Name</Text>
+                        <Input
+                            defaultValue={laborer?.lastName}
+                            value={lastName}
+                            size="md"
+                            onChange={
+                                (e) => {
+                                    setLastName(_.startCase(e.target.value));
+                                }
+                            }
+                        />
+                    </GridItem>
+                    <GridItem colSpan={1}>
+                        <Text>Business Name</Text>
+                        <Input
+                            defaultValue={laborer?.businessName}
+                            value={businessName}
+                            size="md"
+                            onChange={
+                                (e) => {
+                                    setBusinessName(_.startCase(e.target.value));
+                                }
+                            }
+                        />
+                    </GridItem>
+                    <GridItem colSpan={2}>
+                        <Text>Phone</Text>
+                        <Text size="xs">
+                            Phone must be ten digits and include area code. Number formatted automatically.
+                        </Text>
+                        <PhoneInput
+                            autocomplete="new-password"
+                            style={chakraStyleForNonChakra}
+                            placeHolder={laborer?.phoneNumber}
+                            defaultCountry="US"
+                            onChange={
+                                (e) => {
+                                    setPhone(e);
+                                }
+                            }
+                        />
+                    </GridItem>
+                    <GridItem colSpan={2}>
+                        <Text>email</Text>
+                        <Input
+                            size="md"
+                            defaultValue={laborer?.email}
+                            onChange={
+                                (e) => {
+                                    const typedEmail = e.target.value;
+                                    setEmail(typedEmail);
+                                }
+                            }
+                        />
+                    </GridItem>
+                </Grid>
+            </AppModalBody>
+            <AppModalFooter>
+                <Button
+                    backgroundColor="orange"
+                    color="white"
+                    onClick={
+                        async () => {
+                            const laborerEntry : PaidLabor = {
+                                firstName: firstName || laborer?.firstName,
+                                lastName: lastName || laborer?.lastName,
+                                businessName: businessName || laborer?.businessName,
+                                phoneNumber: phone || laborer?.phoneNumber,
+                                email: email || laborer?.email,
+                            };
+                            if (editMode) {
+                                // we are editing an existing entry so PUT it
+                                laborerEntry.paidLaborId = laborer?.paidLaborId || 0;
+                                await updatePaidLabor(state.token, laborerEntry);
+                            } else {
+                                // It's new, so add it to the back end, yay!
+                                await createPaidLabor(state.token, laborerEntry);
+                            }
+                            toast.success({
+                                title: 'Paid labor info updated',
+                                description: `${JSON.stringify(laborerEntry)}`,
+                                duration: 2500,
+                            });
+                            props.onClose();
                         }
-                    >
-                        { editMode ? 'Update' : 'Save' }
-                    </Button>
-                    <Button
-                        backgroundColor="white"
-                        onClick={props.onClose}
-                    >
-                        Close
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-
-        </Modal>
+                    }
+                >
+                    { editMode ? 'Update' : 'Save' }
+                </Button>
+                <Button
+                    backgroundColor="white"
+                    onClick={props.onClose}
+                >
+                    Close
+                </Button>
+            </AppModalFooter>
+        </AppModal>
     );
 }
 PaidLaborModal.defaultProps = {

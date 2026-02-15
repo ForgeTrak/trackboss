@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, ChakraProvider } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { UserContext } from '../contexts/UserContext';
 import EventCalendar from '../components/EventCalendar';
 import Header from '../components/Header';
-import theme from '../theme';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { getCalendarEventsAndJobs } from '../controller/event';
 
@@ -19,7 +18,7 @@ function CalendarPage() {
         getData();
     }, []);
     return (
-        <ChakraProvider theme={theme}>
+        <>
             <Header title="Calendar" activeButtonId={2} />
             <Box p={5} pt={3} pl={10} pr={10}>
                 {
@@ -28,7 +27,7 @@ function CalendarPage() {
                     )
                 }
             </Box>
-        </ChakraProvider>
+        </>
     );
 }
 

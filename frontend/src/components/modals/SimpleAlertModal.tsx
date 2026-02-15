@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-    Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton,
-    Button,
-} from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 
 interface SimpleAlertModalProps {
     isOpen: boolean;
@@ -13,20 +11,17 @@ interface SimpleAlertModalProps {
 
 export default function SimpleAlertModal(props: SimpleAlertModalProps) {
     return (
-        <Modal isOpen={props.isOpen} onClose={props.onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>{props.title}</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                    {props.message}
-                </ModalBody>
-                <ModalFooter>
-                    <Button backgroundColor="orange" color="white" mr={3} onClick={props.onClose}>
-                        Close
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+        <AppModal isOpen={props.isOpen} onClose={props.onClose}>
+            <AppModalHeader>{props.title}</AppModalHeader>
+            <AppModalCloseButton />
+            <AppModalBody>
+                {props.message}
+            </AppModalBody>
+            <AppModalFooter>
+                <Button backgroundColor="orange" color="white" mr={3} onClick={props.onClose}>
+                    Close
+                </Button>
+            </AppModalFooter>
+        </AppModal>
     );
 }

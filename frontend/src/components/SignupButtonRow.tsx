@@ -1,10 +1,10 @@
 import {
-    Button, ButtonGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
-    SimpleGrid,
+    Button, ButtonGroup, SimpleGrid,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import { BsCurrencyDollar, BsTrash2 } from 'react-icons/bs';
 import moment from 'moment-timezone';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { signupForJob, removeSignup, setPaidState } from '../controller/job';
@@ -93,46 +93,43 @@ export default function SignupButtonRow(props: any) {
                         </>
                     )
                 }
-                <Modal isOpen={isNonMemberOpen} onClose={onNonMemberClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader>Add Non Member</ModalHeader>
-                        <ModalCloseButton />
-                        <ModalBody>
-                            You can use this window to add a non member to a job.  Adding a member this way
-                            will cause their points to not be counted for this job, so please use the Member dropdown
-                            for that.  You can either select a name here, or type a new one (FirstName LastName).
-                            and then select it.  These are editable and contact info can be added on the Paid Labor tab.
-                            <PaidLaborSelector
-                                isAdmin
-                                disabled={false}
-                                setSelectedOption={setSelectedPaidLaborOption}
-                            />
-                        </ModalBody>
+                <AppModal isOpen={isNonMemberOpen} onClose={onNonMemberClose}>
+                    <AppModalHeader>Add Non Member</AppModalHeader>
+                    <AppModalCloseButton />
+                    <AppModalBody>
+                        You can use this window to add a non member to a job.  Adding a member this way
+                        will cause their points to not be counted for this job, so please use the Member dropdown
+                        for that.  You can either select a name here, or type a new one (FirstName LastName).
+                        and then select it.  These are editable and contact info can be added on the Paid Labor tab.
+                        <PaidLaborSelector
+                            isAdmin
+                            disabled={false}
+                            setSelectedOption={setSelectedPaidLaborOption}
+                        />
+                    </AppModalBody>
 
-                        <ModalFooter>
-                            <Button
-                                backgroundColor="orange.300"
-                                color="white"
-                                onClick={
-                                    async () => {
-                                        // eslint-disable-next-line max-len
-                                        await signupForJob(state.token, props.data.jobId, selectedPaidLaborOption.value, true);
-                                        // await signupForJobFreeForm(state.token, props.data.jobId, paidLabor);
-                                        await props.refreshData();
-                                        setMarkedPaid(true);
-                                        onNonMemberClose();
-                                    }
+                    <AppModalFooter>
+                        <Button
+                            backgroundColor="orange.300"
+                            color="white"
+                            onClick={
+                                async () => {
+                                    // eslint-disable-next-line max-len
+                                    await signupForJob(state.token, props.data.jobId, selectedPaidLaborOption.value, true);
+                                    // await signupForJobFreeForm(state.token, props.data.jobId, paidLabor);
+                                    await props.refreshData();
+                                    setMarkedPaid(true);
+                                    onNonMemberClose();
                                 }
-                            >
-                                Save
-                            </Button>
-                            <Button ml={3} color="white" onClick={onNonMemberClose}>
-                                Close
-                            </Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
+                            }
+                        >
+                            Save
+                        </Button>
+                        <Button ml={3} color="white" onClick={onNonMemberClose}>
+                            Close
+                        </Button>
+                    </AppModalFooter>
+                </AppModal>
             </SimpleGrid>
         );
     } else {
