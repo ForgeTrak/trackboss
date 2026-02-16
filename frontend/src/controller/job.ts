@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestBlob } from './utils';
 import {
     DeleteJobResponse,
     GetJobListResponse,
@@ -11,32 +11,15 @@ import {
     PostNewJobResponse,
 } from '../../../src/typedefs/job';
 
-export async function createJob(token: string, jobData: PostNewJobRequest): Promise<PostNewJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(jobData),
-    });
-    return response.json();
+export function createJob(token: string, jobData: PostNewJobRequest): Promise<PostNewJobResponse> {
+    return apiRequest(token, 'POST', '/api/job/new', jobData);
 }
 
-export async function getJobList(token: string, queryType?: string, filterType?: string): Promise<GetJobListResponse> {
-    if (queryType && filterType) {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/list?${queryType}=${filterType}`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-        return response.json();
-    }
-    // else
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getJobList(token: string, queryType?: string, filterType?: string): Promise<GetJobListResponse> {
+    const path = (queryType && filterType)
+        ? `/api/job/list?${queryType}=${filterType}`
+        : '/api/job/list';
+    return apiRequest(token, 'GET', path);
 }
 
 export async function getCalendarJobs(token: string) {
@@ -55,61 +38,34 @@ export async function getCalendarJobs(token: string) {
     return undefined;
 }
 
-export async function getJob(token: string, jobID: number): Promise<GetJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/${jobID}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getJob(token: string, jobID: number): Promise<GetJobResponse> {
+    return apiRequest(token, 'GET', `/api/job/${jobID}`);
 }
 
-export async function updateJob(token: string, jobID: number, jobData: PatchJobRequest): Promise<PatchJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/${jobID}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(jobData),
-    });
-    return response.json();
+export function updateJob(token: string, jobID: number, jobData: PatchJobRequest): Promise<PatchJobResponse> {
+    return apiRequest(token, 'PATCH', `/api/job/${jobID}`, jobData);
 }
 
-export async function cloneJob(token: string, jobID: number): Promise<PostCloneJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/${jobID}`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function cloneJob(token: string, jobID: number): Promise<PostCloneJobResponse> {
+    return apiRequest(token, 'POST', `/api/job/${jobID}`);
 }
 
-export async function deleteJob(token: string, jobID: number): Promise<DeleteJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/${jobID}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    const res: DeleteJobResponse = await response.json();
-    return res;
+export function deleteJob(token: string, jobID: number): Promise<DeleteJobResponse> {
+    return apiRequest(token, 'DELETE', `/api/job/${jobID}`);
 }
 
-export async function setVerifiedState(token: string, jobId: number, state: boolean) : Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/verify/${jobId}/${state}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function setVerifiedState(token: string, jobId: number, state: boolean): Promise<any> {
+    return apiRequest(token, 'PATCH', `/api/job/verify/${jobId}/${state}`);
 }
 
-export async function setPaidState(token: string, jobId: number) : Promise<any> {
-    const paidJob : any = await getJob(token, jobId);
+export async function setPaidState(token: string, jobId: number): Promise<any> {
+    const paidJob: any = await getJob(token, jobId);
     const isPaidLaborer = (!paidJob.memberId && paidJob.member);
     if (isPaidLaborer) {
         paidJob.paidLabor = paidJob.member;
     }
     paidJob.paid = !paidJob.paid;
-    const modifiedJob : any = await updateJob(token, jobId, paidJob);
+    const modifiedJob: any = await updateJob(token, jobId, paidJob);
     return modifiedJob;
 }
 
@@ -120,48 +76,38 @@ export async function setPaidState(token: string, jobId: number) : Promise<any> 
  * @param workerId member, or paid laborer, to signup for the job.
  * @returns job signed up for.
  */
-export async function signupForJob(token:string, jobId: number, workerId: number, isPaidLabor: boolean = false)
+export async function signupForJob(token: string, jobId: number, workerId: number, isPaidLabor: boolean = false)
     : Promise<any> {
-    const signupJob : any = await getJob(token, jobId);
+    const signupJob: any = await getJob(token, jobId);
     if (isPaidLabor) {
         signupJob.paidLaborId = workerId;
     } else {
         signupJob.memberId = workerId;
     }
-    const modifiedJob : any = await updateJob(token, jobId, signupJob);
+    const modifiedJob: any = await updateJob(token, jobId, signupJob);
     return modifiedJob;
 }
 
-export async function signupForJobFreeForm(token: string, jobId: number, name: string) : Promise<any> {
-    const signupJob : any = await getJob(token, jobId);
+export async function signupForJobFreeForm(token: string, jobId: number, name: string): Promise<any> {
+    const signupJob: any = await getJob(token, jobId);
     // when we add paid labor to a job the assumption is that it is paid. Admins can undo this, but this
     // assumption saves them work.
     signupJob.paidLabor = name;
     signupJob.paid = true;
-    const modifiedJob : any = await updateJob(token, jobId, signupJob);
+    const modifiedJob: any = await updateJob(token, jobId, signupJob);
     return modifiedJob;
 }
 
-export async function signupForOpenEventJob(token: string, eventId: number, memberId: number) : Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/event/${eventId}/${memberId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function signupForOpenEventJob(token: string, eventId: number, memberId: number): Promise<any> {
+    return apiRequest(token, 'PATCH', `/api/job/event/${eventId}/${memberId}`);
 }
 
-export async function removeSignup(token:string, jobId: number) : Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/remove/signup/${jobId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function removeSignup(token: string, jobId: number): Promise<any> {
+    return apiRequest(token, 'PATCH', `/api/job/remove/signup/${jobId}`);
 }
 
-export async function modifyJobPoints(token: string, jobId:number, points: number) : Promise<any> {
-    const signupJob : GetJobResponse = await getJob(token, jobId) as Job;
+export async function modifyJobPoints(token: string, jobId: number, points: number): Promise<any> {
+    const signupJob: GetJobResponse = await getJob(token, jobId) as Job;
     signupJob.pointsAwarded = points;
     const updatedJob = await updateJob(token, jobId, signupJob);
     return updatedJob;
@@ -173,29 +119,13 @@ interface Worker {
     verified: boolean
 }
 
-export async function getSignupList(token: string, eventId: number): Promise<Worker[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/list?eventID=${eventId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getSignupList(token: string, eventId: number): Promise<Worker[]> {
+    return apiRequest(token, 'GET', `/api/job/list?eventID=${eventId}`);
 }
 
-export async function getSignupListExcel(token: string, eventId: number, shouldGetJobs: boolean): Promise<Blob> {
-    let response;
-    if (shouldGetJobs) {
-        response = await fetch(`${process.env.REACT_APP_API_URL}/api/job/list/excel?eventID=${eventId}`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-    } else {
-        response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/list/excel`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-    }
-    return response.blob();
+export function getSignupListExcel(token: string, eventId: number, shouldGetJobs: boolean): Promise<Blob> {
+    const path = shouldGetJobs
+        ? `/api/job/list/excel?eventID=${eventId}`
+        : '/api/workPoints/list/excel';
+    return apiRequestBlob(token, path);
 }

@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 import {
     DeleteEventJobResponse,
     GetEventJobResponse,
@@ -8,47 +8,25 @@ import {
     PostNewEventJobResponse,
 } from '../../../src/typedefs/eventJob';
 
-export async function createEventJob(
+export function createEventJob(
     token: string,
     eventJobData: PostNewEventJobRequest,
 ): Promise<PostNewEventJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventJob/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventJobData),
-    });
-    return response.json();
+    return apiRequest(token, 'POST', '/api/eventJob/new', eventJobData);
 }
 
-export async function getEventJob(token: string, eventJobId: number): Promise<GetEventJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventJob/${eventJobId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getEventJob(token: string, eventJobId: number): Promise<GetEventJobResponse> {
+    return apiRequest(token, 'GET', `/api/eventJob/${eventJobId}`);
 }
 
-export async function updateEventJob(
+export function updateEventJob(
     token: string,
     eventJobId: number,
     eventJobData: PatchEventJobRequest,
 ): Promise<PatchEventJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventJob/${eventJobId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventJobData),
-    });
-    return response.json();
+    return apiRequest(token, 'PATCH', `/api/eventJob/${eventJobId}`, eventJobData);
 }
 
-export async function deleteEventJob(token: string, eventJobId: number): Promise<DeleteEventJobResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventJob/${eventJobId}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function deleteEventJob(token: string, eventJobId: number): Promise<DeleteEventJobResponse> {
+    return apiRequest(token, 'DELETE', `/api/eventJob/${eventJobId}`);
 }

@@ -6,59 +6,32 @@ import {
     PostNewBoardMemberRequest,
     PostNewBoardMemberResponse,
 } from '../../../src/typedefs/boardMember';
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 
-export async function getAllBoardMembersForYear(token: string, year: number): Promise<GetBoardMemberListResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/boardMember/list?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getAllBoardMembersForYear(token: string, year: number): Promise<GetBoardMemberListResponse> {
+    return apiRequest(token, 'GET', `/api/boardMember/list?year=${year}`);
 }
 
-export async function getAllBoardMembersForCurrentYear(token: string): Promise<GetBoardMemberListResponse> {
+export function getAllBoardMembersForCurrentYear(token: string): Promise<GetBoardMemberListResponse> {
     const currentYear = new Date().getFullYear();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/boardMember/list?year=${currentYear}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+    return apiRequest(token, 'GET', `/api/boardMember/list?year=${currentYear}`);
 }
 
-export async function getBoardRoles(token: string): Promise<GetBoardMemberTypeListResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/boardMemberType/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getBoardRoles(token: string): Promise<GetBoardMemberTypeListResponse> {
+    return apiRequest(token, 'GET', '/api/boardMemberType/list');
 }
 
-export async function updateBoardMember(
+export function updateBoardMember(
     token: string,
     boardMemberId: number,
     req: PatchBoardMemberRequest,
 ): Promise<PatchBoardMemberResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/boardMember/${boardMemberId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(req),
-    });
-    return response.json();
+    return apiRequest(token, 'PATCH', `/api/boardMember/${boardMemberId}`, req);
 }
 
-export async function createBoardMember(
+export function createBoardMember(
     token: string,
     req: PostNewBoardMemberRequest,
 ): Promise<PostNewBoardMemberResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/boardMember/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(req),
-    });
-    return response.json();
+    return apiRequest(token, 'POST', '/api/boardMember/new', req);
 }

@@ -1,5 +1,7 @@
 import moment from 'moment';
 
+export const API_BASE = process.env.REACT_APP_API_URL;
+
 /* eslint-disable radix */
 export function generateHeaders(token: string, range?: string): Headers {
     if (typeof range === 'undefined') {
@@ -13,6 +15,49 @@ export function generateHeaders(token: string, range?: string): Headers {
         Authorization: `Bearer ${token}`,
         Range: `${range}`,
     });
+}
+
+export async function apiRequest<T>(
+    token: string,
+    method: string,
+    path: string,
+    body?: any,
+    options?: { range?: string; mode?: 'cors' | 'no-cors' },
+): Promise<T> {
+    const response = await fetch(`${API_BASE}${path}`, {
+        method,
+        mode: options?.mode || 'cors',
+        headers: generateHeaders(token, options?.range),
+        ...(body !== undefined && { body: JSON.stringify(body) }),
+    });
+    return response.json();
+}
+
+export async function apiRequestBlob(
+    token: string,
+    path: string,
+): Promise<Blob> {
+    const response = await fetch(`${API_BASE}${path}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: generateHeaders(token),
+    });
+    return response.blob();
+}
+
+export async function apiRequestNoAuth<T>(
+    method: string,
+    path: string,
+    body?: any,
+    options?: { mode?: 'cors' | 'no-cors'; headers?: Record<string, string> },
+): Promise<T> {
+    const response = await fetch(`${API_BASE}${path}`, {
+        method,
+        mode: options?.mode || 'cors',
+        ...(options?.headers && { headers: options.headers }),
+        ...(body !== undefined && { body: JSON.stringify(body) }),
+    });
+    return response.json();
 }
 
 // Creates a string with today's date in YYYYMMDD format

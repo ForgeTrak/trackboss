@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestBlob } from './utils';
 import {
     GetMembershipWorkPointsResponse,
     GetMemberWorkPointsResponse,
@@ -10,45 +10,23 @@ function isWorkPoints(res: WorkPoints | ErrorResponse): res is WorkPoints {
     return (res as WorkPoints) !== undefined;
 }
 
-export async function getWorkPointsByMember(
+export function getWorkPointsByMember(
     token: string,
     memberId: number,
     year?: number,
 ): Promise<GetMemberWorkPointsResponse> {
-    if (typeof year === 'undefined') {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/byMember/${memberId}`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-        return response.json();
-    }
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/byMember/${memberId}?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+    const path = typeof year === 'undefined'
+        ? `/api/workPoints/byMember/${memberId}`
+        : `/api/workPoints/byMember/${memberId}?year=${year}`;
+    return apiRequest(token, 'GET', path);
 }
 
-export async function getWorkPointsByMembership(token: string, membershipId: number, year?: number):
+export function getWorkPointsByMembership(token: string, membershipId: number, year?: number):
     Promise<GetMembershipWorkPointsResponse> {
-    if (typeof year === 'undefined') {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/byMembership/${membershipId}`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-        return response.json();
-    }
-    // eslint-disable-next-line max-len
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/byMembership/${membershipId}?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-
-    return response.json();
+    const path = typeof year === 'undefined'
+        ? `/api/workPoints/byMembership/${membershipId}`
+        : `/api/workPoints/byMembership/${membershipId}?year=${year}`;
+    return apiRequest(token, 'GET', path);
 }
 
 export async function getWorkPointsTotal(token: string, membershipId: number) {
@@ -61,20 +39,10 @@ export async function getWorkPointsTotal(token: string, membershipId: number) {
     return undefined;
 }
 
-export async function getMemberPointsExcel(token: string): Promise<Blob> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/workPoints/list/excel`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.blob();
+export function getMemberPointsExcel(token: string): Promise<Blob> {
+    return apiRequestBlob(token, '/api/workPoints/list/excel');
 }
 
-export async function getEligibleVoters(token: string): Promise<Blob> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/list/voterEligibility/excel`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.blob();
+export function getEligibleVoters(token: string): Promise<Blob> {
+    return apiRequestBlob(token, '/api/member/list/voterEligibility/excel');
 }

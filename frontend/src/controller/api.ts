@@ -1,8 +1,8 @@
-import { generateHeaders } from './utils';
+import { generateHeaders, API_BASE } from './utils';
 import { Member } from '../../../src/typedefs/member';
 
 export default async function me(token: string): Promise<Member> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/me`, {
+    const response = await fetch(`${API_BASE}/api/me`, {
         method: 'GET',
         mode: 'cors',
         headers: generateHeaders(token),

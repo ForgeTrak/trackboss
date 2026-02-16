@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestBlob } from './utils';
 import {
     GetBillListResponse,
     GetMembershipBillListResponse,
@@ -13,21 +13,11 @@ function isThreshold(res: WorkPointThreshold | ErrorResponse): res is WorkPointT
     return (res as WorkPointThreshold) !== undefined;
 }
 
-export async function getYearlyThreshold(token: string, year?: number): Promise<GetWorkPointThresholdResponse> {
-    if (typeof year === 'undefined') {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/yearlyWorkPointThreshold`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-        return response.json();
-    }
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/yearlyWorkPointThreshold?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getYearlyThreshold(token: string, year?: number): Promise<GetWorkPointThresholdResponse> {
+    const path = typeof year === 'undefined'
+        ? '/api/billing/yearlyWorkPointThreshold'
+        : `/api/billing/yearlyWorkPointThreshold?year=${year}`;
+    return apiRequest(token, 'GET', path);
 }
 
 export async function getYearlyThresholdValue(token: string) {
@@ -39,79 +29,37 @@ export async function getYearlyThresholdValue(token: string) {
     return undefined;
 }
 
-export async function getBills(token: string, billingYear: number): Promise<GetBillListResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/list?year=${billingYear}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getBills(token: string, billingYear: number): Promise<GetBillListResponse> {
+    return apiRequest(token, 'GET', `/api/billing/list?year=${billingYear}`);
 }
 
-export async function getBillsForMembership(
+export function getBillsForMembership(
     token: string,
     membershipID: number,
 ): Promise<GetMembershipBillListResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/${membershipID}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    const responseJson = response.json();
-    return responseJson;
+    return apiRequest(token, 'GET', `/api/billing/${membershipID}`);
 }
 
-export async function generateBills(token: string): Promise<PostCalculateBillsResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function generateBills(token: string): Promise<PostCalculateBillsResponse> {
+    return apiRequest(token, 'POST', '/api/billing');
 }
 
-export async function payBill(token: string, billId: number, paymentMethod: string): Promise<PostPayBillResponse> {
-    const response =
-        await fetch(`${process.env.REACT_APP_API_URL}/api/billing/${billId}?paymentMethod=${paymentMethod}`, {
-            method: 'POST',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-    return response.json();
+export function payBill(token: string, billId: number, paymentMethod: string): Promise<PostPayBillResponse> {
+    return apiRequest(token, 'POST', `/api/billing/${billId}?paymentMethod=${paymentMethod}`);
 }
 
-export async function attestInsurance(token: string, billId: number): Promise<PostPayBillResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/attestIns/${billId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function attestInsurance(token: string, billId: number): Promise<PostPayBillResponse> {
+    return apiRequest(token, 'PATCH', `/api/billing/attestIns/${billId}`);
 }
 
-export async function markContactedAndRenewing(token: string, billId: number): Promise<PostPayBillResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/markContacted/${billId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function markContactedAndRenewing(token: string, billId: number): Promise<PostPayBillResponse> {
+    return apiRequest(token, 'PATCH', `/api/billing/markContacted/${billId}`);
 }
 
-export async function discountBill(token: string, billId: number): Promise<PostPayBillResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/discount/${billId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function discountBill(token: string, billId: number): Promise<PostPayBillResponse> {
+    return apiRequest(token, 'PATCH', `/api/billing/discount/${billId}`);
 }
 
-export async function getBillListExcel(token: string): Promise<Blob> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/billing/list/excel`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.blob();
+export function getBillListExcel(token: string): Promise<Blob> {
+    return apiRequestBlob(token, '/api/billing/list/excel');
 }

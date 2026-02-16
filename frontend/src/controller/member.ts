@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestNoAuth } from './utils';
 
 import {
     GetMemberListResponse,
@@ -10,96 +10,43 @@ import {
     PostNewMemberResponse,
 } from '../../../src/typedefs/member';
 
-export async function createMember(token: string, memberData: PostNewMemberRequest): Promise<PostNewMemberResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(memberData),
-    });
-    return response.json();
+export function createMember(token: string, memberData: PostNewMemberRequest): Promise<PostNewMemberResponse> {
+    return apiRequest(token, 'POST', '/api/member/new', memberData);
 }
 
-export async function getMember(token: string, memberId: number): Promise<GetMemberResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/${memberId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getMember(token: string, memberId: number): Promise<GetMemberResponse> {
+    return apiRequest(token, 'GET', `/api/member/${memberId}`);
 }
 
 export function getFamilyMembers(token: string, membershipId: number): Promise<GetMemberListResponse> {
-    return fetch(`${process.env.REACT_APP_API_URL}/api/member/list?membershipId=${membershipId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    }).then((response) => response.json()).then((data) => data as GetMemberListResponse);
+    return apiRequest(token, 'GET', `/api/member/list?membershipId=${membershipId}`);
 }
 
-export async function getMemberList(token: string, listType?: string): Promise<GetMemberListResponse> {
-    if (listType) {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/list?status=${listType}`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token),
-        });
-        return response.json();
-    }
-    // else
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getMemberList(token: string, listType?: string): Promise<GetMemberListResponse> {
+    const path = listType ? `/api/member/list?status=${listType}` : '/api/member/list';
+    return apiRequest(token, 'GET', path);
 }
 
-export async function updateMember(
+export function updateMember(
     token: string,
     memberID: number,
     memberData: PatchMemberRequest,
 ): Promise<PatchMemberResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/${memberID}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(memberData),
-    });
-    return response.json();
+    return apiRequest(token, 'PATCH', `/api/member/${memberID}`, memberData);
 }
 
-export async function getMembersByMembership(token: string, membershipId: number): Promise<Member[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/list?membershipId=${membershipId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getMembersByMembership(token: string, membershipId: number): Promise<Member[]> {
+    return apiRequest(token, 'GET', `/api/member/list?membershipId=${membershipId}`);
 }
 
-export async function getMemberByEmail(token: string, email: string): Promise<Member> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/email/${email}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getMemberByEmail(token: string, email: string): Promise<Member> {
+    return apiRequest(token, 'GET', `/api/member/email/${email}`);
 }
 
-export async function memberExistsByEmail(email: string): Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/email/exists/${email}`, {
-        method: 'GET',
-        mode: 'cors',
-    });
-    return response.json();
+export function memberExistsByEmail(email: string): Promise<any> {
+    return apiRequestNoAuth('GET', `/api/member/email/exists/${email}`);
 }
 
-export async function resetMemberPassword(token: string, memberId?: number): Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/member/resetpassword/${memberId}`, {
-        method: 'PUT',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function resetMemberPassword(token: string, memberId?: number): Promise<any> {
+    return apiRequest(token, 'PUT', `/api/member/resetpassword/${memberId}`);
 }

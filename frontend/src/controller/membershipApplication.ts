@@ -1,101 +1,54 @@
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestBlob, apiRequestNoAuth } from './utils';
 
 import { MembershipApplication } from '../../../src/typedefs/membershipApplication';
 
-function buildNotesBody(internalNotes: string, applicantNotes: string) {
-    return JSON.stringify({
-        internalNotes,
-        applicantNotes,
-    });
+// eslint-disable-next-line import/prefer-default-export
+export function getMembershipApplications(token: string, year: number): Promise<MembershipApplication[]> {
+    return apiRequest(token, 'GET', `/api/membershipApplication?year=${year}`);
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export async function getMembershipApplications(token: string, year: number): Promise<MembershipApplication[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
-}
-export async function getMembershipApplication(
+export function getMembershipApplication(
     token: string,
     id: number,
 ): Promise<MembershipApplication[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication/${id}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+    return apiRequest(token, 'GET', `/api/membershipApplication/${id}`);
 }
 
-export async function applicationExists(
-    email: string,
-) : Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication/exists/${email}`, {
-        method: 'GET',
-        mode: 'cors',
-    });
-    return response.json();
+export function applicationExists(email: string): Promise<any> {
+    return apiRequestNoAuth('GET', `/api/membershipApplication/exists/${email}`);
 }
 
-export async function acceptMembershipApplication(
+export function acceptMembershipApplication(
     token: string,
     id: number,
     internalNotes: string,
     applicantNotes: string,
     isGuest?: boolean,
 ): Promise<MembershipApplication[]> {
-    let acceptUrl = `${process.env.REACT_APP_API_URL}/api/membershipApplication/accept/${id}`;
-    if (isGuest) {
-        acceptUrl = `${acceptUrl}?guest=${isGuest}`;
-    }
-    const response = await fetch(
-        acceptUrl,
-        {
-            method: 'POST',
-            mode: 'cors',
-            headers: generateHeaders(token),
-            body: buildNotesBody(internalNotes, applicantNotes),
-        },
-    );
-    return response.json();
-}
-export async function rejectMembershipApplication(
-    token: string,
-    id: number,
-    internalNotes: string,
-    applicantNotes: string,
-): Promise<MembershipApplication[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication/reject/${id}`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: buildNotesBody(internalNotes, applicantNotes),
-    });
-    return response.json();
-}
-export async function reviewMembershipApplication(
-    token: string,
-    id: number,
-    internalNotes: string,
-    applicantNotes: string,
-): Promise<MembershipApplication[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication/review/${id}`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: buildNotesBody(internalNotes, applicantNotes),
-    });
-    return response.json();
+    const path = isGuest
+        ? `/api/membershipApplication/accept/${id}?guest=${isGuest}`
+        : `/api/membershipApplication/accept/${id}`;
+    return apiRequest(token, 'POST', path, { internalNotes, applicantNotes });
 }
 
-export async function getMembershipApplicationListExcel(token: string, year: number): Promise<Blob> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication/list/excel?year=${year}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.blob();
+export function rejectMembershipApplication(
+    token: string,
+    id: number,
+    internalNotes: string,
+    applicantNotes: string,
+): Promise<MembershipApplication[]> {
+    return apiRequest(token, 'POST', `/api/membershipApplication/reject/${id}`, { internalNotes, applicantNotes });
+}
+
+export function reviewMembershipApplication(
+    token: string,
+    id: number,
+    internalNotes: string,
+    applicantNotes: string,
+): Promise<MembershipApplication[]> {
+    return apiRequest(token, 'POST', `/api/membershipApplication/review/${id}`, { internalNotes, applicantNotes });
+}
+
+export function getMembershipApplicationListExcel(token: string, year: number): Promise<Blob> {
+    return apiRequestBlob(token, `/api/membershipApplication/list/excel?year=${year}`);
 }

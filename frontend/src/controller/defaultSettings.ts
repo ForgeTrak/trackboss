@@ -2,60 +2,29 @@ import {
     GetDefaultSettingsResponse,
     DefaultSetting,
 } from '../../../src/typedefs/defaultSetting';
-import { generateHeaders } from './utils';
+import { apiRequest, apiRequestNoAuth } from './utils';
 
-export async function getDefaultSettingsList(token: string): Promise<GetDefaultSettingsResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getDefaultSettingsList(token: string): Promise<GetDefaultSettingsResponse> {
+    return apiRequest(token, 'GET', '/api/defaultSettings');
 }
 
-export async function getDefaultSettingsByName(token: string, name: string): Promise<DefaultSetting> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings/${name}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getDefaultSettingsByName(token: string, name: string): Promise<DefaultSetting> {
+    return apiRequest(token, 'GET', `/api/defaultSettings/${name}`);
 }
 
-export async function getApplicationSetting(): Promise<DefaultSetting> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings/applications/enabled`, {
-        method: 'GET',
-        mode: 'cors',
-    });
-    return response.json();
+export function getApplicationSetting(): Promise<DefaultSetting> {
+    return apiRequestNoAuth('GET', '/api/defaultSettings/applications/enabled');
 }
 
-export async function deleteDefaultSetting(token: string, id:number): Promise<any> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings/${id}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function deleteDefaultSetting(token: string, id: number): Promise<any> {
+    return apiRequest(token, 'DELETE', `/api/defaultSettings/${id}`);
 }
 
 // eslint-disable-next-line max-len
-export async function updateDefaultSetting(token: string, setting: DefaultSetting) : Promise<GetDefaultSettingsResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings/${setting.settingId}`, {
-        method: 'PUT',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(setting),
-    });
-    return response.json();
+export function updateDefaultSetting(token: string, setting: DefaultSetting): Promise<GetDefaultSettingsResponse> {
+    return apiRequest(token, 'PUT', `/api/defaultSettings/${setting.settingId}`, setting);
 }
 
-export async function createDefaultSetting(token: string, setting: DefaultSetting) : Promise<DefaultSetting> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/defaultSettings`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(setting),
-    });
-    return response.json();
+export function createDefaultSetting(token: string, setting: DefaultSetting): Promise<DefaultSetting> {
+    return apiRequest(token, 'POST', '/api/defaultSettings', setting);
 }
