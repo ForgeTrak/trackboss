@@ -23,7 +23,7 @@ export function App() {
         update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
-        const authTarget = `${process.env.REACT_APP_AUTH_URL}/login?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
+        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
         window.location.href = authTarget;
     }, [update]);
 

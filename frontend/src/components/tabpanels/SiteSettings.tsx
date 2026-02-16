@@ -104,7 +104,7 @@ function SiteSettings() {
             {
                 (state.user?.memberType === 'Admin') && (
                     <Link
-                        href={`${process.env.REACT_APP_API_URL}/api/defaultSettings/admin/dataBackup?id=${state.token}`}
+                        href={`${import.meta.env.VITE_API_URL}/api/defaultSettings/admin/dataBackup?id=${state.token}`}
                         mt={4}
                     >
                         Download all data as mysql compatible restore file
