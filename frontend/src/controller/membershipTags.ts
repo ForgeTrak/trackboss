@@ -1,60 +1,27 @@
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 
 import { MembershipTag } from '../../../src/typedefs/membershipTag';
 
-export async function getMembershipTags(
+export function getMembershipTags(token: string, id: number): Promise<MembershipTag[]> {
+    return apiRequest(token, 'GET', `/api/membership/tags/${id}`);
+}
+
+export function addMembershipTags(
     token: string,
-    id: number,
+    membershipId: number,
+    tags: string[],
 ): Promise<MembershipTag[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membership/tags/${id}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+    return apiRequest(token, 'POST', '/api/membership/tags', { membershipId, tags });
 }
 
-export async function addMembershipTags(
+export function deleteMembershipTags(
     token: string,
     membershipId: number,
     tags: string[],
-) : Promise<MembershipTag[]> {
-    const tagsBody = {
-        membershipId,
-        tags,
-    };
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membership/tags`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(tagsBody),
-    });
-    return response.json();
+): Promise<MembershipTag[]> {
+    return apiRequest(token, 'DELETE', '/api/membership/tags', { membershipId, tags });
 }
 
-export async function deleteMembershipTags(
-    token: string,
-    membershipId: number,
-    tags: string[],
-) : Promise<MembershipTag[]> {
-    const tagsBody = {
-        membershipId,
-        tags,
-    };
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membership/tags`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(tagsBody),
-    });
-    return response.json();
-}
-
-export async function getUniqueTags(token: string) : Promise<MembershipTag[]> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/membershipTags/unique`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getUniqueTags(token: string): Promise<MembershipTag[]> {
+    return apiRequest(token, 'GET', '/api/membershipTags/unique');
 }

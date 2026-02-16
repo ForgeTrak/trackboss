@@ -3,42 +3,20 @@ import {
     GetPaidLaborResponse,
     PaidLabor,
 } from '../../../src/typedefs/paidLabor';
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 
-export async function getPaidLaborList(token: string): Promise<GetPaidLaborResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/paidLabor/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getPaidLaborList(token: string): Promise<GetPaidLaborResponse> {
+    return apiRequest(token, 'GET', '/api/paidLabor/list');
 }
 
-export async function deletePaidLabor(token: string, id:number): Promise<DeletePaidLaborResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/paidLabor/${id}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function deletePaidLabor(token: string, id: number): Promise<DeletePaidLaborResponse> {
+    return apiRequest(token, 'DELETE', `/api/paidLabor/${id}`);
 }
 
-export async function updatePaidLabor(token: string, laborer: PaidLabor) : Promise<GetPaidLaborResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/paidLabor/${laborer.paidLaborId}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(laborer),
-    });
-    return response.json();
+export function updatePaidLabor(token: string, laborer: PaidLabor): Promise<GetPaidLaborResponse> {
+    return apiRequest(token, 'PATCH', `/api/paidLabor/${laborer.paidLaborId}`, laborer);
 }
 
-export async function createPaidLabor(token: string, laborer: PaidLabor) : Promise<PaidLabor> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/paidLabor`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(laborer),
-    });
-    return response.json();
+export function createPaidLabor(token: string, laborer: PaidLabor): Promise<PaidLabor> {
+    return apiRequest(token, 'POST', '/api/paidLabor', laborer);
 }

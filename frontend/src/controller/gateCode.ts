@@ -1,26 +1,15 @@
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 
 import { GetGateCodeResponse } from '../../../src/typedefs/gateCode';
 
-export async function getGateCodeLatest(token: string, membershipId?: number): Promise<GetGateCodeResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/gateCode/latest?membershipId=${membershipId}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getGateCodeLatest(token: string, membershipId?: number): Promise<GetGateCodeResponse> {
+    return apiRequest(token, 'GET', `/api/gateCode/latest?membershipId=${membershipId}`);
 }
 
-export async function createGateCode(token: string, gateCode: string): Promise<GetGateCodeResponse> {
+export function createGateCode(token: string, gateCode: string): Promise<GetGateCodeResponse> {
     const gateCodeRequest = {
         year: (new Date()).getFullYear(),
         gateCode,
     };
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/gateCode/latest`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(gateCodeRequest),
-    });
-    return response.json();
+    return apiRequest(token, 'POST', '/api/gateCode/latest', gateCodeRequest);
 }

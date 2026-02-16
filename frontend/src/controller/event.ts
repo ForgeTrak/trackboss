@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { generateHeaders, getEventMonthDay, getTimeOfDay } from './utils';
+import { apiRequest, getEventMonthDay, getTimeOfDay } from './utils';
 import {
     DeleteEventResponse,
     GetEventListResponse,
@@ -18,14 +18,8 @@ function isEventList(res: Event[] | ErrorResponse): res is Event[] {
     return (res as Event[]) !== undefined;
 }
 
-export async function createEvent(token: string, eventData: PostNewEventRequest): Promise<PostNewEventResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventData),
-    });
-    return response.json();
+export function createEvent(token: string, eventData: PostNewEventRequest): Promise<PostNewEventResponse> {
+    return apiRequest(token, 'POST', '/api/event/new', eventData);
 }
 
 // TODO: this is a mocked response for frontend development, replace once API is complete
@@ -39,22 +33,11 @@ export async function makeEvent(name: string, description: string, start: Date, 
     });
 }
 
-export async function getEventList(token: string, listType?: string): Promise<GetEventListResponse> {
+export function getEventList(token: string, listType?: string): Promise<GetEventListResponse> {
     if (listType) {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/list`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: generateHeaders(token, listType),
-        });
-        return response.json();
+        return apiRequest(token, 'GET', '/api/event/list', undefined, { range: listType });
     }
-    // else
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+    return apiRequest(token, 'GET', '/api/event/list');
 }
 
 export async function getCalendarEvents(token: string) {
@@ -97,37 +80,20 @@ export async function getEventCardProps(token: string, listType: string) {
     return undefined;
 }
 
-export async function getEvent(token: string, eventID: number): Promise<GetEventResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/${eventID}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getEvent(token: string, eventID: number): Promise<GetEventResponse> {
+    return apiRequest(token, 'GET', `/api/event/${eventID}`);
 }
 
-export async function updateEvent(
+export function updateEvent(
     token: string,
     eventID: number,
     eventData: PatchEventRequest,
 ): Promise<PatchEventResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/${eventID}`, {
-        method: 'PATCH',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventData),
-    });
-    return response.json();
+    return apiRequest(token, 'PATCH', `/api/event/${eventID}`, eventData);
 }
 
-export async function deleteEvent(token: string, eventID: number) {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/${eventID}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    const res: DeleteEventResponse = await response.json();
-    return res;
+export function deleteEvent(token: string, eventID: number): Promise<DeleteEventResponse> {
+    return apiRequest(token, 'DELETE', `/api/event/${eventID}`);
 }
 
 export async function getCalendarEventsAndJobs(token: string) {
@@ -143,11 +109,6 @@ export async function getCalendarEventsAndJobs(token: string) {
     return calendarEvents;
 }
 
-export async function getNextEvent(token: string): Promise<GetEventResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/event/next`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getNextEvent(token: string): Promise<GetEventResponse> {
+    return apiRequest(token, 'GET', '/api/event/next');
 }

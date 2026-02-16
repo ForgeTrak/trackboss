@@ -1,4 +1,4 @@
-import { generateHeaders } from './utils';
+import { apiRequest } from './utils';
 import {
     GetEventTypeListResponse,
     GetEventTypeResponse,
@@ -8,48 +8,25 @@ import {
     PostNewEventTypeResponse,
 } from '../../../src/typedefs/eventType';
 
-export async function createEventType(
+export function createEventType(
     token: string,
     eventTypeData: PostNewEventTypeRequest,
 ): Promise<PostNewEventTypeResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventType/new`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventTypeData),
-    });
-    return response.json();
+    return apiRequest(token, 'POST', '/api/eventType/new', eventTypeData);
 }
 
-export async function getEventType(token: string, eventTypeId: number): Promise<GetEventTypeResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventType/${eventTypeId}`, {
-        method: 'GET',
-        mode: 'no-cors',
-        headers: generateHeaders(token),
-    });
-    return response.json();
+export function getEventType(token: string, eventTypeId: number): Promise<GetEventTypeResponse> {
+    return apiRequest(token, 'GET', `/api/eventType/${eventTypeId}`, undefined, { mode: 'no-cors' });
 }
 
-export async function updateEventType(
+export function updateEventType(
     token: string,
     eventTypeId: number,
     eventTypeData: PatchEventTypeRequest,
 ): Promise<PatchEventTypeResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventType/${eventTypeId}`, {
-        method: 'PATCH',
-        mode: 'no-cors',
-        headers: generateHeaders(token),
-        body: JSON.stringify(eventTypeData),
-    });
-    return response.json();
+    return apiRequest(token, 'PATCH', `/api/eventType/${eventTypeId}`, eventTypeData, { mode: 'no-cors' });
 }
 
-export async function getEventTypeList(token: string): Promise<GetEventTypeListResponse> {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/eventType/list`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: generateHeaders(token),
-    });
-    const res: GetEventTypeListResponse = await response.json();
-    return res;
+export function getEventTypeList(token: string): Promise<GetEventTypeListResponse> {
+    return apiRequest(token, 'GET', '/api/eventType/list');
 }
