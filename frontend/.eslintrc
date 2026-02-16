@@ -67,8 +67,8 @@
             }
         }
     ],
+    "ignorePatterns": ["src/__tests__/**", "src/mocks/**"],
     "env": {
-        "browser": true,
-        "jest": true
+        "browser": true
     }
 }
