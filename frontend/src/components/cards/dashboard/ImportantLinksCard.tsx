@@ -22,7 +22,7 @@ export default function ImportantLinksCard(props: cardProps) {
                         target="_blank"
                         fontSize="2xl"
                         // eslint-disable-next-line max-len
-                        href={`${process.env.REACT_APP_API_URL}/api/member/card/create/${props.memberId}?id=${props.jwt}`}
+                        href={`${import.meta.env.VITE_API_URL}/api/member/card/create/${props.memberId}?id=${props.jwt}`}
                         color="orange"
                     >
                         <ListItem>

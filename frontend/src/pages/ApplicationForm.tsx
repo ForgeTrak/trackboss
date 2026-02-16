@@ -478,7 +478,7 @@ function ApplicationForm() {
                             };
                             setApplicationJson(JSON.stringify(application));
 
-                            fetch(`${process.env.REACT_APP_API_URL}/api/membershipApplication`, {
+                            fetch(`${import.meta.env.VITE_API_URL}/api/membershipApplication`, {
                                 method: 'POST',
                                 mode: 'cors',
                                 headers: {
