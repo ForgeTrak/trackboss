@@ -1,4 +1,4 @@
-export const handler = async (event) => {
+exports.handler = async (event) => {
   const rawTenantIds = event.request.userAttributes["custom:tenant_ids"];
 
   if (!rawTenantIds) return event;
