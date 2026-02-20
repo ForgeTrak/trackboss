@@ -34,9 +34,22 @@ export class DeployStack extends Stack {
         },
     );
 
+    const forgeTrakZone = route53.HostedZone.fromHostedZoneAttributes(this, 'forgeTrakZone',
+        {
+            hostedZoneId: 'Z08084702HFW0EXZKUGNQ',
+            zoneName: 'forgetrak.com'
+        },
+    );
+
     const hogbackmxCert = new acm.DnsValidatedCertificate(this, 'backendCertificateApi', {
         domainName: '*.hogbackmx.com',
         hostedZone: zone,
+        region: 'us-east-1',
+    });
+
+    const forgeTrakCert = new acm.DnsValidatedCertificate(this, 'forgeTrakCertificate', {
+        domainName: '*.forgetrak.com',
+        hostedZone: forgeTrakZone,
         region: 'us-east-1',
     });
 
@@ -276,8 +289,24 @@ export class DeployStack extends Stack {
         },
       });
     
-      databackupBucket.grantWrite(dataBackupLambda);
-      databackupBucket.grantReadWrite(dataBackupLambda);
-  }
+    databackupBucket.grantWrite(dataBackupLambda);
+    databackupBucket.grantReadWrite(dataBackupLambda);
 
+    const cognitoTenantIdsInjection = new lambda.Function(this, 'cognitoTenantIdsInjection', {
+        runtime: lambda.Runtime.NODEJS_22_X,
+        tracing: lambda.Tracing.ACTIVE,
+        code: lambda.Code.fromAsset('../../../lambda/cognitoTokenInjection'),
+        handler: 'injectCognitoToken.handler',
+        environment: {},
+        timeout: Duration.minutes(10),
+    });
+
+    // Grant Cognito permission to invoke the Lambda
+    cognitoTenantIdsInjection.addPermission('CognitoInvoke', {
+        principal: new iam.ServicePrincipal('cognito-idp.amazonaws.com'),
+        sourceArn: cognitoPool.userPoolArn,
+    });
+
+    // The next last resource goes here (adding this so I don't forget in a year when I inevitably need to add more infra and forget about this comment)
+  };
 }
