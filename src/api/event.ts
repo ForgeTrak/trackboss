@@ -28,8 +28,10 @@ event.post('/new', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token, 'Admin');
-            const insertId = await insertEvent(req.body);
+            const token = await verify(headerCheck.token, 'Admin');
+            const newEvent = req.body as Event;
+            newEvent.tenantId = token.active_tenant_id as string;
+            const insertId = await insertEvent(newEvent);
             response = await getEvent(insertId);
             const relatedEvents = await getRelatedEvents(response);
             // awaiting all this on purpose because a) it is fast and b) I want the UI to update when all of this
@@ -187,8 +189,9 @@ event.patch('/:eventID', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            await verify(headerCheck.token, 'Admin');
-            await patchEvent(id, req.body);
+            const token = await verify(headerCheck.token, 'Admin');
+            const tenantId = token.active_tenant_id as string;
+            await patchEvent(id, tenantId, req.body);
             response = await getEvent(id);
             res.status(200);
         } catch (e: any) {
@@ -229,8 +232,9 @@ event.delete('/:eventID', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            await verify(headerCheck.token, 'Admin');
-            await deleteEvent(id);
+            const token = await verify(headerCheck.token, 'Admin');
+            const tenantId = token.active_tenant_id as string;
+            await deleteEvent(id, tenantId);
             response = { eventId: id };
             res.status(200);
         } catch (e: any) {

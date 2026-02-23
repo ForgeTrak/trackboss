@@ -1,3 +1,10 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = async function(knex) {
+  await knex.schema.raw(`drop procedure sp_event_job_generation`);
+  await knex.schema.raw(`
 CREATE PROCEDURE sp_event_job_generation(
 IN _event_start_date DATETIME,
 IN _event_end_date DATETIME,
@@ -65,3 +72,13 @@ BEGIN
     CLOSE cursorEJ;
     
 END
+  `);
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  
+};

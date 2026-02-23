@@ -7,19 +7,17 @@ import { getPool } from './pool';
 import { Event, PatchEventRequest, PostNewEventRequest } from '../typedefs/event';
 
 export const INSERTED_EVENT_ID_OUT = '@event_id';
-export const INSERT_EVENT_SQL = `CALL sp_event_job_generation(?, ?, ?, ?, ?, ?, ${INSERTED_EVENT_ID_OUT})`;
+export const INSERT_EVENT_SQL = `CALL sp_event_job_generation(?, ?, ?, ?, ?, ?, ?, ${INSERTED_EVENT_ID_OUT})`;
 export const GET_INSERTED_EVENT_ID_SQL = `SELECT ${INSERTED_EVENT_ID_OUT}`;
 export const GET_EVENT_LIST_SQL = 'SELECT * FROM v_event';
 export const GET_EVENT_LIST_DATERANGE_SQL = `${GET_EVENT_LIST_SQL} WHERE end >= ? order by start`;
 export const GET_EVENT_SQL = `${GET_EVENT_LIST_SQL} WHERE event_id = ?`;
-export const PATCH_EVENT_SQL = 'CALL sp_patch_event(?, ?, ?, ?, ?)';
-export const DELETE_EVENT_SQL = 'CALL sp_delete_event(?)';
 
 export async function insertEvent(req: PostNewEventRequest): Promise<number> {
     let restrict = 0;
     if (req.restrictSignups) restrict = 1;
     const values = [req.startDate, req.endDate, req.eventTypeId, req.eventName,
-        req.eventDescription, restrict];
+        req.eventDescription, restrict, req.tenantId];
 
     // Use a single connection for sequential queries with SQL variables
     // (variables are session-scoped)
@@ -91,6 +89,7 @@ export async function getEventList(startDate?: string, endDate?: string): Promis
 
     return results.map((result) => ({
         eventId: result.event_id,
+        tenantId: result.tenant_id,
         eventTypeId: result.event_type_id,
         start: result.start,
         end: result.end,
@@ -118,6 +117,7 @@ export async function getEvent(id: number): Promise<Event> {
 
     return {
         eventId: results[0].event_id,
+        tenantId: results[0].tenant_id,
         start: results[0].start,
         end: results[0].end,
         eventTypeId: results[0].event_type_id,
@@ -144,6 +144,7 @@ export async function getClosestEvent(): Promise<Event> {
 
     return {
         eventId: results[0].event_id,
+        tenantId: results[0].tenant_id,
         start: results[0].start,
         end: results[0].end,
         eventType: results[0].event_type,
@@ -154,17 +155,17 @@ export async function getClosestEvent(): Promise<Event> {
     };
 }
 
-export async function patchEvent(id: number, req: PatchEventRequest): Promise<void> {
+export async function patchEvent(id: number, tenantId: string, req: PatchEventRequest): Promise<void> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
     let restrict = 0;
     if (req.restrictSignups) restrict = 1;
-    const values = [req.startDate, req.endDate, req.eventName, req.eventDescription, restrict, id];
+    const values = [req.startDate, req.endDate, req.eventName, req.eventDescription, restrict, id, tenantId];
 
     const updateSql =
         // eslint-disable-next-line max-len
-        'update event set start_date = ?, end_date = ?, event_name = ?, event_description = ?, restrict_signups = ? where event_id = ?';
+        'update event set start_date = ?, end_date = ?, event_name = ?, event_description = ?, restrict_signups = ? where event_id = ? and tenant_id = ?';
 
     let result;
     try {
@@ -180,12 +181,14 @@ export async function patchEvent(id: number, req: PatchEventRequest): Promise<vo
     }
 }
 
-export async function deleteEvent(id: number): Promise<void> {
-    const values = [id];
+export async function deleteEvent(id: number, tenantId: any): Promise<void> {
+    const values = [id, tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(DELETE_EVENT_SQL, values);
+        await getPool().query('DELETE FROM job where event_id = ? and tenant_id = ? AND verified = 0;', values);
+        await getPool().query('UPDATE job set event_id = null where event_id = ? and tenant_id = ?', values);
+        [result] = await getPool().query<OkPacket>('DELETE FROM event where event_id = ? and tenant_id = ?', values);
     } catch (e) {
         logger.error(`DB error deleting event: ${e}`);
         throw new Error('internal server error');
@@ -229,6 +232,7 @@ export async function getRelatedEvents(event: Event) {
         endDate.setMinutes(defaultEnd[1]);
         endDate.setSeconds(defaultEnd[2]);
         const precedingEvent = {
+            tenantId: event.tenantId,
             startDate: format(startDate, "yyyy-MM-dd'T'HH:mm:ss"),
             endDate: format(endDate, "yyyy-MM-dd'T'HH:mm:ss"),
             eventTypeId: related.related_event_type_id,

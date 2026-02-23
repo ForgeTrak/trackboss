@@ -2,6 +2,7 @@ import { ErrorResponse } from './errorResponse';
 
 export type Event = {
     eventId: number,
+    tenantId: string,
     start: string | Date,
     end: string | Date,
     eventType: string,
@@ -22,6 +23,7 @@ export type PostNewEventRequest = {
     eventName?: string,
     eventDescription?: string,
     restrictSignups?: boolean,
+    tenantId: string,
 }
 
 export type PostNewEventResponse = Event | ErrorResponse

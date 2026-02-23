@@ -16,6 +16,6 @@
     member m
     where 
     m.OLD_MEMBER_ID = eph.old_member_id
-    group by member_id, year
-  ) tmp group by year, membership_id
+    group by tenant_id, member_id, year
+  ) tmp group by tenant_id, year, membership_id
   
