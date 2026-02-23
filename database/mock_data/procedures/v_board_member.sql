@@ -1,7 +1,7 @@
-DELIMITER //
-CREATE VIEW `v_board_member` AS
+create or replace view v_board_member as 
     SELECT 
         board_id,
+        bm.tenant_id,
         bt.title as title,
         bt.board_title_id as title_id,
         year,
@@ -13,6 +13,5 @@ CREATE VIEW `v_board_member` AS
         m.phone_number
     FROM
         board_member bm
-        LEFT JOIN board_member_title bt ON bm.board_title_id = bt.board_title_id
-        left join member m on bm.member_id = m.member_id
-//
+        LEFT JOIN board_member_title bt ON bm.board_title_id = bt.board_title_id and bm.tenant_id = bt.tenant_id
+        left join member m on bm.member_id = m.member_id and bm.tenant_id = m.tenant_id

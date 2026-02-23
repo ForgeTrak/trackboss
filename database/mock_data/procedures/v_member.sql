@@ -1,6 +1,7 @@
 DELIMITER //
-CREATE VIEW `v_member` AS
+  create or replace view v_member as    
      SELECT 
+        m.tenant_id,
         m.member_id,
         m.membership_id,
         m.first_name,
@@ -32,7 +33,7 @@ CREATE VIEW `v_member` AS
     FROM
         member m
             LEFT JOIN
-        membership ms ON m.membership_id = ms.membership_id
+        membership ms ON m.membership_id = ms.membership_id and ms.tenant_id = m.tenant_id
             LEFT JOIN
         member ma ON ms.membership_admin_id = ma.member_id
             LEFT JOIN
@@ -40,5 +41,5 @@ CREATE VIEW `v_member` AS
             LEFT JOIN
         membership_types mst ON ms.membership_type_id = mst.membership_type_id
 			left join 
-		board_member bm on m.member_id = bm.member_id and bm.year = year(now())
+		board_member bm on m.member_id = bm.member_id and m.tenant_id = bm.tenant_id and bm.year = year(now())
 //

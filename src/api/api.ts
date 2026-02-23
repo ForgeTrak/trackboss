@@ -47,9 +47,11 @@ api.get('/me', async (req: Request, res: Response) => {
         try {
             const payload = await verify(headerCheck.token);
             const uuid = payload['cognito:username'];
+            const tenantId = payload.active_tenant_id;
             try {
+                // TODO: tenant ID
                 response = await getMember(uuid);
-                logger.info(`Login successful for ${response.email} (user id: ${uuid})`);
+                logger.info(`Login successful for ${response.email} (user id: ${uuid}) on tenant ${tenantId}`);
                 res.status(200);
             } catch (e: any) {
                 logger.error(e);

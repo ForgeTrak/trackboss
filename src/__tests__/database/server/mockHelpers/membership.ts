@@ -166,31 +166,6 @@ export async function getRegisteredMemberIdResponse() {
     }
 }
 
-export function getRegistrationResponse(memberId: number) {
-    switch (memberId) {
-        case 18:
-            return Promise.resolve([[{
-                member_type: 'member',
-                first_name: 'Testy',
-                last_name: 'Testington',
-                phone_number: '123-456-7890',
-                occupation: 'Involuntary Testing Entity',
-                email: 'em@il.com',
-                birthdate: '2022-02-08',
-                address: '1 Test St',
-                city: 'Rotester',
-                state: 'NT',
-                zip: '11111',
-            }]]);
-        case 765:
-            return Promise.resolve([[]]);
-        case -100:
-            throw new Error('error message');
-        default:
-            return Promise.resolve();
-    }
-}
-
 export function getBaseDuesResponse(id: number) {
     switch (id) {
         case 18:

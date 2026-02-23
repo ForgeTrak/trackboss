@@ -31,8 +31,6 @@ export const REGISTERED_MEMBERSHIP_ID_OUT = '@membership_id';
 export const REGISTER_MEMBERSHIP_SQL = 'CALL sp_register_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ' +
     `${REGISTERED_MEMBER_ID_OUT}, ${REGISTERED_MEMBERSHIP_ID_OUT})`;
 export const GET_REGISTERED_MEMBER_ID_SQL = `SELECT ${REGISTERED_MEMBER_ID_OUT}`;
-export const GET_REGISTRATION_SQL = 'SELECT member_type, first_name, last_name, phone_number, occupation, email, ' +
-    'birthdate, address, city, state, zip FROM v_registration WHERE member_id = ?';
 
 export async function insertMembership(req: PostNewMembershipRequest): Promise<number> {
     if (_.isEmpty(req)) {
@@ -255,34 +253,6 @@ export async function registerMembership(req: PostRegisterMembershipRequest): Pr
     } finally {
         conn.release();
     }
-}
-
-export async function getRegistration(memberId: number): Promise<Registration> {
-    let results;
-    try {
-        [results] = await getPool().query<RowDataPacket[]>(GET_REGISTRATION_SQL, [memberId]);
-    } catch (e) {
-        logger.error(`DB error getting registration: ${e}`);
-        throw new Error('internal server error');
-    }
-
-    if (_.isEmpty(results)) {
-        throw new Error('not found');
-    }
-
-    return {
-        memberType: results[0].member_type,
-        firstName: results[0].first_name,
-        lastName: results[0].last_name,
-        phoneNumber: results[0].phone_number,
-        occupation: results[0].occupation,
-        email: results[0].email,
-        birthdate: results[0].birthdate,
-        address: results[0].address,
-        city: results[0].city,
-        state: results[0].state,
-        zip: results[0].zip,
-    };
 }
 
 export async function getBaseDues(membershipId: number): Promise<number> {

@@ -1,6 +1,7 @@
    create or replace view v_job as 
    SELECT 
         `j`.`job_id` AS `job_id`,
+        `j`.`tenant_id` AS `tenant_id`,
         (CASE
             WHEN
                 ((`j`.`paid_labor` IS NULL)
@@ -46,9 +47,9 @@
         CONCAT(`m2`.`first_name`, ' ', `m2`.`last_name`) AS `last_modified_by`
     FROM
         (((((`job` `j`
-        LEFT JOIN `member` `m` ON ((`m`.`member_id` = `j`.`member_id`)))
-        LEFT JOIN `member` `m2` ON ((`m2`.`member_id` = `j`.`last_modified_by`)))
-        LEFT JOIN `event` `e` ON ((`e`.`event_id` = `j`.`event_id`)))
-        LEFT JOIN `job_type` `jt` ON ((`j`.`job_type_id` = `jt`.`job_type_id`)))
-        LEFT JOIN `paid_labor` `pl` ON ((`j`.`paid_labor_id` = `pl`.`paid_labor_id`)))
+        LEFT JOIN `member` `m` ON ((`m`.`member_id` = `j`.`member_id`) AND (`m`.`tenant_id` = `j`.`tenant_id`)))
+        LEFT JOIN `member` `m2` ON ((`m2`.`member_id` = `j`.`last_modified_by`) AND (`m2`.`tenant_id` = `j`.`tenant_id`)))
+        LEFT JOIN `event` `e` ON ((`e`.`event_id` = `j`.`event_id`)) AND (`e`.`tenant_id` = `j`.`tenant_id`)))
+        LEFT JOIN `job_type` `jt` ON ((`j`.`job_type_id` = `jt`.`job_type_id`)) AND (`jt`.`tenant_id` = `j`.`tenant_id`))
+        LEFT JOIN `paid_labor` `pl` ON ((`j`.`paid_labor_id` = `pl`.`paid_labor_id`)) AND (`pl`.`tenant_id` = `j`.`tenant_id`)
         

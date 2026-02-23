@@ -2,7 +2,6 @@ import { Request, Response, Router } from 'express';
 import {
     getMembership,
     getMembershipList,
-    getRegistration,
     insertMembership,
     patchMembership,
     registerMembership,
@@ -89,27 +88,6 @@ membership.get('/list', async (req: Request, res: Response) => {
                 res.status(500);
                 response = { reason: 'internal server error' };
             }
-        }
-    }
-    res.send(response);
-});
-
-// This request does not require authentication.
-membership.post('/register', async (req: Request, res: Response) => {
-    let response: PostRegisterMembershipResponse;
-    try {
-        const insertId = await registerMembership(req.body);
-        response = await getRegistration(insertId);
-        res.status(201);
-    } catch (e: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(e);
-        if (e.message === 'user input error') {
-            res.status(400);
-            response = { reason: 'bad request' };
-        } else {
-            res.status(500);
-            response = { reason: 'internal server error' };
         }
     }
     res.send(response);

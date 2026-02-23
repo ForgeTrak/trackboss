@@ -1,7 +1,8 @@
 DELIMITER //
-CREATE VIEW `v_bill` AS
+create or replace view v_bill as
     SELECT 
         mb.bill_id,
+        mb.tenant_id,
         DATE_FORMAT(mb.generated_date, '%Y-%m-%d') AS generated_date,
         mb.year,
         round(mb.amount, 2) as amount,
@@ -27,11 +28,11 @@ CREATE VIEW `v_bill` AS
     FROM
         member_bill mb
             LEFT JOIN
-        membership ms ON mb.membership_id = ms.membership_id
+        membership ms ON mb.membership_id = ms.membership_id and mb.tenant_id = ms.tenant_id
             LEFT JOIN
-        member ma ON ms.membership_admin_id = ma.member_id
-			left join 
-		membership_types mt on ms.membership_type_id = mt.membership_type_id
+        member ma ON ms.membership_admin_id = ma.member_id and mb.tenant_id = ma.tenant_id
+            LEFT JOIN 
+		membership_types mt on ms.membership_type_id = mt.membership_type_id and mb.tenant_id = mt.tenant_id
 	WHERE 
 		ms.status = 'active'
 	ORDER BY

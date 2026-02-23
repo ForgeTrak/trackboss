@@ -1,7 +1,7 @@
-DELIMITER //
-CREATE VIEW `v_job_type` AS
+create or replace view v_job_type as
     SELECT 
         jt.job_type_id,
+        jt.tenant_id,
         jt.title,
         jt.point_value,
         jt.cash_value,
@@ -15,4 +15,4 @@ CREATE VIEW `v_job_type` AS
         jt.last_modified_by
     FROM
         job_type jt
-//
+

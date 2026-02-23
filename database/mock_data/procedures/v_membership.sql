@@ -1,7 +1,7 @@
-DELIMITER //
-CREATE VIEW `v_membership` AS
+create or replace view v_membership as 
     SELECT 
         ms.membership_id,
+        ms.tenant_id,
         CONCAT(ma.first_name, ' ', ma.last_name) AS membership_admin,
         ms.status,
         (select type from membership_types where membership_type_id = ms.membership_type_id) membership_type,
@@ -17,7 +17,6 @@ CREATE VIEW `v_membership` AS
     FROM
         membership ms
             LEFT JOIN
-        member ma ON ms.membership_admin_id = ma.member_id
+        member ma ON ms.membership_admin_id = ma.member_id and ms.tenant_id = ma.tenant_id
             LEFT JOIN
         member lmb ON ms.last_modified_by = lmb.member_id
-//
