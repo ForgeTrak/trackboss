@@ -178,6 +178,7 @@ export async function getMember(searchParam: string): Promise<Member> {
     return {
         memberId: results[0].member_id,
         membershipId: results[0].membership_id,
+        tenantId: results[0].tenant_id,
         firstName: results[0].first_name,
         lastName: results[0].last_name,
         membershipAdmin: results[0].membership_admin,
@@ -221,6 +222,7 @@ export async function getMemberByPhone(phone: string): Promise<Member> {
     return {
         memberId: results[0].member_id,
         membershipId: results[0].membership_id,
+        tenantId: results[0].tenant_id,
         firstName: results[0].first_name,
         lastName: results[0].last_name,
         membershipAdmin: results[0].membership_admin,

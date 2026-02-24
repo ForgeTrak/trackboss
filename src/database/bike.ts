@@ -8,16 +8,15 @@ import { Bike, PatchBikeRequest, PostNewBikeRequest } from '../typedefs/bike';
 export const GET_BIKE_LIST_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike';
 export const GET_BIKE_LIST_BY_MEMBERSHIP_SQL = `${GET_BIKE_LIST_SQL} WHERE membership_id = ?`;
 export const GET_BIKE_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike WHERE bike_id = ?';
-export const INSERT_BIKE_SQL = 'INSERT INTO member_bikes (year, make, model, membership_id) VALUES (?, ?, ?, ?)';
-export const PATCH_BIKE_SQL = 'CALL sp_patch_bike(?, ?, ?, ?, ?)';
 export const DELETE_BIKE_SQL = 'DELETE FROM member_bikes WHERE bike_id = ?';
 
 export async function insertBike(req: PostNewBikeRequest): Promise<number> {
-    const values = [req.year, req.make, req.model, req.membershipId];
+    const values = [req.year, req.make, req.model, req.membershipId, req.tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(INSERT_BIKE_SQL, values);
+        // eslint-disable-next-line max-len
+        [result] = await getPool().query<OkPacket>('INSERT INTO member_bikes (year, make, model, membership_id, tenant_id) VALUES (?, ?, ?, ?, ?)', values);
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {
@@ -38,9 +37,9 @@ export async function insertBike(req: PostNewBikeRequest): Promise<number> {
     return result.insertId;
 }
 
-export async function getBikeList(membershipId?: number): Promise<Bike[]> {
+export async function getBikeList(membershipId?: number, tenantId?: string): Promise<Bike[]> {
     let sql;
-    let values: number[];
+    let values: any[];
     if (typeof membershipId !== 'undefined') {
         sql = GET_BIKE_LIST_BY_MEMBERSHIP_SQL;
         values = [membershipId];
@@ -59,6 +58,7 @@ export async function getBikeList(membershipId?: number): Promise<Bike[]> {
 
     return results.map((result) => ({
         bikeId: result.bike_id,
+        tenantId: result.tenant_id,
         year: result.year,
         make: result.make,
         model: result.model,
@@ -66,8 +66,8 @@ export async function getBikeList(membershipId?: number): Promise<Bike[]> {
     }));
 }
 
-export async function getBike(id: number): Promise<Bike> {
-    const values = [id];
+export async function getBike(id: number, tenantId: string): Promise<Bike> {
+    const values = [id, tenantId];
 
     let results;
     try {
@@ -83,6 +83,7 @@ export async function getBike(id: number): Promise<Bike> {
 
     return {
         bikeId: results[0].bike_id,
+        tenantId: results[0].tenant_id,
         year: results[0].year,
         make: results[0].make,
         model: results[0].model,
@@ -95,11 +96,12 @@ export async function patchBike(id: number, req: PatchBikeRequest): Promise<void
         throw new Error('user input error');
     }
 
-    const values = [id, req.year, req.make, req.model, req.membershipId];
+    const values = [req.year, req.make, req.model, id, req.tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(PATCH_BIKE_SQL, values);
+        // eslint-disable-next-line max-len
+        [result] = await getPool().query<OkPacket>('update member_bikes set year = ?, make = ?, model = ? where bike_id = ? and tenant_id = ?', values);
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {
@@ -122,8 +124,8 @@ export async function patchBike(id: number, req: PatchBikeRequest): Promise<void
     }
 }
 
-export async function deleteBike(id: number): Promise<void> {
-    const values = [id];
+export async function deleteBike(id: number, tenantId: string): Promise<void> {
+    const values = [id, tenantId];
 
     let result;
     try {

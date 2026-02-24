@@ -37,7 +37,8 @@ export default function Header(props:pageProps) {
                 <Spacer />
                 <Box>
                     <Heading pr={90} size="lg">{`Trackboss - ${props.title}`}</Heading>
-                    <Text fontSize="xs">Powered by ForgeTrak</Text>
+                    <Text fontSize="sm">Powered by ForgeTrak</Text>
+                    <Text fontSize="xs">{`Tenant ID: ${state.user?.tenantId}`}</Text>
                 </Box>
                 <Spacer />
             </Flex>

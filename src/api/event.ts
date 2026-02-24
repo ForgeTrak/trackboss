@@ -32,7 +32,7 @@ event.post('/new', async (req: Request, res: Response) => {
             const newEvent = req.body as Event;
             newEvent.tenantId = token.active_tenant_id as string;
             const insertId = await insertEvent(newEvent);
-            response = await getEvent(insertId);
+            response = await getEvent(insertId, newEvent.tenantId);
             const relatedEvents = await getRelatedEvents(response);
             // awaiting all this on purpose because a) it is fast and b) I want the UI to update when all of this
             // is done. We are in mañuel transmission mode here.
@@ -85,11 +85,12 @@ event.get('/list', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token);
+            const token = await verify(headerCheck.token);
+            const tenantId = token.active_tenant_id as string;
             const { range } = req.headers;
             let eventList: Event[];
             if (typeof range === 'undefined') {
-                eventList = await getEventList();
+                eventList = await getEventList(tenantId);
                 res.status(200);
             } else {
                 const [start, end] = range.split('-');
@@ -103,13 +104,15 @@ event.get('/list', async (req: Request, res: Response) => {
                 } else {
                     if (start === '' && end !== '') {
                         eventList = await getEventList(
+                            tenantId,
                             undefined,
                             `${format(endData.date, 'yyyy-MM-dd')}`,
                         );
                     } else if (end === '' && start !== '') {
-                        eventList = await getEventList(`${format(startData.date, 'yyyy-MM-dd')}`);
+                        eventList = await getEventList(tenantId, `${format(startData.date, 'yyyy-MM-dd')}`);
                     } else {
                         eventList = await getEventList(
+                            tenantId,
                             `${format(startData.date, 'yyyy-MM-dd')}`,
                             `${format(endData.date, 'yyyy-MM-dd')}`,
                         );
@@ -145,16 +148,17 @@ event.get('/:eventID', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token);
+            const token = await verify(headerCheck.token);
+            const tenantId = token.active_tenant_id as string;
             const { eventID } = req.params;
             if (eventID === 'next') {
-                response = await getClosestEvent();
+                response = await getClosestEvent(tenantId);
             } else {
                 const id = Number(eventID);
                 if (Number.isNaN(id)) {
                     throw new Error('not found');
                 }
-                response = await getEvent(id);
+                response = await getEvent(id, tenantId);
             }
             res.status(200);
         } catch (e: any) {
@@ -192,7 +196,7 @@ event.patch('/:eventID', async (req: Request, res: Response) => {
             const token = await verify(headerCheck.token, 'Admin');
             const tenantId = token.active_tenant_id as string;
             await patchEvent(id, tenantId, req.body);
-            response = await getEvent(id);
+            response = await getEvent(id, tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -256,26 +260,6 @@ event.delete('/:eventID', async (req: Request, res: Response) => {
         }
     }
     res.send(response);
-});
-
-event.get('/calendar/ical', async (req: Request, res: Response) => {
-    const eventList : Event[] = await getEventList();
-    const cal = ical({
-        name: 'Palmyra Racing Association - Calendar',
-    });
-
-    eventList.forEach((trackbossEvent) => {
-        cal.createEvent({
-            start: trackbossEvent.start,
-            end: trackbossEvent.end,
-            summary: trackbossEvent.title,
-            description: trackbossEvent.eventDescription,
-            location: '4343 Hogback Hill Road Palmyra NY 14522',
-            url: 'https://trackboss.hogbackmx.com',
-        });
-    });
-    res.setHeader('Content-Type', 'text/calendar');
-    res.send(cal.toString());
 });
 
 export default event;

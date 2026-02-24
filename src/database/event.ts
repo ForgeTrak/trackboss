@@ -56,7 +56,7 @@ export async function insertEvent(req: PostNewEventRequest): Promise<number> {
     }
 }
 
-export async function getEventList(startDate?: string, endDate?: string): Promise<Event[]> {
+export async function getEventList(tenantId:string, startDate?: string, endDate?: string): Promise<Event[]> {
     let sql;
     let values: string[];
     let sDate: string;
@@ -100,12 +100,15 @@ export async function getEventList(startDate?: string, endDate?: string): Promis
     }));
 }
 
-export async function getEvent(id: number): Promise<Event> {
-    const values = [id];
+export async function getEvent(id: number, tenantId: string): Promise<Event> {
+    const values = [id, tenantId];
 
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(GET_EVENT_SQL, values);
+        [results] = await getPool().query<RowDataPacket[]>(
+            'select * from v_event where event_id = ? and tenant_id = ?',
+            values,
+        );
     } catch (e) {
         logger.error(`DB error getting event: ${e}`);
         throw new Error('internal server error');
@@ -128,11 +131,11 @@ export async function getEvent(id: number): Promise<Event> {
     };
 }
 
-export async function getClosestEvent(): Promise<Event> {
+export async function getClosestEvent(tenantId: string): Promise<Event> {
     let results;
     try {
-        [results] = await getPool()
-            .query<RowDataPacket[]>('select * from v_event where start >= now() order by start limit 1');
+        // eslint-disable-next-line max-len
+        [results] = await getPool().query<RowDataPacket[]>('select * from v_event where tenant_id = ? and start >= now() order by start limit 1', [tenantId]);
     } catch (e) {
         logger.error(`DB error getting event: ${e}`);
         throw new Error('internal server error');
@@ -200,7 +203,7 @@ export async function deleteEvent(id: number, tenantId: any): Promise<void> {
 }
 
 export async function getRelatedEvents(event: Event) {
-    const values = [event.eventTypeId];
+    const values = [event.eventTypeId, event.tenantId];
 
     const relatedEventSql =
         `select 
@@ -208,7 +211,7 @@ export async function getRelatedEvents(event: Event) {
         et.type, et.default_start, et.default_end
         from
         event_type_relationship etr, event_type et
-        where etr.event_type_id = ? and
+        where etr.event_type_id = ? and et.tenant_id = ?
         et.event_type_id = etr.related_event_type_id order by etr.day_difference`;
 
     let relatedEventResults;

@@ -2,6 +2,7 @@ import { BoardMember } from './boardMember';
 import { ErrorResponse } from './errorResponse';
 
 export type Member = {
+    tenantId: string,
     memberId: number,
     membershipId: number,
     membershipAdmin: string,

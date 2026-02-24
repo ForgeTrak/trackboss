@@ -20,8 +20,9 @@ eventJob.post('/new', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token, 'Admin');
-            const insertId = await insertEventJob(req.body);
+            const token = await verify(headerCheck.token, 'Admin');
+            const tenantId = token.active_tenant_id as string;
+            const insertId = await insertEventJob(req.body, tenantId);
             response = await getEventJob(insertId);
             res.status(201);
         } catch (e: any) {

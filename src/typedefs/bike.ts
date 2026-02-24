@@ -5,7 +5,8 @@ export type Bike = {
     year: string,
     make: string,
     model: string,
-    membershipAdmin: string
+    membershipAdmin: string,
+    tenantId: string,
 }
 
 export type DeletedBike = {
@@ -16,7 +17,8 @@ export type PostNewBikeRequest = {
     year?: string,
     make?: string,
     model?: string,
-    membershipId: number
+    membershipId: number,
+    tenantId: string,
 }
 
 export type PostNewBikeResponse = Bike | ErrorResponse
@@ -30,6 +32,7 @@ export type PatchBikeRequest = {
     make?: string,
     model?: string,
     membershipId?: number
+    tenantId: string,
 }
 
 export type PatchBikeResponse = Bike | ErrorResponse

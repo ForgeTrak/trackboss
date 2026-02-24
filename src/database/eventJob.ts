@@ -15,7 +15,7 @@ export const INSERT_EVENT_JOB_SQL = 'INSERT INTO event_job (event_type_id, job_t
 export const PATCH_EVENT_JOB_SQL = 'CALL sp_patch_event_job(?, ?, ?, ?)';
 export const DELETE_EVENT_JOB_SQL = 'DELETE FROM event_job WHERE event_job_id = ?';
 
-export async function insertEventJob(req: PostNewEventJobRequest): Promise<number> {
+export async function insertEventJob(req: PostNewEventJobRequest, tenantId: string): Promise<number> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
@@ -40,7 +40,7 @@ export async function insertEventJob(req: PostNewEventJobRequest): Promise<numbe
         }
     }
     // first get all the events
-    let upcomingEvents = await getEventList();
+    let upcomingEvents = await getEventList(tenantId);
     upcomingEvents = upcomingEvents.filter((event) => event.eventTypeId === req.eventTypeId);
     upcomingEvents.forEach(async (event) => {
         // now for each event, insert the job for that event

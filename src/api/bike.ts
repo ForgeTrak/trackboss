@@ -22,9 +22,12 @@ bike.post('/new', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token, 'Membership Admin');
+            const token = await verify(headerCheck.token, 'Membership Admin');
+            const tenantId = token.active_tenant_id as string;
+            const bikeRequest = req.body;
+            bikeRequest.tenantId = tenantId;
             const insertId = await insertBike(req.body);
-            response = await getBike(insertId);
+            response = await getBike(insertId, tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -97,9 +100,10 @@ bike.get('/:bikeID', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            await verify(headerCheck.token);
+            const token = await verify(headerCheck.token);
+            const tenantId = token.active_tenant_id as string;
             const { bikeID } = req.params;
-            response = await getBike(Number(bikeID));
+            response = await getBike(Number(bikeID), tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -133,9 +137,12 @@ bike.patch('/:bikeID', async (req: Request, res: Response) => {
             if (Number.isNaN(bikeIdNum)) {
                 throw new Error('not found');
             }
-            await verify(headerCheck.token, 'Membership Admin');
-            await patchBike(bikeIdNum, req.body);
-            response = await getBike(bikeIdNum);
+            const token = await verify(headerCheck.token, 'Membership Admin');
+            const tenantId = token.active_tenant_id as string;
+            const bikeRequest = req.body;
+            bikeRequest.tenantId = tenantId;
+            await patchBike(bikeIdNum, bikeRequest);
+            response = await getBike(bikeIdNum, tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -175,8 +182,9 @@ bike.delete('/:bikeID', async (req: Request, res: Response) => {
             if (Number.isNaN(bikeIdNum)) {
                 throw new Error('not found');
             }
-            await verify(headerCheck.token, 'Membership Admin');
-            await deleteBike(bikeIdNum);
+            const token = await verify(headerCheck.token, 'Membership Admin');
+            const tenantId = token.active_tenant_id as string;
+            await deleteBike(bikeIdNum, tenantId);
             response = { bikeId: bikeIdNum };
             res.status(200);
         } catch (e: any) {
