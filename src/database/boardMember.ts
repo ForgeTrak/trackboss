@@ -5,23 +5,18 @@ import { BoardMember, PatchBoardMemberRequest, PostNewBoardMemberRequest } from 
 import logger from '../logger';
 import { getPool } from './pool';
 
-export const INSERT_BOARD_MEMBER_SQL =
-    'INSERT INTO board_member(year, member_id, board_title_id) VALUES (?, ?, ?)';
-export const GET_BOARD_MEMBER_LIST_SQL = 'SELECT * FROM v_board_member';
-export const GET_BOARD_MEMBER_SQL = `${GET_BOARD_MEMBER_LIST_SQL} WHERE board_id = ?`;
-export const GET_BOARD_MEMBER_YEAR_SQL = `${GET_BOARD_MEMBER_LIST_SQL} WHERE year = ?`;
-export const PATCH_BOARD_MEMBER_SQL = 'CALL sp_patch_board_member(?, ?, ?, ?)';
-export const DELETE_BOARD_MEMBER_SQL = 'DELETE FROM board_member where board_id = ?';
-
 export async function insertBoardMember(req: PostNewBoardMemberRequest): Promise<number> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
-    const values = [req.year, req.memberId, req.boardMemberTitleId];
+    const values = [req.tenantId, req.year, req.memberId, req.boardMemberTitleId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(INSERT_BOARD_MEMBER_SQL, values);
+        [result] = await getPool().query<OkPacket>(
+            'INSERT INTO board_member(tenant_id, year, member_id, board_title_id) VALUES (?, ?, ?, ?)',
+            values,
+        );
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {
@@ -41,15 +36,15 @@ export async function insertBoardMember(req: PostNewBoardMemberRequest): Promise
     return result.insertId;
 }
 
-export async function getBoardMemberList(year?: string): Promise<BoardMember[]> {
+export async function getBoardMemberList(tenantId: string, year?: string): Promise<BoardMember[]> {
     let sql;
     let values: string[];
     if (typeof year !== 'undefined') {
-        sql = GET_BOARD_MEMBER_YEAR_SQL;
-        values = [year];
+        sql = 'SELECT * FROM v_board_member WHERE tenant_id = ? AND year = ?';
+        values = [tenantId, year];
     } else {
-        sql = GET_BOARD_MEMBER_LIST_SQL;
-        values = [];
+        sql = 'select * from v_board_member where tenant_id = ?';
+        values = [tenantId];
     }
 
     let results;
@@ -61,6 +56,7 @@ export async function getBoardMemberList(year?: string): Promise<BoardMember[]> 
     }
 
     return results.map((result) => ({
+        tenantId: result.tenant_id,
         boardId: result.board_id,
         firstName: result.first_name,
         lastName: result.last_name,
@@ -74,12 +70,15 @@ export async function getBoardMemberList(year?: string): Promise<BoardMember[]> 
     }));
 }
 
-export async function getBoardMember(id: number): Promise<BoardMember> {
-    const values = [id];
+export async function getBoardMember(tenantId: string, id: number): Promise<BoardMember> {
+    const values = [tenantId, id];
 
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(GET_BOARD_MEMBER_SQL, values);
+        [results] = await getPool().query<RowDataPacket[]>(
+            'SELECT * FROM v_board_member WHERE tenant_id = ? AND board_id = ?',
+            values,
+        );
     } catch (e) {
         logger.error(`DB error getting board member: ${e}`);
         throw new Error('internal server error');
@@ -90,6 +89,7 @@ export async function getBoardMember(id: number): Promise<BoardMember> {
     }
 
     return {
+        tenantId: results[0].tenant_id,
         boardId: results[0].board_id,
         title: results[0].title,
         titleId: results[0].title_id,
@@ -103,11 +103,15 @@ export async function patchBoardMember(id: number, req: PatchBoardMemberRequest)
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
-    const values = [id, req.year, req.memberId, req.boardMemberTitleId];
+    const values = [req.tenantId, req.year, req.memberId, req.boardMemberTitleId, id];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(PATCH_BOARD_MEMBER_SQL, values);
+        [result] = await getPool().query<OkPacket>(
+            // eslint-disable-next-line max-len
+            'UPDATE board_member SET tenant_id = ?, year = ?, member_id = ?, board_title_id = ? WHERE board_id = ?',
+            values,
+        );
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {
@@ -130,12 +134,15 @@ export async function patchBoardMember(id: number, req: PatchBoardMemberRequest)
     }
 }
 
-export async function deleteBoardMember(id: number): Promise<void> {
-    const values = [id];
+export async function deleteBoardMember(tenantId: string, id: number): Promise<void> {
+    const values = [tenantId, id];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(DELETE_BOARD_MEMBER_SQL, values);
+        [result] = await getPool().query<OkPacket>(
+            'DELETE FROM board_member where tenant_id = ? AND board_id = ?',
+            values,
+        );
     } catch (e) {
         logger.error(`DB error deleting board member: ${e}`);
         throw new Error('internal server error');

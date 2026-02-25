@@ -3,7 +3,7 @@ import express from 'express';
 import AWS from 'aws-sdk';
 import api from './api/api';
 import logger from './logger';
-import { createVerifier } from './util/auth';
+import { checkHeader, createVerifier, verify } from './util/auth';
 import { getEnvironmentParameter } from './util/environmentWrapper';
 import startBillingJob from './jobs/billingJob';
 
@@ -28,6 +28,22 @@ const port = process.env.PORT || 8080;
 createVerifier();
 
 AWS.config.update({ region: 'us-east-1' });
+
+const addTenantToRequest = async (req : any, res : any, next : () => void) => {
+    const headerCheck = checkHeader(req.headers.authorization);
+    if (headerCheck.token) {
+        const verifiedToken = await verify(headerCheck.token);
+        const tenantId = verifiedToken.active_tenant_id as string;
+        const uuid = verifiedToken['cognito:username'];
+        req.user = {
+            tenantId,
+            uuid,
+        };
+    }
+    next();
+};
+
+app.use(addTenantToRequest);
 
 app.use('/api', api);
 app.use((err: any, req: any, res: any, next: () => void) => {

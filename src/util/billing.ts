@@ -98,45 +98,6 @@ export async function generateNewBills(
     return _.differenceWith(allBills, preGeneratedBills, _.isEqual);
 }
 
-/**
- * Email out all bills in the given list
- *
- * Ostensibly, none of the bills should have been emailed yet, but this function
- * protects against duplicate emails anyway.
- *
- * Note that an error emailing a bill **does not** short-circuit the loop. The
- * function will email all the bills it can.
- *
- * (Extracted into helper function to ease testing)
- *
- * @param billList The list of all bills to email out
- * @returns The updated list of bills (successfully-emailed bills are marked as
- * such)
- */
-// TODO: remove this line when emailBills tests are un-skipped
-/* istanbul ignore next */
-export async function emailBills(billList: Bill[]): Promise<Bill[]> {
-    await Promise.all(billList.map(async (bill) => {
-        // prevent sending duplicate emails
-        if (typeof bill.emailedBill === 'undefined') {
-            try {
-                //
-                // TODO: send the email
-                //
-                // // (gonna need to import this fn from '../database/billing')
-                // await markBillEmailed(bill.billId);
-                // // update our local copy of the bill
-                // bill.emailedBill = format(new Date(), 'yyyy-MM-dd');
-                throw new Error('sending emails is unimplemented!');
-            } catch (e) {
-                // send more emails even if this one failed
-                logger.error(`Failed to email bill ${bill.billId} to ${bill.membershipAdminEmail}: ${e}`);
-            }
-        }
-    }));
-    return billList;
-}
-
 export async function processBillPayment(billId: number, paymentMethod: string) {
     logger.info(`marking bill ${billId} paid with payment method ${paymentMethod}`);
     await markBillPaid(billId, paymentMethod);

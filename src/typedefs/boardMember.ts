@@ -1,6 +1,7 @@
 import { ErrorResponse } from './errorResponse';
 
 export type BoardMember = {
+    tenantId: string,
     boardId: number,
     title: string,
     titleId: number,
@@ -19,6 +20,7 @@ export type GetBoardMemberResponse = BoardMember | ErrorResponse;
 
 export type PostNewBoardMemberRequest = {
     boardMemberTitleId: number,
+    tenantId: string,
     year: number,
     memberId: number
 }
@@ -26,6 +28,7 @@ export type PostNewBoardMemberRequest = {
 export type PostNewBoardMemberResponse = BoardMember | ErrorResponse;
 
 export type PatchBoardMemberRequest = {
+    tenantId: string,
     boardMemberTitleId?: number,
     year?: number,
     memberId?: number

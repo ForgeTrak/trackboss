@@ -11,7 +11,6 @@ export const GENERATE_BILL_SQL =
     'INSERT INTO member_bill (generated_date, year, amount, amount_with_fee, membership_id, emailed_bill, ' +
     'cur_year_paid, threshold, points_earned, work_detail) ' +
     'VALUES (CURDATE(), ?, ?, ?, ?, NULL, 0, ?, ?, ?)';
-export const PATCH_BILL_SQL = 'CALL sp_patch_bill (?, ?, ?)';
 
 export async function generateBill(req: GenerateSingleBillRequest): Promise<number> {
     const workDetailJson = JSON.stringify(
@@ -128,20 +127,6 @@ export async function getBillList(filters: GetBillListRequestFilters): Promise<B
         detail: result.work_detail,
         memberActive: result.status,
     }));
-}
-
-export async function markBillEmailed(id: number): Promise<void> {
-    let result;
-    try {
-        [result] = await getPool().query<OkPacket>(PATCH_BILL_SQL, [id, 'CURDATE()', null]);
-    } catch (e) {
-        logger.error(`DB error marking bill as emailed: ${e}`);
-        throw new Error('internal server error');
-    }
-
-    if (result.affectedRows < 1) {
-        throw new Error('not found');
-    }
 }
 
 export async function markBillPaid(id: number, paymentMethod?: string): Promise<void> {

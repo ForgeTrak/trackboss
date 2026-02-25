@@ -28,8 +28,6 @@ export const INSERT_MEMBERSHIP_SQL = 'INSERT INTO membership (membership_admin_i
 export const PATCH_MEMBERSHIP_SQL = 'CALL sp_patch_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 export const REGISTERED_MEMBER_ID_OUT = '@member_id';
 export const REGISTERED_MEMBERSHIP_ID_OUT = '@membership_id';
-export const REGISTER_MEMBERSHIP_SQL = 'CALL sp_register_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ' +
-    `${REGISTERED_MEMBER_ID_OUT}, ${REGISTERED_MEMBERSHIP_ID_OUT})`;
 export const GET_REGISTERED_MEMBER_ID_SQL = `SELECT ${REGISTERED_MEMBER_ID_OUT}`;
 
 export async function insertMembership(req: PostNewMembershipRequest): Promise<number> {
@@ -201,58 +199,6 @@ export async function markMembershipFormer(id: number, deactivationReason: strin
     }
 
     return id;
-}
-
-export async function registerMembership(req: PostRegisterMembershipRequest): Promise<number> {
-    const values = [
-        req.memberTypeId,
-        req.firstName,
-        req.lastName,
-        req.phoneNumber,
-        req.occupation,
-        req.email,
-        req.birthdate,
-        req.address,
-        req.city,
-        req.state,
-        req.zip,
-    ];
-
-    // Use a single connection for sequential queries with SQL variables
-    // (variables are session-scoped)
-    const conn = await getPool().getConnection();
-    try {
-        try {
-            await conn.query<OkPacket>(REGISTER_MEMBERSHIP_SQL, values);
-        } catch (e: any) {
-            if ('errno' in e) {
-                switch (e.errno) {
-                    case 1048: // non-null violation, missing a non-nullable column
-                    case 1452: // FK violation - referenced is missing
-                        logger.error(`User error registering membership in DB: ${e}`);
-                        throw new Error('user input error');
-                    default:
-                        logger.error(`DB error registering membership: ${e}`);
-                        throw new Error('internal server error');
-                }
-            } else {
-                // this should not happen - errors from query should always have 'errno' field
-                throw e;
-            }
-        }
-
-        let results;
-        try {
-            [results] = await conn.query<RowDataPacket[]>(GET_REGISTERED_MEMBER_ID_SQL);
-        } catch (e) {
-            logger.error(`DB error getting member ID after registration: ${e}`);
-            throw new Error('internal server error');
-        }
-
-        return results[0][REGISTERED_MEMBER_ID_OUT];
-    } finally {
-        conn.release();
-    }
 }
 
 export async function getBaseDues(membershipId: number): Promise<number> {

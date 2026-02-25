@@ -29,8 +29,9 @@ boardMember.post('/new', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
+            req.body.tenantId = req.user.tenantId;
             const insertId = await insertBoardMember(req.body);
-            response = await getBoardMember(insertId);
+            response = await getBoardMember(req.user.tenantId, insertId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -63,7 +64,8 @@ boardMember.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const memberList: BoardMember[] = await getBoardMemberList(req.query.year as string);
+            const memberList: BoardMember[] =
+                await getBoardMemberList(req.user.tenantId, req.query.year as string);
             res.status(200);
             response = memberList;
         } catch (e: any) {
@@ -96,7 +98,7 @@ boardMember.get('/:boardMemberId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            response = await getBoardMember(id);
+            response = await getBoardMember(req.user.tenantId, id);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -131,8 +133,9 @@ boardMember.patch('/:boardMemberId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            req.body.tenantId = req.user.tenantId;
             await patchBoardMember(id, req.body);
-            response = await getBoardMember(id);
+            response = await getBoardMember(req.user.tenantId, id);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -173,7 +176,7 @@ boardMember.delete('/:boardMemberId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await deleteBoardMember(id);
+            await deleteBoardMember(req.user.tenantId, id);
             response = { boardMemberId: id };
             res.status(200);
         } catch (e: any) {

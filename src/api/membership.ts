@@ -4,7 +4,6 @@ import {
     getMembershipList,
     insertMembership,
     patchMembership,
-    registerMembership,
 } from '../database/membership';
 import {
     cleanMembershipTags,
