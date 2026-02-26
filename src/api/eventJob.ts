@@ -23,7 +23,7 @@ eventJob.post('/new', async (req: Request, res: Response) => {
             const token = await verify(headerCheck.token, 'Admin');
             const tenantId = token.active_tenant_id as string;
             const insertId = await insertEventJob(req.body, tenantId);
-            response = await getEventJob(insertId);
+            response = await getEventJob(insertId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -57,7 +57,7 @@ eventJob.get('/:eventJobID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { eventJobID } = req.params;
-            response = await getEventJob(Number(eventJobID));
+            response = await getEventJob(Number(eventJobID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -92,8 +92,8 @@ eventJob.patch('/:eventJobID', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await patchEventJob(eventJobIdNum, req.body);
-            response = await getEventJob(eventJobIdNum);
+            await patchEventJob(eventJobIdNum, req.user.tenantId, req.body);
+            response = await getEventJob(eventJobIdNum, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -134,7 +134,7 @@ eventJob.delete('/:eventJobID', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await deleteEventJob(eventJobIdNum);
+            await deleteEventJob(eventJobIdNum, req.user.tenantId);
             response = { eventJobId: eventJobIdNum };
             res.status(200);
         } catch (e: any) {

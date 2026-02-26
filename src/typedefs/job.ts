@@ -4,6 +4,7 @@ export type Job = {
     jobId: number,
     memberId: number,
     membershipId: number,
+    tenantId: string,
     member?: string,
     paidLabor?: string,
     eventId?: number,
@@ -31,6 +32,7 @@ export type DeletedJob = {
 export type PostNewJobRequest = {
     memberId?: number,
     membershipId?: number,
+    tenantId?: string,
     cashPayout?: number,
     eventId?: number,
     jobTypeId: number,

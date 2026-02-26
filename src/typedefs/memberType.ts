@@ -2,6 +2,7 @@ import { ErrorResponse } from './errorResponse';
 
 export type MemberType = {
     memberTypeId: number,
+    tenantId: string,
     type: string,
     baseDuesAmt: number,
     // count is an optional parameter for pages that want to know how many of each type we have.
@@ -13,6 +14,7 @@ export type GetMemberTypeRequest = Record<string, never>;
 export type GetMemberTypeResponse = MemberType | ErrorResponse;
 
 export type PatchMemberTypeRequest = {
+    tenantId: string,
     type?: string,
     baseDuesAmt?: number
 };

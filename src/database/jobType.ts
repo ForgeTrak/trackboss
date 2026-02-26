@@ -5,17 +5,15 @@ import logger from '../logger';
 import { getPool } from './pool';
 import { JobType, PatchJobTypeRequest, PostNewJobTypeRequest } from '../typedefs/jobType';
 
-export const GET_JOB_TYPE_LIST_SQL = 'SELECT * FROM v_job_type';
-export const GET_JOB_TYPE_SQL = `${GET_JOB_TYPE_LIST_SQL} WHERE job_type_id = ?`;
-export const INSERT_JOB_TYPE_SQL = 'INSERT INTO job_type (title, point_value, cash_value, job_day_number, active, ' +
-    'reserved, online, meal_ticket, sort_order, last_modified_date, last_modified_by)' +
-    'VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, CURDATE(), ?)';
-export const PATCH_JOB_TYPE_SQL = 'CALL sp_patch_job_type (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+export const INSERT_JOB_TYPE_SQL = 'INSERT INTO job_type (tenant_id, title, point_value, cash_value, job_day_number, ' +
+    'active, reserved, online, meal_ticket, sort_order, last_modified_date, last_modified_by)' +
+    'VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, CURDATE(), ?)';
 
 const jobDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-export async function insertJobType(req: PostNewJobTypeRequest): Promise<number> {
+export async function insertJobType(tenantId: string, req: PostNewJobTypeRequest): Promise<number> {
     const values = [
+        tenantId,
         req.title,
         req.pointValue,
         req.cashValue,
@@ -50,12 +48,15 @@ export async function insertJobType(req: PostNewJobTypeRequest): Promise<number>
     return result.insertId;
 }
 
-export async function getJobType(id: number): Promise<JobType> {
-    const values = [id];
+export async function getJobType(id: number, tenantId:string): Promise<JobType> {
+    const values = [id, tenantId];
 
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(GET_JOB_TYPE_SQL, values);
+        [results] = await getPool().query<RowDataPacket[]>(
+            'select * from job_type where job_type_id = ? and tenant_id = ?',
+            values,
+        );
     } catch (e) {
         logger.error(`DB error getting job type: ${e}`);
         throw new Error('internal server error');
@@ -67,6 +68,7 @@ export async function getJobType(id: number): Promise<JobType> {
 
     return {
         jobTypeId: results[0].job_type_id,
+        tenantId: results[0].tenant_id,
         title: results[0].title,
         pointValue: results[0].point_value,
         cashValue: results[0].cash_value,
@@ -82,9 +84,9 @@ export async function getJobType(id: number): Promise<JobType> {
     };
 }
 
-export async function getJobTypeList(): Promise<JobType[]> {
-    const sql = GET_JOB_TYPE_LIST_SQL;
-    const values: string[] = [];
+export async function getJobTypeList(tenantId: string): Promise<JobType[]> {
+    const sql = 'select * from job_type where tenant_id = ?';
+    const values: string[] = [tenantId];
 
     let results;
     try {
@@ -95,6 +97,7 @@ export async function getJobTypeList(): Promise<JobType[]> {
     }
     return results.map((result) => ({
         jobTypeId: result.job_type_id,
+        tenantId: result.tenant_id,
         title: result.title,
         pointValue: result.point_value,
         cashValue: result.cash_value,
@@ -110,7 +113,7 @@ export async function getJobTypeList(): Promise<JobType[]> {
     }));
 }
 
-export async function getJobTypesEventList(eventTypeName : string) : Promise<JobType[]> {
+export async function getJobTypesEventList(tenantId: string, eventTypeName : string) : Promise<JobType[]> {
     const sql = `select jt.*, ej.event_job_id, ej.count from job_type jt, event_job ej, event_type et
     where et.type = ? and ej.event_type_id = et.event_type_id and
     ej.job_type_id = jt.job_type_id order by jt.job_day_number, jt.job_type_id`;
@@ -122,8 +125,11 @@ export async function getJobTypesEventList(eventTypeName : string) : Promise<Job
         logger.error(`DB error getting job type list: ${e}`);
         throw new Error('internal server error');
     }
+    // this is a hackaroo job, but this is OK since it's a small query and I can fix it later if it's fukt.
+    results = results.filter((result) => result.tenant_id === tenantId);
     return results.map((result) => ({
         jobTypeId: result.job_type_id,
+        tenantId: result.tenant_id,
         title: result.title,
         pointValue: result.point_value,
         cashValue: result.cash_value,
@@ -141,12 +147,12 @@ export async function getJobTypesEventList(eventTypeName : string) : Promise<Job
     }));
 }
 
-export async function patchJobType(id: number, req: PatchJobTypeRequest): Promise<void> {
+export async function patchJobType(tenantId:string, id: number, req: PatchJobTypeRequest): Promise<void> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
 
-    const existingJobType = await getJobType(id);
+    const existingJobType = await getJobType(id, tenantId);
     // check the values to see if they are set, and if not, set them. This is good practice that makes
     // this a true "PATCH"
     // eslint-disable-next-line no-restricted-syntax
@@ -163,13 +169,14 @@ export async function patchJobType(id: number, req: PatchJobTypeRequest): Promis
         req.active,
         req.modifiedBy,
         id,
+        tenantId,
     ];
 
     let result;
     try {
         const updateSql = `update job_type set title = ?, point_value = ?, cash_value = ?, job_day_number = ?,
             reserved = ?, online = ?, meal_ticket = ?, sort_order = ?, active = ?, last_modified_by = ?,
-            last_modified_date = NOW() where job_type_id = ?
+            last_modified_date = NOW() where job_type_id = ? and tenant_id = ?
         `;
         [result] = await getPool().query<OkPacket>(updateSql, values);
         logger.info(`updated job: ${JSON.stringify(req)} in job type database`);
@@ -177,8 +184,9 @@ export async function patchJobType(id: number, req: PatchJobTypeRequest): Promis
         // also update any future jobs in the job table that already have this info on them (use case: calendar
         // already made for the year, and now we want to change the point value).
         const jobUpdateSql = `update job set points_awarded = ?, cash_payout = ? 
-            where job_type_id = ? and job_start_date > date_sub(now(), interval 7 day)`;
-        const [jobUpdateResult] = await getPool().query<OkPacket>(jobUpdateSql, [req.pointValue, req.cashValue, id]);
+            where tenant_id = ? and job_type_id = ? and job_start_date > date_sub(now(), interval 7 day)`;
+        // eslint-disable-next-line max-len
+        const [jobUpdateResult] = await getPool().query<OkPacket>(jobUpdateSql, [req.pointValue, req.cashValue, tenantId, id]);
         logger.info(`updated job: ${JSON.stringify(req)} in future jobs table`);
         logger.info(`${jobUpdateResult.affectedRows} were updated`);
     } catch (e: any) {

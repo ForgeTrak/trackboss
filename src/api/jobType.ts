@@ -22,8 +22,8 @@ jobType.post('/new', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
-            const insertId = await insertJobType(req.body);
-            response = await getJobType(insertId);
+            const insertId = await insertJobType(req.user.tenantId, req.body);
+            response = await getJobType(insertId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -56,7 +56,7 @@ jobType.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const jobTypeList: JobType[] = await getJobTypeList();
+            const jobTypeList: JobType[] = await getJobTypeList(req.user.tenantId);
             res.status(200);
             response = jobTypeList;
         } catch (e: any) {
@@ -84,7 +84,7 @@ jobType.get('/list/:eventTypeName', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const jobTypeList: JobType[] = await getJobTypesEventList(req.params.eventTypeName);
+            const jobTypeList: JobType[] = await getJobTypesEventList(req.user.tenantId, req.params.eventTypeName);
             res.status(200);
             response = jobTypeList;
         } catch (e: any) {
@@ -113,7 +113,7 @@ jobType.get('/:jobTypeID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { jobTypeID } = req.params;
-            response = await getJobType(Number(jobTypeID));
+            response = await getJobType(Number(jobTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -144,8 +144,8 @@ jobType.patch('/:jobTypeID', async (req: Request, res: Response) => {
         try {
             const { jobTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
-            await patchJobType(Number(jobTypeID), req.body);
-            response = await getJobType(Number(jobTypeID));
+            await patchJobType(req.user.tenantId, Number(jobTypeID), req.body);
+            response = await getJobType(Number(jobTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

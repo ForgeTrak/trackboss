@@ -21,7 +21,7 @@ memberType.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const memberTypeList: MemberType[] = await getMemberTypeList();
+            const memberTypeList: MemberType[] = await getMemberTypeList(req.user.tenantId);
             res.status(200);
             response = memberTypeList;
         } catch (e: any) {
@@ -49,7 +49,7 @@ memberType.get('/membershipCounts', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const memberTypeList: MemberType[] = await getMembershipTypeCounts();
+            const memberTypeList: MemberType[] = await getMembershipTypeCounts(req.user.tenantId);
             res.status(200);
             response = memberTypeList;
         } catch (e: any) {
@@ -78,7 +78,7 @@ memberType.get('/:memberTypeID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { memberTypeID } = req.params;
-            response = await getMemberType(Number(memberTypeID));
+            response = await getMemberType(Number(memberTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -109,8 +109,8 @@ memberType.patch('/:memberTypeID', async (req: Request, res: Response) => {
         try {
             const { memberTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
-            await patchMemberType(Number(memberTypeID), req.body);
-            response = await getMemberType(Number(memberTypeID));
+            await patchMemberType(Number(memberTypeID), req.user.tenantId, req.body);
+            response = await getMemberType(Number(memberTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

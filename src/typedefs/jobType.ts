@@ -2,6 +2,7 @@ import { ErrorResponse } from './errorResponse';
 
 export type JobType = {
     jobTypeId: number,
+    tenantId: string,
     title: string,
     pointValue: number,
     cashValue: number,

@@ -159,7 +159,7 @@ job.post('/new', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token, 'Admin');
             const jobInsertRequest : PostNewJobRequest = req.body;
-            const insertId = await insertJob(jobInsertRequest);
+            const insertId = await insertJob(req.user.tenantId, jobInsertRequest);
             response = await getJob(insertId);
             // we have added the job so update the user's billing immediately so we can backdate stuff which happens.
             // it also keeps stuff instantly up to date for verification.

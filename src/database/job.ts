@@ -9,17 +9,18 @@ import { getPool } from './pool';
 export const GET_JOB_LIST_SQL = 'SELECT *, year(end) year FROM v_job';
 export const GET_JOB_SQL = `${GET_JOB_LIST_SQL} WHERE job_id = ?`;
 export const INSERT_JOB_SQL = 'INSERT INTO job (member_id, event_id, job_type_id, job_start_date, job_end_date, ' +
-     ' last_modified_date, verified, verified_date, points_awarded, cash_payout, paid, paid_date, last_modified_by) ' +
-     'VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?)';
+     ' last_modified_date, verified, verified_date, points_awarded, cash_payout, paid, paid_date,' +
+     ' last_modified_by, tenant_id) ' +
+     'VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?)';
 export const PATCH_JOB_SQL = 'CALL sp_patch_job(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 export const DELETE_JOB_SQL = 'DELETE FROM job WHERE job_id = ?';
 
-export async function insertJob(req: PostNewJobRequest): Promise<number> {
+export async function insertJob(tenantId:string, req: PostNewJobRequest): Promise<number> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
     const values = [req.memberId, req.eventId, req.jobTypeId, req.jobStartDate, req.jobEndDate, req.verified,
-        req.verifiedDate, req.pointsAwarded, req.cashPayout, req.paid, req.paidDate, req.modifiedBy];
+        req.verifiedDate, req.pointsAwarded, req.cashPayout, req.paid, req.paidDate, req.modifiedBy, tenantId];
 
     let result;
     try {
@@ -207,6 +208,7 @@ export async function getJob(id: number): Promise<Job> {
 
     return {
         jobId: results[0].job_id,
+        tenantId: results[0].tenant_id,
         member: results[0].member,
         memberId: results[0].member_id,
         membershipId: results[0].membership_id,
@@ -243,6 +245,7 @@ export async function getOpenEventJob(eventId: number): Promise<Job> {
 
     return {
         jobId: results[0].job_id,
+        tenantId: results[0].tenant_id,
         member: results[0].member,
         memberId: results[0].member_id,
         membershipId: results[0].membership_id,

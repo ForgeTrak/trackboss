@@ -129,7 +129,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             membershipType = 'Guest Member';
             billingYear = currentYear;
         }
-        const membershipInfo = await getMembershipType(membershipType);
+        const membershipInfo = await getMembershipType(membershipType, req.user.tenantId);
         const actingUser = await validateAdminAccess(req, res);
         await sendApplicationStatus(req, res, applicationStatus);
         // get the application, and convert the primary member to a member. This call will create a

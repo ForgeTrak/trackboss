@@ -13,11 +13,11 @@ export const GET_EVENT_LIST_SQL = 'SELECT * FROM v_event';
 export const GET_EVENT_LIST_DATERANGE_SQL = `${GET_EVENT_LIST_SQL} WHERE end >= ? order by start`;
 export const GET_EVENT_SQL = `${GET_EVENT_LIST_SQL} WHERE event_id = ?`;
 
-export async function insertEvent(req: PostNewEventRequest): Promise<number> {
+export async function insertEvent(tenantId:string, req: PostNewEventRequest): Promise<number> {
     let restrict = 0;
     if (req.restrictSignups) restrict = 1;
     const values = [req.startDate, req.endDate, req.eventTypeId, req.eventName,
-        req.eventDescription, restrict, req.tenantId];
+        req.eventDescription, restrict, tenantId];
 
     // Use a single connection for sequential queries with SQL variables
     // (variables are session-scoped)
@@ -202,8 +202,8 @@ export async function deleteEvent(id: number, tenantId: any): Promise<void> {
     }
 }
 
-export async function getRelatedEvents(event: Event) {
-    const values = [event.eventTypeId, event.tenantId];
+export async function getRelatedEvents(tenantId: string, event: Event) {
+    const values = [event.eventTypeId, tenantId];
 
     const relatedEventSql =
         `select 
@@ -211,7 +211,7 @@ export async function getRelatedEvents(event: Event) {
         et.type, et.default_start, et.default_end
         from
         event_type_relationship etr, event_type et
-        where etr.event_type_id = ? and et.tenant_id = ?
+        where etr.event_type_id = ? and et.tenant_id = ? and
         et.event_type_id = etr.related_event_type_id order by etr.day_difference`;
 
     let relatedEventResults;
