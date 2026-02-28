@@ -40,7 +40,7 @@ ridingAreaStatus.get('/', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            response = await getRidingAreaStatuses();
+            response = await getRidingAreaStatuses(req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -66,7 +66,7 @@ ridingAreaStatus.patch('/:id', async (req: Request, res: Response) => {
         const { id } = req.params;
         const ridingArea = req.body;
         await validateAdminAccess(req, res);
-        const updatedArea = await flipRidingAreaStatus(Number(id), ridingArea);
+        const updatedArea = await flipRidingAreaStatus(Number(id), ridingArea, req.user.tenantId);
         res.send(updatedArea);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);

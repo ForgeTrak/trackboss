@@ -7,12 +7,12 @@ import { getPool } from './pool';
 /**
  * Get all the riding area statuses.
  */
-export async function getRidingAreaStatuses(): Promise<RidingAreaStatus[]> {
+export async function getRidingAreaStatuses(tenantId: string): Promise<RidingAreaStatus[]> {
     // this just pulls eveyrthing, but there are only 3 rows as of 8/2022.  I can't forsee
     // there ever being more than that, maybe 4 tops one day.  But taht would require changing
     // the UI also.
-    const sql = 'select * from riding_area_status';
-    const values: string[] = [];
+    const sql = 'select * from riding_area_status where tenant_id = ?';
+    const values: string[] = [tenantId];
 
     let results;
     try {
@@ -28,11 +28,11 @@ export async function getRidingAreaStatuses(): Promise<RidingAreaStatus[]> {
     }));
 }
 
-export async function flipRidingAreaStatus(id: number, status: any) : Promise<RidingAreaStatus> {
-    const sql = 'update riding_area_status set status = ? where riding_area_status_id = ?';
+export async function flipRidingAreaStatus(id: number, status: any, tenantId: string) : Promise<RidingAreaStatus> {
+    const sql = 'update riding_area_status set status = ? where riding_area_status_id = ? and tenant_id = ?';
     let results;
     try {
-        [results] = await getPool().query<OkPacket>(sql, [Number(status.isOpen), id]);
+        [results] = await getPool().query<OkPacket>(sql, [Number(status.isOpen), id, tenantId]);
     } catch (error: any) {
         logger.error('Error updating riding area status');
         logger.error(error);

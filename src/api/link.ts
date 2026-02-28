@@ -20,7 +20,7 @@ link.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const links: Link[] = await getLinks();
+            const links: Link[] = await getLinks(req.user.tenantId);
             res.status(200);
             response = links;
         } catch (e: any) {

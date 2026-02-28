@@ -12,7 +12,7 @@ export const INSERT_JOB_SQL = 'INSERT INTO job (member_id, event_id, job_type_id
      ' last_modified_date, verified, verified_date, points_awarded, cash_payout, paid, paid_date,' +
      ' last_modified_by, tenant_id) ' +
      'VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?)';
-export const PATCH_JOB_SQL = 'CALL sp_patch_job(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+export const PATCH_JOB_SQL = 'CALL sp_patch_job(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 export async function insertJob(tenantId:string, req: PostNewJobRequest): Promise<number> {
     if (_.isEmpty(req)) {

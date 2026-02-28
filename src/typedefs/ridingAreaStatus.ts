@@ -2,12 +2,13 @@ import { ErrorResponse } from './errorResponse';
 
 export type RidingAreaStatus = {
     id?: number,
+    tenantId?: string,
     name: string,
     isOpen: boolean,
 }
 
 export type PatchRidingAreaStatusRequest = {
-    name: string
+    name: string,
     isOpen: boolean,
 }
 

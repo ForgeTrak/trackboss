@@ -5,9 +5,9 @@ import { getPool } from './pool';
 import { Link } from '../typedefs/link';
 
 // eslint-disable-next-line import/prefer-default-export
-export async function getLinks(): Promise<Link[]> {
-    const sql = 'select * from link where online = 1 order by display_order';
-    const values: string[] = [];
+export async function getLinks(tenantId: string): Promise<Link[]> {
+    const sql = 'select * from link where online = 1 and tenant_id = ? order by display_order';
+    const values: string[] = [tenantId];
 
     let results;
     try {
@@ -18,6 +18,7 @@ export async function getLinks(): Promise<Link[]> {
     }
     return results.map((result) => ({
         linkId: result.link_id,
+        tenantId: result.tenant_id,
         linkTitle: result.link_title,
         linkUrl: result.link_url,
         linkDisplayOrder: result.display_order,
