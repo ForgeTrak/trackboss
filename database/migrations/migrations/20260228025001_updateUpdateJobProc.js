@@ -1,3 +1,10 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = async function(knex) {
+    await knex.schema.raw(`drop procedure sp_patch_job`);
+    await knex.schema.raw(`
 CREATE PROCEDURE sp_patch_job(
 	IN _job_id INT,
     IN _tenant_id VARCHAR(255),
@@ -47,4 +54,13 @@ BEGIN
 		last_modified_by = _modified_by
 	WHERE
 		job_id = _job_id AND tenant_id = _tenant_id;
-END
+END`);
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  
+};

@@ -120,7 +120,7 @@ async function GetJobList(req: Request, res:Response) {
                 if (typeof endDate !== 'undefined') {
                     filters.endDate = endDate;
                 }
-                const jobList: Job[] = await getJobList(filters);
+                const jobList: Job[] = await getJobList(filters, req.user.tenantId);
                 if (typeof filters.startDate !== 'undefined' || typeof filters.endDate !== 'undefined') {
                     res.status(206);
                 } else {
@@ -200,9 +200,9 @@ job.patch('/event/:eventId/:memberId', async (req: Request, res: Response) => {
         try {
             const { eventId, memberId } = req.params;
             // get an open event job.  This would normally be a meeting or a work day so there should be plenty.
-            const eventJob = await getOpenEventJob(parseInt(eventId, 10));
+            const eventJob = await getOpenEventJob(parseInt(eventId, 10), req.user.tenantId);
             eventJob.memberId = parseInt(memberId, 10);
-            await patchJob(eventJob.jobId, eventJob);
+            await patchJob(eventJob.jobId, req.user.tenantId, eventJob);
             response = eventJob;
         } catch (error: any) {
             logger.error(`Error at path ${req.path}`);
@@ -316,7 +316,7 @@ job.patch('/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            await patchJob(Number(jobId), req.body);
+            await patchJob(Number(jobId), req.user.tenantId, req.body);
             response = await getJob(id);
             res.status(200);
         } catch (e: any) {
@@ -359,7 +359,7 @@ job.patch('/verify/:jobId/:state', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            await setJobVerifiedState(id, verifiedState);
+            await setJobVerifiedState(id, verifiedState, req.user.tenantId);
             response = await getJob(id);
             res.status(200);
         } catch (e: any) {
@@ -395,7 +395,7 @@ job.patch('/remove/signup/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            await removeSignup(id);
+            await removeSignup(id, req.user.tenantId);
             response = await getJob(id);
             res.status(200);
         } catch (e: any) {
@@ -439,7 +439,7 @@ job.delete('/:jobId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await deleteJob(id);
+            await deleteJob(id, req.user.tenantId);
             response = { jobId: id };
             res.status(200);
         } catch (e: any) {

@@ -7,13 +7,12 @@ import logger from '../logger';
 import { getPool } from './pool';
 
 export const GET_JOB_LIST_SQL = 'SELECT *, year(end) year FROM v_job';
-export const GET_JOB_SQL = `${GET_JOB_LIST_SQL} WHERE job_id = ?`;
+export const GET_JOB_SQL = 'SELECT *, year(end) year FROM v_job WHERE job_id = ? and tenant_id = ?';
 export const INSERT_JOB_SQL = 'INSERT INTO job (member_id, event_id, job_type_id, job_start_date, job_end_date, ' +
      ' last_modified_date, verified, verified_date, points_awarded, cash_payout, paid, paid_date,' +
      ' last_modified_by, tenant_id) ' +
      'VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?)';
 export const PATCH_JOB_SQL = 'CALL sp_patch_job(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-export const DELETE_JOB_SQL = 'DELETE FROM job WHERE job_id = ?';
 
 export async function insertJob(tenantId:string, req: PostNewJobRequest): Promise<number> {
     if (_.isEmpty(req)) {
@@ -44,7 +43,7 @@ export async function insertJob(tenantId:string, req: PostNewJobRequest): Promis
     return result.insertId;
 }
 
-export async function getJobList(filters: GetJobListRequestFilters): Promise<Job[]> {
+export async function getJobList(filters: GetJobListRequestFilters, tenantId: string): Promise<Job[]> {
     let sql;
     let values: any[] = [];
     let useMemberFilter = false;
@@ -94,6 +93,8 @@ export async function getJobList(filters: GetJobListRequestFilters): Promise<Job
         sql = GET_JOB_LIST_SQL;
         values = [];
     }
+    sql += ' and tenant_id = ?';
+    values.push(tenantId);
     // sorting by job_id keeps stuff in the same order. SORT of important for front end so it doesn't just
     // change shit randomly.
     sql += ' order by job_day_number, sort_order, job_id';
@@ -109,6 +110,7 @@ export async function getJobList(filters: GetJobListRequestFilters): Promise<Job
 
     let jobResults : any = results.map((result) => ({
         jobId: result.job_id,
+        tenantId: result.tenant_id,
         member: result.member,
         memberId: result.member_id,
         membershipId: result.membership_id,
@@ -138,14 +140,15 @@ export async function getJobList(filters: GetJobListRequestFilters): Promise<Job
               eph.description title, eph.point_value points_awarded, year(eph.date) year
               from member m, earned_points_history eph where 
               eph.old_member_id = m.old_member_id and 
-              m.membership_id = ?`,
-            [membershipId],
+              m.membership_id = ? and m.tenant_id = ? and eph.tenant_id = ?`,
+            [membershipId, tenantId, tenantId],
         );
         if (historicalResults) {
             historicalResults[0].map((legacyPoints) => (jobResults.push({
                 member: legacyPoints.member,
                 memberId: legacyPoints.member_id,
                 membershipId: legacyPoints.membership_id,
+                tenantId: legacyPoints.tenant_id,
                 start: legacyPoints.date,
                 end: legacyPoints.date,
                 title: legacyPoints.title,
@@ -165,14 +168,15 @@ export async function getJobList(filters: GetJobListRequestFilters): Promise<Job
               eph.description title, eph.point_value points_awarded, year(eph.date) year
               from member m, earned_points_history eph where 
               eph.old_member_id = m.old_member_id and 
-              m.membership_id = ?`,
-            [membershipId],
+              m.membership_id = ? and m.tenant_id = ? and eph.tenant_id = ?`,
+            [membershipId, tenantId, tenantId],
         );
         if (historicalResults) {
             historicalResults[0].map((legacyPoints) => (jobResults.push({
                 member: legacyPoints.member,
                 memberId: legacyPoints.member_id,
                 membershipId: legacyPoints.membership_id,
+                tenantId: legacyPoints.tenant_id,
                 start: legacyPoints.date,
                 end: legacyPoints.date,
                 title: legacyPoints.title,
@@ -229,11 +233,11 @@ export async function getJob(id: number): Promise<Job> {
     };
 }
 
-export async function getOpenEventJob(eventId: number): Promise<Job> {
-    const sql = 'select * from job where event_id = ? and member_id is null';
+export async function getOpenEventJob(eventId: number, tenantId: string): Promise<Job> {
+    const sql = 'select * from job where event_id = ? and tenant_id = ? and member_id is null';
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(sql, [eventId]);
+        [results] = await getPool().query<RowDataPacket[]>(sql, [eventId, tenantId]);
     } catch (e) {
         logger.error(`DB error getting job: ${e}`);
         throw new Error('internal server error');
@@ -266,11 +270,11 @@ export async function getOpenEventJob(eventId: number): Promise<Job> {
     };
 }
 
-export async function patchJob(id: number, req: PatchJobRequest): Promise<void> {
+export async function patchJob(id: number, tenantId: string, req: PatchJobRequest): Promise<void> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
-    const values = [id, req.memberId, req.eventId, req.jobTypeId, req.jobStartDate, req.jobEndDate,
+    const values = [id, tenantId, req.memberId, req.eventId, req.jobTypeId, req.jobStartDate, req.jobEndDate,
         req.pointsAwarded, req.verified, req.paid, req.modifiedBy, req.paidLabor, req.paidLaborId];
 
     let result;
@@ -298,28 +302,28 @@ export async function patchJob(id: number, req: PatchJobRequest): Promise<void> 
     }
 }
 
-export async function setJobVerifiedState(id: number, state: boolean) : Promise<number> {
+export async function setJobVerifiedState(id: number, state: boolean, tenantId: string) : Promise<number> {
     const [result] = await getPool().query<OkPacket>(
-        'update job set verified = ? where job_id = ?',
-        [state, id],
+        'update job set verified = ? where job_id = ? and tenant_id = ?',
+        [state, id, tenantId],
     );
     return result.affectedRows;
 }
 
-export async function removeSignup(jobId: number) : Promise<number> {
+export async function removeSignup(jobId: number, tenantId: string) : Promise<number> {
     const [result] = await getPool().query<OkPacket>(
-        'update job set member_id = null, paid_labor = null, paid_labor_id = null where job_id = ?',
-        [jobId],
+        'update job set member_id = null, paid_labor = null, paid_labor_id = null where job_id = ? and tenant_id = ?',
+        [jobId, tenantId],
     );
     return result.affectedRows;
 }
 
-export async function deleteJob(id: number): Promise<void> {
-    const values = [id];
+export async function deleteJob(id: number, tenantId: string): Promise<void> {
+    const values = [id, tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(DELETE_JOB_SQL, values);
+        [result] = await getPool().query<OkPacket>('delete from job WHERE job_id = ? and tenant_id = ?', values);
     } catch (e) {
         logger.error(`DB error deleting job: ${e}`);
         throw new Error('internal server error');

@@ -2,6 +2,7 @@ import { ErrorResponse } from './errorResponse';
 
 export type EventType = {
     eventTypeId: number,
+    tenantId: string,
     type: string,
     active: boolean,
     lastModifiedDate: string,

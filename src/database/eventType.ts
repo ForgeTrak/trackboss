@@ -5,19 +5,16 @@ import logger from '../logger';
 import { getPool } from './pool';
 import { EventType, PatchEventTypeRequest, PostNewEventTypeRequest } from '../typedefs/eventType';
 
-export const GET_EVENT_TYPE_LIST_SQL =
-'SELECT event_type_id, type, active, last_modified_by, last_modified_date FROM v_event_type order by type';
-export const GET_EVENT_TYPE_SQL = `${GET_EVENT_TYPE_LIST_SQL} WHERE event_type_id = ?`;
-export const INSERT_EVENT_TYPE_SQL =
-    'INSERT INTO event_type (type, last_modified_by, last_modified_date, active) VALUES (?, ?, CURDATE(), 1)';
-export const PATCH_EVENT_TYPE_SQL = 'CALL sp_patch_event_type (?, ?, ?, ?)';
-
-export async function insertEventType(req: PostNewEventTypeRequest): Promise<number> {
-    const values = [req.type, req.modifiedBy];
+export async function insertEventType(tenantId: string, req: PostNewEventTypeRequest): Promise<number> {
+    const values = [req.type, req.modifiedBy, tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(INSERT_EVENT_TYPE_SQL, values);
+        [result] = await getPool().query<OkPacket>(
+            // eslint-disable-next-line max-len
+            'INSERT INTO event_type (type, last_modified_by, last_modified_date, active, tenant_id) VALUES (?, ?, CURDATE(), 1, ?)',
+            values,
+        );
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {
@@ -38,12 +35,15 @@ export async function insertEventType(req: PostNewEventTypeRequest): Promise<num
     return result.insertId;
 }
 
-export async function getEventType(id: number): Promise<EventType> {
-    const values = [id];
+export async function getEventType(id: number, tenantId: string): Promise<EventType> {
+    const values = [id, tenantId];
 
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(GET_EVENT_TYPE_SQL, values);
+        [results] = await getPool().query<RowDataPacket[]>(
+            'select * from v_event_type where event_type_id = ? and tenant_id = ?',
+            values,
+        );
     } catch (e) {
         logger.error(`DB error getting event type: ${e}`);
         throw new Error('internal server error');
@@ -55,6 +55,7 @@ export async function getEventType(id: number): Promise<EventType> {
 
     return {
         eventTypeId: results[0].event_type_id,
+        tenantId: results[0].tenant_id,
         type: results[0].type,
         active: !!results[0].active[0],
         lastModifiedDate: results[0].last_modified_date,
@@ -64,9 +65,11 @@ export async function getEventType(id: number): Promise<EventType> {
     };
 }
 
-export async function getEventTypeList(): Promise<EventType[]> {
-    const sql = GET_EVENT_TYPE_LIST_SQL;
-    const values: string[] = [];
+export async function getEventTypeList(tenantId: string): Promise<EventType[]> {
+    const sql =
+        // eslint-disable-next-line max-len
+        'SELECT event_type_id, type, active, last_modified_by, last_modified_date FROM v_event_type where tenant_id = ? order by type';
+    const values: string[] = [tenantId];
 
     let results;
     try {
@@ -77,6 +80,7 @@ export async function getEventTypeList(): Promise<EventType[]> {
     }
     return results.map((result) => ({
         eventTypeId: result.event_type_id,
+        tenantId: result.tenant_id,
         type: result.type,
         lastModifiedBy: result.last_modified_by,
         lastModifiedDate: result.last_modified_date,
@@ -86,15 +90,17 @@ export async function getEventTypeList(): Promise<EventType[]> {
     }));
 }
 
-export async function patchEventType(id: number, req: PatchEventTypeRequest): Promise<void> {
+export async function patchEventType(id: number, tenantId: string, req: PatchEventTypeRequest): Promise<void> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
-    const values = [id, req.type, req.active, req.modifiedBy];
+    const values = [req.type, req.active, req.modifiedBy, id, tenantId];
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(PATCH_EVENT_TYPE_SQL, values);
+        // eslint-disable-next-line max-len
+        const patchSql = 'update event_type set type = ?, active = ?, last_modified_by = ?, last_modified_date = CURDATE() where event_type_id = ? and tenant_id = ?';
+        [result] = await getPool().query<OkPacket>(patchSql, values);
     } catch (e: any) {
         if ('errno' in e) {
             switch (e.errno) {

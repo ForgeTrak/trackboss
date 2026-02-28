@@ -23,8 +23,8 @@ eventType.post('/new', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
-            const insertId = await insertEventType(req.body);
-            response = await getEventType(insertId);
+            const insertId = await insertEventType(req.user.tenantId, req.body);
+            response = await getEventType(insertId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -57,7 +57,7 @@ eventType.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const eventTypeList: EventType[] = await getEventTypeList();
+            const eventTypeList: EventType[] = await getEventTypeList(req.user.tenantId);
             res.status(200);
             response = eventTypeList;
         } catch (e: any) {
@@ -86,7 +86,7 @@ eventType.get('/:eventTypeID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { eventTypeID } = req.params;
-            response = await getEventType(Number(eventTypeID));
+            response = await getEventType(Number(eventTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -117,8 +117,8 @@ eventType.patch('/:eventTypeID', async (req: Request, res: Response) => {
         try {
             const { eventTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
-            await patchEventType(Number(eventTypeID), req.body);
-            response = await getEventType(Number(eventTypeID));
+            await patchEventType(Number(eventTypeID), req.user.tenantId, req.body);
+            response = await getEventType(Number(eventTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

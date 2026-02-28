@@ -38,6 +38,7 @@ export async function generateNewBills(
     preGeneratedBills: Bill[],
     threshold: number,
     year: number,
+    tenantId: string,
 ): Promise<Bill[]> {
     // look at the next year's board members because they pay $0.
     const boardMembers = await getBoardMemberList((year + 1).toString(10));
@@ -64,7 +65,7 @@ export async function generateNewBills(
                     owed = 0;
                     fee = 0;
                 }
-                let workDetail = await getJobList({ membershipId: membership.membershipId, year });
+                let workDetail = await getJobList({ membershipId: membership.membershipId, year }, tenantId);
                 workDetail = workDetail.filter((job: Job) => (!job.paid && !isFuture(job.start as Date)));
                 // sort by date.  I have to do this in JS due to the way jobs are stored in two different tables and
                 // messed with here.  Post 2022 this will no longer be required.
@@ -113,12 +114,15 @@ export async function processBillPayment(billId: number, paymentMethod: string) 
     return bill;
 }
 
-export async function runBillingComplete(year: number, membershipList: Membership[], membershipId?: number) {
+export async function runBillingComplete(
+    year: number, membershipList: Membership[],
+    membershipId?: number, tenantId?: string,
+) {
     const { threshold } = await getWorkPointThreshold(year);
     // to protect against generating duplicate bills
     const cleanedUp = await cleanBilling(year, membershipId);
     const preGeneratedBills = await getBillList({ year, membershipId });
-    const generatedBills = await generateNewBills(membershipList, preGeneratedBills, threshold, year);
+    const generatedBills = await generateNewBills(membershipList, preGeneratedBills, threshold, year, tenantId || '');
     return generatedBills;
 }
 
