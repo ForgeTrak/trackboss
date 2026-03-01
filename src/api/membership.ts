@@ -181,7 +181,7 @@ membership.post('/tags', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipId, tags } = req.body;
-            response = await createMembershipTag(membershipId, tags);
+            response = await createMembershipTag(membershipId, tags, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -212,7 +212,7 @@ membership.get('/tags/:membershipID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipID } = req.params;
-            response = await getMembershipTags(Number(membershipID));
+            response = await getMembershipTags(Number(membershipID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -243,7 +243,7 @@ membership.delete('/tags', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipId, tags } = req.body;
-            response = await deleteMembershipTag(membershipId, tags);
+            response = await deleteMembershipTag(membershipId, tags, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

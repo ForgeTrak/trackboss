@@ -61,16 +61,8 @@ bike.get('/list', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const id = req.query.membershipID;
-            let filterMembership: number | undefined;
-            if (typeof id === 'undefined') {
-                filterMembership = undefined;
-            } else {
-                filterMembership = Number(id);
-                if (Number.isNaN(filterMembership)) {
-                    throw new Error('user input error');
-                }
-            }
-            const bikeList: Bike[] = await getBikeList(filterMembership);
+            const filterMembership = Number(id);
+            const bikeList: Bike[] = await getBikeList(filterMembership, req.user.tenantId);
             res.status(200);
             response = bikeList;
         } catch (e: any) {

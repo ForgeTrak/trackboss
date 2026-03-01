@@ -6,9 +6,9 @@ import { getPool } from './pool';
 import { Bike, PatchBikeRequest, PostNewBikeRequest } from '../typedefs/bike';
 
 export const GET_BIKE_LIST_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike';
-export const GET_BIKE_LIST_BY_MEMBERSHIP_SQL = `${GET_BIKE_LIST_SQL} WHERE membership_id = ?`;
+export const GET_BIKE_LIST_BY_MEMBERSHIP_SQL = `${GET_BIKE_LIST_SQL} WHERE membership_id = ? and tenant_id = ?`;
 export const GET_BIKE_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike WHERE bike_id = ?';
-export const DELETE_BIKE_SQL = 'DELETE FROM member_bikes WHERE bike_id = ?';
+export const DELETE_BIKE_SQL = 'DELETE FROM member_bikes WHERE bike_id = ? and tenant_id = ?';
 
 export async function insertBike(req: PostNewBikeRequest): Promise<number> {
     const values = [req.year, req.make, req.model, req.membershipId, req.tenantId];
@@ -37,16 +37,9 @@ export async function insertBike(req: PostNewBikeRequest): Promise<number> {
     return result.insertId;
 }
 
-export async function getBikeList(membershipId?: number, tenantId?: string): Promise<Bike[]> {
-    let sql;
-    let values: any[];
-    if (typeof membershipId !== 'undefined') {
-        sql = GET_BIKE_LIST_BY_MEMBERSHIP_SQL;
-        values = [membershipId];
-    } else {
-        sql = GET_BIKE_LIST_SQL;
-        values = [];
-    }
+export async function getBikeList(membershipId: number, tenantId: string): Promise<Bike[]> {
+    const sql = GET_BIKE_LIST_BY_MEMBERSHIP_SQL;
+    const values = [membershipId, tenantId];
 
     let results;
     try {

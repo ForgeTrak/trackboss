@@ -26,9 +26,6 @@ export const INSERT_MEMBERSHIP_SQL = 'INSERT INTO membership (membership_admin_i
     'membership_type_id) ' +
     'VALUES (?, "Active", 0, 1, 0, ?, ?, ?, ?, ?, CURDATE(), ?, ?)';
 export const PATCH_MEMBERSHIP_SQL = 'CALL sp_patch_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-export const REGISTERED_MEMBER_ID_OUT = '@member_id';
-export const REGISTERED_MEMBERSHIP_ID_OUT = '@membership_id';
-export const GET_REGISTERED_MEMBER_ID_SQL = `SELECT ${REGISTERED_MEMBER_ID_OUT}`;
 
 export async function insertMembership(req: PostNewMembershipRequest): Promise<number> {
     if (_.isEmpty(req)) {

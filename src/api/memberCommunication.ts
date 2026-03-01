@@ -16,7 +16,7 @@ const memberCommunication = Router();
 memberCommunication.get('/', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
-        const allCommunications = await getMemberCommunications();
+        const allCommunications = await getMemberCommunications(req.user.tenantId);
         res.send(allCommunications);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -29,7 +29,7 @@ memberCommunication.get('/:communicationId', async (req: Request, res: Response)
     try {
         await validateAdminAccess(req, res);
         const id = Number(req.params.communicationId);
-        const singleCommunication = await getMemberCommunicationById(id);
+        const singleCommunication = await getMemberCommunicationById(id, req.user.tenantId);
         res.send(singleCommunication);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -93,7 +93,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
                 uniqueSubscribedMembers[member.memberId] = member;
             });
             // get all board members too, and if they aren't already in the list add them.
-            const boardMembers = await getBoardMemberList(new Date().getFullYear().toString());
+            const boardMembers = await getBoardMemberList(req.user.tenantId, new Date().getFullYear().toString());
             boardMembers.forEach((boardMember) => {
                 // add board members who already not admins (this was a gaping hole in initial functionality as spouses
                 // can be board members) but would not get texts.
@@ -107,7 +107,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
                 }
             });
         }
-        const response = await insertMemberCommunication(communication);
+        const response = await insertMemberCommunication(communication, req.user.tenantId);
 
         // now stick the message in the respective SQS queue for further processing.
         const outboundQueueName = `trackboss-queue-${communication.mechanism}`;

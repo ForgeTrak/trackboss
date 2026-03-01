@@ -2,6 +2,7 @@ import { Member } from './member';
 
 export type MemberCommunication = {
     memberCommunicationId?: number,
+    tenantId?: string,
     subject: string,
     mechanism: string,
     senderId: number,
