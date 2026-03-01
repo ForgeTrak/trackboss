@@ -6,13 +6,13 @@ import { getPool } from './pool';
 import { Bill, GenerateSingleBillRequest, GetBillListRequestFilters, WorkPointThreshold } from '../typedefs/bill';
 
 export const GET_BILL_LIST_SQL = 'SELECT * FROM v_bill';
-export const GET_THRESHOLD_SQL = 'SELECT * FROM point_threshold WHERE year = ?';
+export const GET_THRESHOLD_SQL = 'SELECT * FROM point_threshold WHERE year = ? and tenant_id = ?';
 export const GENERATE_BILL_SQL =
     'INSERT INTO member_bill (generated_date, year, amount, amount_with_fee, membership_id, emailed_bill, ' +
-    'cur_year_paid, threshold, points_earned, work_detail) ' +
-    'VALUES (CURDATE(), ?, ?, ?, ?, NULL, 0, ?, ?, ?)';
+    'cur_year_paid, cur_year_ins, threshold, points_earned, work_detail, tenant_id) ' +
+    'VALUES (CURDATE(), ?, ?, ?, ?, NULL, 0, 0, ?, ?, ?, ?)';
 
-export async function generateBill(req: GenerateSingleBillRequest): Promise<number> {
+export async function generateBill(req: GenerateSingleBillRequest, tenantId: string): Promise<number> {
     const workDetailJson = JSON.stringify(
         req.workDetail,
         function replacer(key, value) {
@@ -26,7 +26,7 @@ export async function generateBill(req: GenerateSingleBillRequest): Promise<numb
 
     const values = [
         req.billingYear, req.amount.toFixed(2), req.amountWithFee.toFixed(2), req.membershipId,
-        req.pointsThreshold, req.pointsEarned, workDetailJson,
+        req.pointsThreshold, req.pointsEarned, workDetailJson, tenantId,
     ];
     let result;
     try {
@@ -41,8 +41,8 @@ export async function generateBill(req: GenerateSingleBillRequest): Promise<numb
     return result.insertId;
 }
 
-export async function getWorkPointThreshold(year: number): Promise<WorkPointThreshold> {
-    const values = [year];
+export async function getWorkPointThreshold(year: number, tenantId: string): Promise<WorkPointThreshold> {
+    const values = [year, tenantId];
 
     let results;
     try {
@@ -62,7 +62,7 @@ export async function getWorkPointThreshold(year: number): Promise<WorkPointThre
     };
 }
 
-export async function getBillList(filters: GetBillListRequestFilters): Promise<Bill[]> {
+export async function getBillList(filters: GetBillListRequestFilters, tenantId: string): Promise<Bill[]> {
     let sql;
     let values: any[] = [];
     if (_.values(filters).find((filter) => typeof filter !== 'undefined')) {
@@ -93,7 +93,8 @@ export async function getBillList(filters: GetBillListRequestFilters): Promise<B
         sql = GET_BILL_LIST_SQL;
         values = [];
     }
-
+    sql += ' AND tenant_id = ?';
+    values.push(tenantId);
     let results;
     try {
         [results] = await getPool().query<RowDataPacket[]>(sql, values);
@@ -103,6 +104,7 @@ export async function getBillList(filters: GetBillListRequestFilters): Promise<B
     }
     return results.map((result) => ({
         billId: result.bill_id,
+        tenantId: result.tenant_id,
         generatedDate: result.generated_date,
         year: result.year,
         amount: result.amount.toFixed(2),
@@ -129,13 +131,13 @@ export async function getBillList(filters: GetBillListRequestFilters): Promise<B
     }));
 }
 
-export async function markBillPaid(id: number, paymentMethod?: string): Promise<void> {
+export async function markBillPaid(id: number, paymentMethod?: string, tenantId?: string): Promise<void> {
     let result;
     try {
         const sql =
           // eslint-disable-next-line max-len
-          'update member_bill set cur_year_paid = 1, payment_method = ?, last_updated_date = current_timestamp()  where bill_id = ?';
-        [result] = await getPool().query<OkPacket>(sql, [paymentMethod, id]);
+          'update member_bill set cur_year_paid = 1, payment_method = ?, last_updated_date = current_timestamp()  where bill_id = ? AND tenant_id = ?';
+        [result] = await getPool().query<OkPacket>(sql, [paymentMethod, id, tenantId]);
     } catch (e) {
         logger.error(`DB error marking bill as paid: ${e}`);
         throw new Error('internal server error');
@@ -146,12 +148,12 @@ export async function markBillPaid(id: number, paymentMethod?: string): Promise<
     }
 }
 
-export async function markInsuranceAttestation(id: number): Promise<void> {
+export async function markInsuranceAttestation(id: number, tenantId: string): Promise<void> {
     let result;
     try {
         const sql =
-          'update member_bill set cur_year_ins = 1 where bill_id = ?';
-        [result] = await getPool().query<OkPacket>(sql, [id]);
+          'update member_bill set cur_year_ins = 1 where bill_id = ? AND tenant_id = ?';
+        [result] = await getPool().query<OkPacket>(sql, [id, tenantId]);
     } catch (e) {
         logger.error(`DB error marking bill as paid: ${e}`);
         throw new Error('internal server error');
@@ -162,12 +164,12 @@ export async function markInsuranceAttestation(id: number): Promise<void> {
     }
 }
 
-export async function markContactedAndRenewing(id: number): Promise<void> {
+export async function markContactedAndRenewing(id: number, tenantId: string): Promise<void> {
     let result;
     try {
         const sql =
-          'update member_bill set renewal_contacted = 1 where bill_id = ?';
-        [result] = await getPool().query<OkPacket>(sql, [id]);
+          'update member_bill set renewal_contacted = 1 where bill_id = ? and tenant_id = ?';
+        [result] = await getPool().query<OkPacket>(sql, [id, tenantId]);
     } catch (e) {
         logger.error(`DB error marking bill as paid: ${e}`);
         throw new Error('internal server error');
@@ -178,12 +180,12 @@ export async function markContactedAndRenewing(id: number): Promise<void> {
     }
 }
 
-export async function discountBill(id: number, amount: number, amountWithFee: number): Promise<void> {
+export async function discountBill(id: number, amount: number, amountWithFee: number, tenantId: string): Promise<void> {
     let result;
-    const params = [amount, amountWithFee, id];
+    const params = [amount, amountWithFee, id, tenantId];
     try {
         const sql =
-          'update member_bill set amount = ?, amount_with_fee = ? where bill_id = ?';
+          'update member_bill set amount = ?, amount_with_fee = ? where bill_id = ? AND tenant_id = ?';
         [result] = await getPool().query<OkPacket>(sql, params);
     } catch (e) {
         logger.error(`DB error marking bill as paid: ${e}`);
@@ -195,12 +197,12 @@ export async function discountBill(id: number, amount: number, amountWithFee: nu
     }
 }
 
-export async function addSquareAttributes(bill: Bill): Promise<void> {
+export async function addSquareAttributes(bill: Bill, tenantId: string): Promise<void> {
     let result;
     try {
         const sql =
-          'update member_bill set square_link = ?, square_order_id = ? where bill_id = ?';
-        [result] = await getPool().query<OkPacket>(sql, [bill.squareLink, bill.squareOrderId, bill.billId]);
+          'update member_bill set square_link = ?, square_order_id = ? where bill_id = ? AND tenant_id = ?';
+        [result] = await getPool().query<OkPacket>(sql, [bill.squareLink, bill.squareOrderId, bill.billId, tenantId]);
     } catch (e) {
         logger.error(`DB error adding square attributes: ${e}`);
         throw new Error('internal server error');
@@ -211,16 +213,16 @@ export async function addSquareAttributes(bill: Bill): Promise<void> {
     }
 }
 
-export async function cleanBilling(year: number, membershipId?: number): Promise<number> {
+export async function cleanBilling(year: number, membershipId?: number, tenantId?: string): Promise<number> {
     let param;
     let result;
     let sql;
     if (membershipId) {
-        sql = 'delete from member_bill where membership_id = ? and year = ? and cur_year_ins = 0';
-        param = [membershipId, year];
+        sql = 'delete from member_bill where membership_id = ? and year = ? and cur_year_ins = 0 AND tenant_id = ?';
+        param = [membershipId, year, tenantId];
     } else {
-        sql = 'delete from member_bill where year = ? and cur_year_ins = 0';
-        param = [year];
+        sql = 'delete from member_bill where year = ? and cur_year_ins = 0 AND tenant_id = ?';
+        param = [year, tenantId];
     }
     try {
         [result] = await getPool().query<OkPacket>(sql, param);
@@ -232,10 +234,11 @@ export async function cleanBilling(year: number, membershipId?: number): Promise
     return result.affectedRows;
 }
 
-export async function getBill(billId: number) : Promise<Bill> {
+export async function getBill(billId: number, tenantId: string) : Promise<Bill> {
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>('select * from v_bill where bill_id = ?', [billId]);
+        // eslint-disable-next-line max-len
+        [results] = await getPool().query<RowDataPacket[]>('select * from v_bill where bill_id = ? AND tenant_id = ?', [billId, tenantId]);
     } catch (e) {
         logger.error(`DB error getting bill list: ${e}`);
         throw new Error('internal server error');
@@ -272,6 +275,7 @@ export async function getBill(billId: number) : Promise<Bill> {
 export async function getBillByOrderId(orderId: string) : Promise<any> {
     let results;
     try {
+        // eslint-disable-next-line max-len
         [results] = await getPool().query<RowDataPacket[]>('select * from v_bill where square_order_id = ?', [orderId]);
     } catch (e) {
         logger.error(`DB error getting bill list: ${e}`);
@@ -281,6 +285,7 @@ export async function getBillByOrderId(orderId: string) : Promise<any> {
         const billResultSingle = results[0];
         const bill = {
             billId: billResultSingle.bill_id,
+            tenantId: billResultSingle.tenant_id,
             generatedDate: billResultSingle.generated_date,
             year: billResultSingle.year,
             amount: billResultSingle.amount,
@@ -309,12 +314,12 @@ export async function getBillByOrderId(orderId: string) : Promise<any> {
     return {};
 }
 
-export async function getLatestBillMembership(membershipId: number) : Promise<Bill> {
+export async function getLatestBillMembership(membershipId: number, tenantId: string) : Promise<Bill> {
     let results;
     try {
         [results] = await getPool().query<RowDataPacket[]>(
-            'select * from v_bill where membership_id = ? and year = year(now())-1',
-            [membershipId],
+            'select * from v_bill where membership_id = ? and year = year(now())-1 AND tenant_id = ?',
+            [membershipId, tenantId],
         );
     } catch (e) {
         logger.error(`DB error getting bill list: ${e}`);

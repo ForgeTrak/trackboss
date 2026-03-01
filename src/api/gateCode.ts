@@ -42,7 +42,7 @@ gateCode.get('/latest', async (req: Request, res: Response) => {
     } else {
         try {
             const membershipId = parseInt(req.query.membershipId?.toString() || '', 10);
-            const latestBill = await getLatestBillMembership(membershipId);
+            const latestBill = await getLatestBillMembership(membershipId, req.user.tenantId);
             if (latestBill.curYearIns && latestBill.curYearPaid) {
                 response = await getGateCodeLatest();
             } else {

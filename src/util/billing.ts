@@ -41,7 +41,7 @@ export async function generateNewBills(
     tenantId: string,
 ): Promise<Bill[]> {
     // look at the next year's board members because they pay $0.
-    const boardMembers = await getBoardMemberList((year + 1).toString(10));
+    const boardMembers = await getBoardMemberList(tenantId, (year + 1).toString(10));
     await Promise.all(membershipList.map(async (membership) => {
         // only generate a bill if one hasn't already been generated
         if (typeof _.find(
@@ -78,10 +78,10 @@ export async function generateNewBills(
                     pointsThreshold: threshold,
                     workDetail,
                     billingYear: year,
-                });
+                }, tenantId);
                 if (owed === 0) {
                     // flip the bill to paid if they owe zero. This is just easy record keeping.
-                    await markBillPaid(billId);
+                    await markBillPaid(billId, 'Waived', tenantId);
                 }
                 // if they are at or over the threshold, then update their membership type.
                 if ((earned >= threshold) && (membership.membershipType === 'Associate Member')) {
@@ -95,15 +95,15 @@ export async function generateNewBills(
             }
         }
     }));
-    const allBills = await getBillList({ year });
+    const allBills = await getBillList({ year }, tenantId);
     return _.differenceWith(allBills, preGeneratedBills, _.isEqual);
 }
 
-export async function processBillPayment(billId: number, paymentMethod: string) {
+export async function processBillPayment(billId: number, paymentMethod: string, tenantId: string) {
     logger.info(`marking bill ${billId} paid with payment method ${paymentMethod}`);
-    await markBillPaid(billId, paymentMethod);
-    await markContactedAndRenewing(billId);
-    const bill = await getBill(billId);
+    await markBillPaid(billId, paymentMethod, tenantId);
+    await markContactedAndRenewing(billId, tenantId);
+    const bill = await getBill(billId, tenantId);
     logger.info(`Got bill id ${billId} and its paid status is ${bill.curYearPaid}`);
     // if they marked the attestation as complete, send an email.
     if (bill.curYearPaid) {
@@ -118,28 +118,28 @@ export async function runBillingComplete(
     year: number, membershipList: Membership[],
     membershipId?: number, tenantId?: string,
 ) {
-    const { threshold } = await getWorkPointThreshold(year);
+    const { threshold } = await getWorkPointThreshold(year, tenantId || '');
     // to protect against generating duplicate bills
     const cleanedUp = await cleanBilling(year, membershipId);
-    const preGeneratedBills = await getBillList({ year, membershipId });
+    const preGeneratedBills = await getBillList({ year, membershipId }, tenantId || '');
     const generatedBills = await generateNewBills(membershipList, preGeneratedBills, threshold, year, tenantId || '');
     return generatedBills;
 }
 
-export async function runBillingCompleteCurrent(membershipList: Membership[], membershipId: number) {
+export async function runBillingCompleteCurrent(membershipList: Membership[], membershipId: number, tenantId: string) {
     const currentYear = calculateBillingYear();
-    const billsBillsBills = await runBillingComplete(currentYear, membershipList, membershipId);
+    const billsBillsBills = await runBillingComplete(currentYear, membershipList, membershipId, tenantId);
     return billsBillsBills;
 }
 
-export async function generateSquareLinks(billingYear: number, membershipId?: number) {
+export async function generateSquareLinks(billingYear: number, membershipId?: number, tenantId?: string) {
     const billingFilters : any = {
         year: Number(billingYear),
     };
     if (membershipId) {
         billingFilters.membershipId = Number(membershipId);
     }
-    const billingList: Bill[] = await getBillList(billingFilters);
+    const billingList: Bill[] = await getBillList(billingFilters, tenantId || '');
     logger.info('Billing Job - starting Square link generation.');
     // I don't care if this is slower, I would actualy prefer it so I don't hit Square's rate limits.
     // This runs once a year so who cares how fast it is anyway?
@@ -156,7 +156,7 @@ export async function generateSquareLinks(billingYear: number, membershipId?: nu
             logger.info(`${bill.billId} - ${bill.squareLink}`);
             // slow down sally, you're moving too fast.....
             // eslint-disable-next-line no-await-in-loop
-            await addSquareAttributes(bill);
+            await addSquareAttributes(bill, tenantId || '');
             linkCount += 1;
             logger.info(`Billing Job - Generated square id ${bill.squareOrderId} for bill ${bill.billId} ${linkCount}`);
         }

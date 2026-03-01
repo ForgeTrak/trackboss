@@ -178,7 +178,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
         await patchMember(`${primaryMemberId}`, memberUpdate);
         // now send a welcome email to the member.
         await sendNewMemberEmail(application);
-        const { threshold } = await getWorkPointThreshold(billingYear);
+        const { threshold } = await getWorkPointThreshold(billingYear, req.user.tenantId);
         const billId = await generateBill({
             amount: membershipInfo.baseDuesAmt,
             amountWithFee: ((membershipInfo.baseDuesAmt) + (membershipInfo.baseDuesAmt * 0.0290) + 0.30),
@@ -187,7 +187,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             pointsThreshold: threshold,
             workDetail: [],
             billingYear,
-        });
+        }, req.user.tenantId);
         await generateSquareLinks(billingYear, newMembershipId);
         // TODO: this really needs type checking, otherwise it is prone to typeos and speling erors can mess it up.
         application.familyMembers.forEach(async (familyMember) => {

@@ -160,13 +160,13 @@ job.post('/new', async (req: Request, res: Response) => {
             await verify(headerCheck.token, 'Admin');
             const jobInsertRequest : PostNewJobRequest = req.body;
             const insertId = await insertJob(req.user.tenantId, jobInsertRequest);
-            response = await getJob(insertId);
+            response = await getJob(insertId, req.user.tenantId);
             // we have added the job so update the user's billing immediately so we can backdate stuff which happens.
             // it also keeps stuff instantly up to date for verification.
             const workYear = parse(jobInsertRequest.jobStartDate || '', 'yyyy-MM-dd HH:mm', new Date()).getFullYear();
             const { membershipId } = jobInsertRequest;
             const membership = await getMembership(membershipId || 0);
-            runBillingComplete(workYear, [membership], membership.membershipId);
+            runBillingComplete(workYear, [membership], membership.membershipId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -281,7 +281,7 @@ job.get('/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
-            response = await getJob(id);
+            response = await getJob(id, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -317,7 +317,7 @@ job.patch('/:jobId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await patchJob(Number(jobId), req.user.tenantId, req.body);
-            response = await getJob(id);
+            response = await getJob(id, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -360,7 +360,7 @@ job.patch('/verify/:jobId/:state', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await setJobVerifiedState(id, verifiedState, req.user.tenantId);
-            response = await getJob(id);
+            response = await getJob(id, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -396,7 +396,7 @@ job.patch('/remove/signup/:jobId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await removeSignup(id, req.user.tenantId);
-            response = await getJob(id);
+            response = await getJob(id, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

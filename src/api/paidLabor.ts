@@ -25,7 +25,7 @@ paidLabor.get('/list', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token);
-            const links: PaidLabor[] = await getPaidLabor();
+            const links: PaidLabor[] = await getPaidLabor(req.user.tenantId);
             res.status(200);
             response = links;
         } catch (e: any) {
@@ -54,7 +54,7 @@ paidLabor.get('/:paidLaborId', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { memberTypeID } = req.params;
-            response = await getPaidLaborById(Number(memberTypeID));
+            response = await getPaidLaborById(Number(memberTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -90,7 +90,7 @@ paidLabor.delete('/:paidLaborId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await deletePaidLaborById(id);
+            await deletePaidLaborById(id, req.user.tenantId);
             response = { paidLaborId: id };
             res.status(200);
         } catch (e: any) {
@@ -129,7 +129,7 @@ paidLabor.patch('/:paidLaborId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
-            await updatePaidLabor(id, req.body);
+            await updatePaidLabor(id, req.body, req.user.tenantId);
             response = req.body;
             res.status(200);
         } catch (e: any) {
@@ -163,7 +163,7 @@ paidLabor.post('/', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
-            response = await createPaidLabor(req.body);
+            response = await createPaidLabor(req.body, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

@@ -10,4 +10,4 @@ CREATE or replace VIEW `v_membership_base_dues` AS
             LEFT JOIN
         membership_types mt ON ms.membership_type_id = mt.membership_type_id and ms.tenant_id = mt.tenant_id
     GROUP BY
-        membership_id
+        tenant_id, membership_id

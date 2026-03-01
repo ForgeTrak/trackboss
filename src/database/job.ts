@@ -195,8 +195,8 @@ export async function getJobList(filters: GetJobListRequestFilters, tenantId: st
     return jobResults;
 }
 
-export async function getJob(id: number): Promise<Job> {
-    const values = [id];
+export async function getJob(id: number, tenantId: string): Promise<Job> {
+    const values = [id, tenantId];
 
     let results;
     try {

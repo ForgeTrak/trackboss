@@ -2,6 +2,7 @@ import { ErrorResponse } from './errorResponse';
 
 export type PaidLabor = {
     paidLaborId?: number,
+    tenantId?: string,
     firstName?: string,
     lastName?: string,
     businessName?: string,

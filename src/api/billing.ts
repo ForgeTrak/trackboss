@@ -46,7 +46,7 @@ billing.get('/yearlyWorkPointThreshold', async (req: Request, res: Response) => 
             await verify(headerCheck.token);
             // If the year is undefined or NaN, just default to this year
             const year = Number(req.query.year) || new Date().getFullYear();
-            response = await getWorkPointThreshold(year);
+            response = await getWorkPointThreshold(year, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -83,7 +83,7 @@ billing.get('/list', async (req: Request, res: Response) => {
                 paymentStatus: paymentStatus as string,
                 year: Number(billingYear),
                 membershipStatus: 'active',
-            });
+            }, req.user.tenantId);
             res.status(200);
             response = billingList;
         } catch (e: any) {
@@ -119,7 +119,7 @@ billing.get('/:membershipID', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
 
-            const results = await getBillList({ membershipId, membershipStatus: 'Active' });
+            const results = await getBillList({ membershipId, membershipStatus: 'Active' }, req.user.tenantId);
             response = results;
             res.status(200);
         } catch (e: any) {
@@ -158,7 +158,7 @@ billing.post('/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
-            await processBillPayment(billId, paymentMethod?.toString() || '');
+            await processBillPayment(billId, paymentMethod?.toString() || '', req.user.tenantId);
             response = {};
             res.status(200);
         } catch (e: any) {
@@ -229,11 +229,11 @@ billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
-            const originalBill = await getBill(billId);
+            const originalBill = await getBill(billId, req.user.tenantId);
             if (!originalBill.curYearIns) {
-                await markInsuranceAttestation(billId);
+                await markInsuranceAttestation(billId, req.user.tenantId);
             }
-            const bill = await getBill(billId);
+            const bill = await getBill(billId, req.user.tenantId);
             // if they marked the attestation as complete, send an email.
             if (!originalBill.curYearIns && bill.curYearIns) {
                 await sendInsuranceConfirmEmail(bill);
@@ -241,7 +241,7 @@ billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {
             // if the bill is zero, mark the member as contacted because because they are done and there
             // is no need to check them.
             if (bill.amount === 0) {
-                await markContactedAndRenewing(billId);
+                await markContactedAndRenewing(billId, req.user.tenantId);
             }
             response = {};
             res.status(200);
@@ -280,7 +280,7 @@ billing.patch('/markContacted/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
-            await markContactedAndRenewing(billId);
+            await markContactedAndRenewing(billId, req.user.tenantId);
             response = {};
             res.status(200);
         } catch (e: any) {
@@ -318,17 +318,17 @@ billing.patch('/discount/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
-            const bill = await getBill(billId);
+            const bill = await getBill(billId, req.user.tenantId);
             const discountPercent = 50;
             const newAmount = bill.amount * (discountPercent / 100);
             const newAmountWithFee = bill.amountWithFee * (discountPercent / 100);
-            await discountBill(billId, newAmount, newAmountWithFee);
+            await discountBill(billId, newAmount, newAmountWithFee, req.user.tenantId);
             bill.amount = newAmount;
             bill.amountWithFee = newAmountWithFee;
             const paymentLink = await createPaymentLink(bill);
             bill.squareLink = paymentLink.squareUrl;
             bill.squareOrderId = paymentLink.squareOrderId;
-            await addSquareAttributes(bill);
+            await addSquareAttributes(bill, req.user.tenantId);
             response = {};
             res.status(200);
         } catch (e: any) {
@@ -365,7 +365,7 @@ billing.get('/list/excel', async (req: Request, res: Response) => {
         const billingList: Bill[] = await getBillList({
             paymentStatus: paymentStatus as string,
             year: Number(billingYear),
-        });
+        }, req.user.tenantId);
 
         const workbookTitle = `PRA billing ${billingYear}`;
         const workbook = startWorkbook(workbookTitle);
@@ -452,10 +452,10 @@ billing.post('/webhook/incoming', async (req: Request, res: Response) => {
         if (!ourBill.curYearPaid) {
             if (completed) {
                 logger.info(`Processing payment on our side for ${squareOrderId}, ${ourBill.billId}`);
-                billResponse = await processBillPayment(ourBill.billId, 'Square');
+                billResponse = await processBillPayment(ourBill.billId, 'Square', req.user.tenantId);
             } else {
                 logger.error(`Marking bill ${ourBill.billId} as paid, but there could be a problem - verify manually`);
-                billResponse = await processBillPayment(ourBill.billId, 'Square');
+                billResponse = await processBillPayment(ourBill.billId, 'Square', req.user.tenantId);
             }
         } else {
             logger.info(`Got another webhook for ${ourBill.billId} as order Id ${ourBill.squareOrderId}. Ignoring.`);

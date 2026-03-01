@@ -143,7 +143,7 @@ membership.patch('/:membershipID', async (req: Request, res: Response) => {
             response = await getMembership(membershipIdNum);
             if (priorToUpdate.membershipType !== response.membershipType) {
                 console.log(`old ${priorToUpdate.membershipType} new ${response.membershipType}`);
-                runBillingCompleteCurrent([response], response.membershipId);
+                runBillingCompleteCurrent([response], response.membershipId, req.user.tenantId);
             }
             res.status(200);
         } catch (e: any) {
