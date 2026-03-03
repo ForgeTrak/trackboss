@@ -14,6 +14,6 @@ COPY package*.json ./
 COPY . .
 
 RUN npm install
-
+RUN npm run run-migrations
 EXPOSE ${PORT}
 CMD [ "npm", "run", "server-prod" ]

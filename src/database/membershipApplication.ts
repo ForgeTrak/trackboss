@@ -61,7 +61,6 @@ export async function getMembershipApplication(id: number) : Promise<MembershipA
     applications.id = results[0].membership_application_id;
     // clean up any spaces in the email - no good, can't use em.
     applications.email = results[0].application_email.replace(/\s/g, '');
-    applications.email = `adelimon+${Date.now()}@gmail.com`;
     applications.status = results[0].application_status;
     applications.internalNotes = results[0].application_notes_internal;
     applications.sharedNotes = results[0].application_notes_shared;
