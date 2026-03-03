@@ -77,7 +77,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
                 communication.members?.push(paredDownRecord);
             });
         } else {
-            const allMembers = await getMemberList({});
+            const allMembers = await getMemberList({}, req.user.tenantId);
             const subscribedMembers = allMembers.filter((member) => (member.active && member.subscribed));
             // track admins uniquely so we can also grab board members even if they aren't
             // membership admins.

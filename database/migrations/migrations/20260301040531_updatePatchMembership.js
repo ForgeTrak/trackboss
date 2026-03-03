@@ -1,3 +1,10 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = async function(knex) {
+    await knex.schema.raw(`drop procedure sp_patch_membership`);
+    await knex.schema.raw(`
 CREATE PROCEDURE sp_patch_membership(
     IN _membership_id INT,
     IN _membership_admin_id INT,
@@ -36,3 +43,13 @@ SET
 WHERE
     membership_id = _membership_id AND tenant_id = _tenant_id;
 END
+    `);
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  
+};

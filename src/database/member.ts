@@ -15,19 +15,20 @@ export const MEMBER_TYPE_MAP = new Map([
 ]);
 
 export const GET_MEMBER_LIST_SQL = 'SELECT * FROM v_member';
-export const GET_MEMBER_SQL = `${GET_MEMBER_LIST_SQL} WHERE member_id = ?`;
-export const GET_MEMBER_UUID_SQL = `${GET_MEMBER_LIST_SQL} WHERE uuid = ?`;
+export const GET_MEMBER_SQL = `${GET_MEMBER_LIST_SQL} WHERE member_id = ? and tenant_id = ?`;
+export const GET_MEMBER_UUID_SQL = `${GET_MEMBER_LIST_SQL} WHERE uuid = ? and tenant_id = ?`;
 export const INSERT_MEMBER_SQL = 'INSERT INTO member (membership_id, uuid, member_type_id, first_name, last_name, ' +
     // eslint-disable-next-line max-len
-    'phone_number, occupation, email, birthdate, date_joined, last_modified_date, last_modified_by, active, subscribed, dependent_status)' +
-    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, 1, ?, ?)';
-export const PATCH_MEMBER_SQL = 'CALL sp_patch_member(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    'phone_number, occupation, email, birthdate, date_joined, last_modified_date, last_modified_by, active, subscribed, dependent_status, tenant_id)' +
+    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, 1, ?, ?, ?)';
+export const PATCH_MEMBER_SQL = 'CALL sp_patch_member(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 export const GET_VALID_ACTORS_SQL = 'select member_id from pradb.member m where member_id=? or (m.member_type_id=2 ' +
     'and m.member_id=(select ms.membership_admin_id from pradb.member m left join pradb.membership ms on ' +
-    'm.membership_id=ms.membership_id where member_id=?)) or m.member_type_id=1';
+    'm.membership_id=ms.membership_id where member_id=?)) or m.member_type_id=1 and m.tenant_id = ?';
 
 async function mapMemberFromResult(results: any) {
     const members = results.map((result: any) => ({
+        tenantId: result.tenant_id,
         memberId: result.member_id,
         membershipId: result.membership_id,
         firstName: result.first_name,
@@ -60,7 +61,7 @@ async function mapMemberFromResult(results: any) {
     return members;
 }
 
-export async function insertMember(req: PostNewMemberRequest): Promise<number> {
+export async function insertMember(req: PostNewMemberRequest, tenantId: string): Promise<number> {
     if (req.email) {
         logger.info(`Creating new user for email ${req.email} on membership ${req.membershipId}`);
         try {
@@ -87,6 +88,7 @@ export async function insertMember(req: PostNewMemberRequest): Promise<number> {
         req.modifiedBy,
         `${req.subscribed}`,
         req.dependentStatus,
+        tenantId,
     ];
 
     let result;
@@ -112,7 +114,7 @@ export async function insertMember(req: PostNewMemberRequest): Promise<number> {
     return result.insertId;
 }
 
-export async function getMemberList(filters: GetMemberListFilters): Promise<Member[]> {
+export async function getMemberList(filters: GetMemberListFilters, tenantId: string): Promise<Member[]> {
     let sql;
     let values: any[] = [];
     if (!_.isEmpty(filters)) {
@@ -130,16 +132,17 @@ export async function getMemberList(filters: GetMemberListFilters): Promise<Memb
             values[counter++] = filters.membershipId;
         }
         // slice the trailing AND
-        sql = `${GET_MEMBER_LIST_SQL + dynamicSql.slice(0, -4)}`;
+        sql = `${GET_MEMBER_LIST_SQL + dynamicSql.slice(0, -4)} and tenant_id = ?`;
         if (!usingMembershipFilter) {
             sql += 'order by last_name, first_name';
         } else {
             sql += 'order by birthdate, last_name, first_name';
         }
     } else {
-        sql = GET_MEMBER_LIST_SQL;
+        sql = `${GET_MEMBER_LIST_SQL} where tenant_id = ?`;
         values = [];
     }
+    values.push(tenantId);
     let results;
     try {
         [results] = await getPool().query<RowDataPacket[]>(sql, values);
@@ -151,17 +154,17 @@ export async function getMemberList(filters: GetMemberListFilters): Promise<Memb
     return mapMemberFromResult(results);
 }
 
-export async function getMember(searchParam: string): Promise<Member> {
+export async function getMember(searchParam: string, tenantId: string): Promise<Member> {
     const id = Number(searchParam);
     let sql;
     let values;
     let results;
     if (Number.isNaN(id)) {
         // uuid search
-        values = [searchParam];
+        values = [searchParam, tenantId];
         sql = GET_MEMBER_UUID_SQL;
     } else {
-        values = [id];
+        values = [id, tenantId];
         sql = GET_MEMBER_SQL;
     }
 
@@ -295,7 +298,7 @@ export async function getMemberByEmail(email: string): Promise<any> {
     return memberWithEmail;
 }
 
-export async function patchMember(id: string, req: PatchMemberRequest): Promise<void> {
+export async function patchMember(id: string, req: PatchMemberRequest, tenantId: string): Promise<void> {
     if (_.isEmpty(req)) { // empty request
         throw new Error('user input error');
     }
@@ -313,6 +316,7 @@ export async function patchMember(id: string, req: PatchMemberRequest): Promise<
         req.birthdate,
         req.dateJoined,
         req.modifiedBy,
+        tenantId,
     ];
     let result;
     try {
@@ -354,8 +358,8 @@ export async function patchMember(id: string, req: PatchMemberRequest): Promise<
     }
 }
 
-export async function getValidActors(member: number): Promise<number[]> {
-    const values = [member, member];
+export async function getValidActors(member: number, tenantId: string): Promise<number[]> {
+    const values = [member, member, tenantId];
     let results;
     try {
         [results] = await getPool().query<RowDataPacket[]>(GET_VALID_ACTORS_SQL, values);
@@ -369,11 +373,11 @@ export async function getValidActors(member: number): Promise<number[]> {
     return _.map(results, (result) => result.member_id);
 }
 
-export async function deleteFamilyMember(memberId: number): Promise<number> {
+export async function deleteFamilyMember(memberId: number, tenantId: string): Promise<number> {
     // remove the member but only if they are a sub member. Magic numberism here, fix it later.
     const sql =
-        'delete from member where member_id = ? and member_type_id = 9';
-    const values = [memberId];
+        'delete from member where member_id = ? and member_type_id = 9 and tenant_id = ?';
+    const values = [memberId, tenantId];
 
     let result;
     try {

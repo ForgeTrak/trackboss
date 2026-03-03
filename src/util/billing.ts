@@ -50,7 +50,7 @@ export async function generateNewBills(
         ) === 'undefined') {
             try {
                 logger.info(`Running billing for membership with id ${membership.membershipId}`);
-                const baseDues = await getBaseDues(membership.membershipId);
+                const baseDues = await getBaseDues(membership.membershipId, tenantId);
                 const earned = (await getWorkPointsByMembership(membership.membershipId, year)).total;
                 let owed = Math.max((1 - earned / threshold) * baseDues, 0);
                 // the Paypal Fee is 0.0290%, plus $0.30.  We hard code this here, with a big ole comment
@@ -85,7 +85,7 @@ export async function generateNewBills(
                 }
                 // if they are at or over the threshold, then update their membership type.
                 if ((earned >= threshold) && (membership.membershipType === 'Associate Member')) {
-                    await upgradeMembershipSenior(membership.membershipId);
+                    await upgradeMembershipSenior(membership.membershipId, tenantId);
                     // eslint-disable-next-line max-len
                     logger.info(`Automatically updated ${membership.membershipAdmin} membership to Senior based on ${earned} points.`);
                 }

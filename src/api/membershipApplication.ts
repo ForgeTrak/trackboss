@@ -129,7 +129,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             membershipType = 'Guest Member';
             billingYear = currentYear;
         }
-        const membershipInfo = await getMembershipType(membershipType, req.user.tenantId);
+        const membershipInfo = await getMembershipType(req.user.tenantId, membershipType);
         const actingUser = await validateAdminAccess(req, res);
         await sendApplicationStatus(req, res, applicationStatus);
         // get the application, and convert the primary member to a member. This call will create a
@@ -156,7 +156,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             membershipType,
             dependentStatus: 'Primary',
         };
-        const primaryMemberId = await insertMember(newMember);
+        const primaryMemberId = await insertMember(newMember, req.user.tenantId);
         newMemberId = primaryMemberId;
         const newMembership : PostNewMembershipRequest = {
             // Associate member. Magic numberism again.
@@ -169,15 +169,15 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             zip: application.zip,
             modifiedBy: actingUser.memberId,
         };
-        const newMembershipId = await insertMembership(newMembership);
+        const newMembershipId = await insertMembership(newMembership, req.user.tenantId);
         const memberUpdate : PatchMemberRequest = {
             membershipId: newMembershipId,
             modifiedBy: actingUser.memberId,
             subscribed: true,
         };
-        await patchMember(`${primaryMemberId}`, memberUpdate);
+        await patchMember(`${primaryMemberId}`, memberUpdate, req.user.tenantId);
         // now send a welcome email to the member.
-        await sendNewMemberEmail(application);
+        // await sendNewMemberEmail(application);
         const { threshold } = await getWorkPointThreshold(billingYear, req.user.tenantId);
         const billId = await generateBill({
             amount: membershipInfo.baseDuesAmt,
@@ -203,10 +203,10 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             newMemberFamily.birthdate = format(new Date(familyMember.dob), 'yyyy-MM-dd');
             newMemberFamily.lastModifiedBy = actingUser.memberId;
             // now insert the new family member.
-            await insertMember(newMemberFamily);
+            await insertMember(newMemberFamily, req.user.tenantId);
         });
         logger.info(`Generated bill ${billId} for membership ${newMembershipId} - application converted to member.`);
-        const newMemberRecord = await getMember(`${primaryMemberId}`);
+        const newMemberRecord = await getMember(`${primaryMemberId}`, req.user.tenantId);
     } catch (error: any) {
         logger.error(error);
         res.status(500);

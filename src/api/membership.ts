@@ -17,15 +17,12 @@ import {
     Membership,
     PatchMembershipResponse,
     PostNewMembershipResponse,
-    PostRegisterMembershipResponse,
 } from '../typedefs/membership';
-import { checkHeader, validateAdminAccess, verify } from '../util/auth';
+import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
 import { ErrorResponse } from '../typedefs/errorResponse';
 import { MembershipTag } from '../typedefs/membershipTag';
-import { getMemberByEmail } from '../database/member';
-import { Member } from '../typedefs/member';
-import { runBillingComplete, runBillingCompleteCurrent } from '../util/billing';
+import { runBillingCompleteCurrent } from '../util/billing';
 
 const membership = Router();
 
@@ -39,8 +36,8 @@ membership.post('/new', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
-            const insertId = await insertMembership(req.body);
-            response = await getMembership(insertId);
+            const insertId = await insertMembership(req.body, req.user.tenantId);
+            response = await getMembership(insertId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -74,7 +71,7 @@ membership.get('/list', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { status } = req.query;
-            const membershipList: Membership[] = await getMembershipList(status as string);
+            const membershipList: Membership[] = await getMembershipList(status as string, req.user.tenantId);
             res.status(200);
             response = membershipList;
         } catch (e: any) {
@@ -103,7 +100,7 @@ membership.get('/:membershipID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipID } = req.params;
-            response = await getMembership(Number(membershipID));
+            response = await getMembership(Number(membershipID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -134,13 +131,13 @@ membership.patch('/:membershipID', async (req: Request, res: Response) => {
         try {
             const { membershipID } = req.params;
             const membershipIdNum = Number(membershipID);
-            const priorToUpdate = await getMembership(membershipIdNum);
+            const priorToUpdate = await getMembership(membershipIdNum, req.user.tenantId);
             if (Number.isNaN(membershipIdNum)) {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Membership Admin');
-            await patchMembership(membershipIdNum, req.body);
-            response = await getMembership(membershipIdNum);
+            await patchMembership(membershipIdNum, req.body, req.user.tenantId);
+            response = await getMembership(membershipIdNum, req.user.tenantId);
             if (priorToUpdate.membershipType !== response.membershipType) {
                 console.log(`old ${priorToUpdate.membershipType} new ${response.membershipType}`);
                 runBillingCompleteCurrent([response], response.membershipId, req.user.tenantId);

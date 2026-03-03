@@ -19,7 +19,7 @@ defaultSetting.get('/', async (req: Request, res: Response) => {
     let response: GetDefaultSettingsResponse;
     try {
         await validateAdminAccess(req, res);
-        const settings: DefaultSetting[] = await getAllDefaultSettings();
+        const settings: DefaultSetting[] = await getAllDefaultSettings(req.user.tenantId);
         res.status(200);
         response = settings;
         res.send(response);
@@ -44,7 +44,7 @@ defaultSetting.get('/:settingName', async (req: Request, res: Response) => {
             res.status(401).send({ reason: headerCheck.reason });
         }
         const { settingName } = req.params;
-        const setting = await getDefaultSetting(settingName);
+        const setting = await getDefaultSetting(settingName, req.user.tenantId);
         res.send(setting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -56,7 +56,7 @@ defaultSetting.get('/:settingName', async (req: Request, res: Response) => {
 
 defaultSetting.get('/applications/enabled', async (req: Request, res: Response) => {
     try {
-        const setting = await getDefaultSetting('ALLOW_APPLICATIONS');
+        const setting = await getDefaultSetting('ALLOW_APPLICATIONS', 'ad6a18d1-d963-11f0-858e-1284e6c74c95');
         res.send(setting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -69,7 +69,7 @@ defaultSetting.get('/applications/enabled', async (req: Request, res: Response) 
 defaultSetting.put('/:id', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
-        const patchedSetting = await updateDefaultSetting(Number(req.params.id), req.body);
+        const patchedSetting = await updateDefaultSetting(Number(req.params.id), req.body, req.user.tenantId);
         res.json(patchedSetting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -83,8 +83,8 @@ defaultSetting.post('/', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
         const newSetting : DefaultSetting = req.body;
-        await insertDefaultSetting(newSetting);
-        const savedNewSetting = await getDefaultSetting(newSetting.settingName);
+        await insertDefaultSetting(newSetting, req.user.tenantId);
+        const savedNewSetting = await getDefaultSetting(newSetting.settingName, req.user.tenantId);
         res.json(savedNewSetting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -97,7 +97,7 @@ defaultSetting.post('/', async (req: Request, res: Response) => {
 defaultSetting.delete('/:id', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
-        await deleteDefaultSetting(Number(req.params.id));
+        await deleteDefaultSetting(Number(req.params.id), req.user.tenantId);
         res.status(200);
         res.send('deleted default setting');
     } catch (error: any) {

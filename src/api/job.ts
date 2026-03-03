@@ -165,7 +165,7 @@ job.post('/new', async (req: Request, res: Response) => {
             // it also keeps stuff instantly up to date for verification.
             const workYear = parse(jobInsertRequest.jobStartDate || '', 'yyyy-MM-dd HH:mm', new Date()).getFullYear();
             const { membershipId } = jobInsertRequest;
-            const membership = await getMembership(membershipId || 0);
+            const membership = await getMembership(membershipId || 0, req.user.tenantId);
             runBillingComplete(workYear, [membership], membership.membershipId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {

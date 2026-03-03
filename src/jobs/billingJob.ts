@@ -7,7 +7,9 @@ import logger from '../logger';
 export default function startBillingJob() {
     schedule('30 22 * * *', async () => {
         const billingYear = new Date().getFullYear();
-        const billingOn = ((await getDefaultSettingValue('BILLING_ENABLED')) === 'true');
+        const billingOn = (
+            (await getDefaultSettingValue('BILLING_ENABLED', 'ad6a18d1-d963-11f0-858e-1284e6c74c95')) === 'true'
+        );
         logger.info(`Starting billing with billing setting of ${billingOn}`);
         if (billingOn) {
             const membershipList = await getMembershipList('active');

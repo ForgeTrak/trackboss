@@ -4,9 +4,9 @@ import logger from '../logger';
 import { getPool } from './pool';
 import { DefaultSetting } from '../typedefs/defaultSetting';
 
-export async function getDefaultSettingValue(settingName: string): Promise<string> {
-    const sql = 'select * from default_settings where default_setting_name = ?';
-    const values: string[] = [settingName];
+export async function getDefaultSettingValue(settingName: string, tenantId: string): Promise<string> {
+    const sql = 'select * from default_settings where default_setting_name = ? and tenant_id = ?';
+    const values: string[] = [settingName, tenantId];
 
     let results;
     try {
@@ -18,9 +18,9 @@ export async function getDefaultSettingValue(settingName: string): Promise<strin
     return results[0].default_setting_value;
 }
 
-export async function getDefaultSetting(id: string): Promise<DefaultSetting> {
-    const sql = 'select * from default_settings where default_setting_name = ?';
-    const values: string[] = [id];
+export async function getDefaultSetting(id: string, tenantId: string): Promise<DefaultSetting> {
+    const sql = 'select * from default_settings where default_setting_name = ? and tenant_id = ?';
+    const values: string[] = [id, tenantId];
 
     let results;
     try {
@@ -39,12 +39,12 @@ export async function getDefaultSetting(id: string): Promise<DefaultSetting> {
     return setting;
 }
 
-export async function getAllDefaultSettings(): Promise<DefaultSetting[]> {
-    const sql = 'select * from default_settings order by default_setting_type';
+export async function getAllDefaultSettings(tenantId: string): Promise<DefaultSetting[]> {
+    const sql = 'select * from default_settings where tenant_id = ? order by default_setting_type';
 
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>(sql);
+        [results] = await getPool().query<RowDataPacket[]>(sql, [tenantId]);
     } catch (e) {
         logger.error(`DB error getting member type list: ${e}`);
         throw new Error('internal server error');
@@ -59,8 +59,8 @@ export async function getAllDefaultSettings(): Promise<DefaultSetting[]> {
     return allSettings;
 }
 
-export async function deleteDefaultSetting(id: number): Promise<void> {
-    const values = [id];
+export async function deleteDefaultSetting(id: number, tenantId: string): Promise<void> {
+    const values = [id, tenantId];
 
     let result;
     try {
@@ -75,11 +75,12 @@ export async function deleteDefaultSetting(id: number): Promise<void> {
     }
 }
 
-export async function insertDefaultSetting(newSetting: DefaultSetting): Promise<number> {
+export async function insertDefaultSetting(newSetting: DefaultSetting, tenantId: string): Promise<number> {
     // eslint-disable-next-line max-len
-    const insertSql = 'insert into default_settings (default_setting_name, default_setting_value, default_setting_type, default_setting_display_name) values (?, ?, ?, ?)';
+    const insertSql = 'insert into default_settings (default_setting_name, default_setting_value, default_setting_type, default_setting_display_name, tenant_id) values (?, ?, ?, ?, ?)';
 
-    const values = [newSetting.settingName, newSetting.settingValue, newSetting.settingType];
+    const values = [newSetting.settingName, newSetting.settingValue,
+        newSetting.settingType, newSetting.settingDisplayName, tenantId];
     let result;
     try {
         [result] = await getPool().query<OkPacket>(insertSql, values);
@@ -102,12 +103,15 @@ export async function insertDefaultSetting(newSetting: DefaultSetting): Promise<
     return result.insertId;
 }
 
-export async function updateDefaultSetting(id: number, updatedSetting: DefaultSetting): Promise<DefaultSetting> {
+export async function updateDefaultSetting(
+    id: number, updatedSetting: DefaultSetting,
+    tenantId: string,
+): Promise<DefaultSetting> {
     const updateSql =
         'update default_settings set default_setting_name = ?, default_setting_value = ?, ' +
-        'default_setting_type = ?, default_setting_display_name = ? where default_setting_id = ?';
+        'default_setting_type = ?, default_setting_display_name = ? where default_setting_id = ? and tenant_id = ?';
     const values = [updatedSetting.settingName, updatedSetting.settingValue,
-        updatedSetting.settingType, updatedSetting.settingDisplayName, updatedSetting.settingId];
+        updatedSetting.settingType, updatedSetting.settingDisplayName, updatedSetting.settingId, tenantId];
     let result;
     try {
         [result] = await getPool().query<OkPacket>(updateSql, values);
@@ -119,7 +123,7 @@ export async function updateDefaultSetting(id: number, updatedSetting: DefaultSe
                     logger.error(`User error patching default setting in DB: ${e}`);
                     throw new Error('user input error');
                 default:
-                    logger.error(`DB error patching bdefault setting: ${e}`);
+                    logger.error(`DB error patching default setting: ${e}`);
                     throw new Error('internal server error');
             }
         } else {
@@ -131,6 +135,6 @@ export async function updateDefaultSetting(id: number, updatedSetting: DefaultSe
     if (result.affectedRows < 1) {
         throw new Error('not found');
     }
-    const newValue = await getDefaultSetting(updatedSetting.settingName);
+    const newValue = await getDefaultSetting(updatedSetting.settingName, tenantId);
     return newValue;
 }

@@ -36,8 +36,8 @@ member.post('/new', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Membership Admin');
-            const insertId = await insertMember(req.body);
-            response = await getMember(`${insertId}`);
+            const insertId = await insertMember(req.body, req.user.tenantId);
+            response = await getMember(`${insertId}`, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
             logger.error('Error adding new member', e);
@@ -91,7 +91,7 @@ member.get('/list', async (req: Request, res: Response) => {
                 if (typeof membershipFilter !== 'undefined') {
                     filters.membershipId = membershipNum;
                 }
-                const memberList: Member[] = await getMemberList(filters);
+                const memberList: Member[] = await getMemberList(filters, req.user.tenantId);
                 res.status(200);
                 response = memberList;
             }
@@ -121,7 +121,7 @@ member.get('/:memberId', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { memberId } = req.params;
-            response = await getMember(memberId);
+            response = await getMember(memberId, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -233,15 +233,15 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
         try {
             const { memberId } = req.params;
             await verify(headerCheck.token, 'Membership Admin', Number(memberId));
-            const prePatchMember = await getMember(memberId);
-            await patchMember(memberId, req.body);
-            const updatedMember = await getMember(memberId);
+            const prePatchMember = await getMember(memberId, req.user.tenantId);
+            await patchMember(memberId, req.body, req.user.tenantId);
+            const updatedMember = await getMember(memberId, req.user.tenantId);
             response = updatedMember;
             // if it's a family member ("member") and inactivated, then delete the cognito user
             // and the member record.  This is just cleanup stuff. and may change later.
             if (!updatedMember.active && (updatedMember.memberType === 'Member')) {
                 try {
-                    const removeCount = await deleteFamilyMember(updatedMember.memberId);
+                    const removeCount = await deleteFamilyMember(updatedMember.memberId, req.user.tenantId);
                     const userEmail = updatedMember.email;
                     logger.info(`Removed ${removeCount} rows for user ${updatedMember.email}`);
                     if (updatedMember.email) {
@@ -269,6 +269,7 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
                 const id = await markMembershipFormer(
                     updatedMember.membershipId,
                     req.body.deactivationReason || '',
+                    req.user.tenantId,
                 );
                 // eslint-disable-next-line max-len
                 logger.info(`${updatedMember.firstName} ${updatedMember.lastName} set to Former member, reason code ${req.body.deactivationReason}`);
@@ -387,7 +388,7 @@ member.get('/card/create/:memberId', async (req: Request, res: Response) => {
     } else {
         logger.info('Generating membership card - verifying token.');
         await verify(headerCheck.token, 'Member', Number(memberId));
-        const memberForCard = await getMember(memberId);
+        const memberForCard = await getMember(memberId, req.user.tenantId);
         const boardMembers = await getBoardMemberList(new Date().getFullYear().toString());
         const president = boardMembers.find((m) => m.title === 'President');
 
@@ -445,8 +446,8 @@ member.put('/resetpassword/:memberId', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
         const { memberId } = req.params;
-        const memberForReset = await getMember(memberId);
-        const defaultResetValue = await getDefaultSettingValue('USER_DEFAULT_PW');
+        const memberForReset = await getMember(memberId, req.user.tenantId);
+        const defaultResetValue = await getDefaultSettingValue('USER_DEFAULT_PW', req.user.tenantId);
         // fire and forget, the back to the UI immediately so this call isn't slow.
         resetCognitoPassword(memberForReset, defaultResetValue);
         res.send({

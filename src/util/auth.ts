@@ -33,8 +33,9 @@ const verify = async (token: string, permissionLevel?: string, targetActingAs?: 
     }
     try {
         const payload = await verifier.verify(token);
+        const tenantId = payload.active_tenant_id as string;
         if (permissionLevel) {
-            const member = await getMember(payload['cognito:username']);
+            const member = await getMember(payload['cognito:username'], tenantId);
             payload.memberId = member.memberId;
             let actingAs = targetActingAs;
             if (typeof actingAs === 'undefined') {
@@ -48,7 +49,7 @@ const verify = async (token: string, permissionLevel?: string, targetActingAs?: 
                 if (member.memberType !== 'Admin') {
                     if (member.memberType === 'Membership Admin') {
                         // make sure they have permission to act on this
-                        const memberActingAs = await getMember(`${actingAs}`);
+                        const memberActingAs = await getMember(`${actingAs}`, tenantId);
                         if (memberActingAs.membershipAdminId !== member.memberId) {
                             throw new Error(`${member.firstName} ${member.lastName} perform an action 
                                 on ${memberActingAs.firstName} ${memberActingAs.lastName}.  This is probably a bug.`);
@@ -63,7 +64,7 @@ const verify = async (token: string, permissionLevel?: string, targetActingAs?: 
                 }
                 if (member.memberType !== 'Admin') {
                     // check that they have permission to act on this
-                    const validActors = await getValidActors(actingAs);
+                    const validActors = await getValidActors(actingAs, tenantId);
                     if (!validActors.includes(member.memberId)) {
                         throw new Error('Forbidden');
                     }

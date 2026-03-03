@@ -7,8 +7,6 @@ import {
     Membership,
     PatchMembershipRequest,
     PostNewMembershipRequest,
-    PostRegisterMembershipRequest,
-    Registration,
 } from '../typedefs/membership';
 
 // Map the API values for the membership statuses to the DB values
@@ -17,17 +15,18 @@ const MEMBERSHIP_STATUS_MAP = new Map([
     ['inactive', 'Former'],
     ['pending', 'Pending'],
 ]);
-export const GET_BASE_DUES_SQL = 'SELECT base_dues_amt FROM v_membership_base_dues WHERE membership_id = ?';
-export const GET_MEMBERSHIP_LIST_SQL = 'SELECT * FROM v_membership';
-export const GET_MEMBERSHIP_LIST_BY_STATUS_SQL = `${GET_MEMBERSHIP_LIST_SQL} WHERE status = ?`;
-export const GET_MEMBERSHIP_SQL = `${GET_MEMBERSHIP_LIST_SQL} WHERE membership_id = ?`;
+export const GET_BASE_DUES_SQL =
+    'SELECT base_dues_amt FROM v_membership_base_dues WHERE membership_id = ? and tenant_id = ?';
+export const GET_MEMBERSHIP_LIST_SQL = 'SELECT * FROM v_membership where tenant_id = ?';
+export const GET_MEMBERSHIP_LIST_BY_STATUS_SQL = `${GET_MEMBERSHIP_LIST_SQL} and status = ?`;
+export const GET_MEMBERSHIP_SQL = `${GET_MEMBERSHIP_LIST_SQL} and membership_id = ?`;
 export const INSERT_MEMBERSHIP_SQL = 'INSERT INTO membership (membership_admin_id, status, cur_year_renewed, ' +
     'view_online, renewal_sent, year_joined, address, city, state, zip, last_modified_date, last_modified_by, ' +
-    'membership_type_id) ' +
-    'VALUES (?, "Active", 0, 1, 0, ?, ?, ?, ?, ?, CURDATE(), ?, ?)';
-export const PATCH_MEMBERSHIP_SQL = 'CALL sp_patch_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    'membership_type_id, tenant_id) ' +
+    'VALUES (?, "Active", 0, 1, 0, ?, ?, ?, ?, ?, CURDATE(), ?, ?, ?)';
+export const PATCH_MEMBERSHIP_SQL = 'CALL sp_patch_membership(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-export async function insertMembership(req: PostNewMembershipRequest): Promise<number> {
+export async function insertMembership(req: PostNewMembershipRequest, tenantId: string): Promise<number> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
@@ -41,6 +40,7 @@ export async function insertMembership(req: PostNewMembershipRequest): Promise<n
         req.zip,
         req.modifiedBy,
         req.membershipTypeId,
+        tenantId,
     ];
 
     let result;
@@ -65,17 +65,16 @@ export async function insertMembership(req: PostNewMembershipRequest): Promise<n
     return result.insertId;
 }
 
-export async function getMembershipList(status?: string): Promise<Membership[]> {
+export async function getMembershipList(status?: string, tenantId?: string): Promise<Membership[]> {
     let sql;
-    let values: string[];
+    const values: string[] = [tenantId as string];
     if (typeof status !== 'undefined') {
         sql = GET_MEMBERSHIP_LIST_BY_STATUS_SQL;
         // if status is not in the map, it won't hurt to throw it in
         // anyway (and this makes testing easier)
-        values = [MEMBERSHIP_STATUS_MAP.get(status) || status];
+        values.push(MEMBERSHIP_STATUS_MAP.get(status) || status);
     } else {
         sql = GET_MEMBERSHIP_LIST_SQL;
-        values = [];
     }
 
     let results;
@@ -88,6 +87,7 @@ export async function getMembershipList(status?: string): Promise<Membership[]> 
 
     return _.map(results, (result) => ({
         membershipId: result.membership_id,
+        tenantId: result.tenant_id,
         membershipAdmin: result.membership_admin,
         status: result.status,
         membershipType: result.membership_type,
@@ -103,8 +103,8 @@ export async function getMembershipList(status?: string): Promise<Membership[]> 
     }));
 }
 
-export async function getMembership(id: number): Promise<Membership> {
-    const values = [id];
+export async function getMembership(id: number, tenantId: string): Promise<Membership> {
+    const values = [tenantId, id];
 
     let results;
     try {
@@ -120,6 +120,7 @@ export async function getMembership(id: number): Promise<Membership> {
 
     return {
         membershipId: results[0].membership_id,
+        tenantId: results[0].tenant_id,
         membershipAdmin: results[0].membership_admin,
         status: results[0].status,
         membershipType: results[0].membership_type,
@@ -135,7 +136,7 @@ export async function getMembership(id: number): Promise<Membership> {
     };
 }
 
-export async function patchMembership(id: number, req: PatchMembershipRequest): Promise<void> {
+export async function patchMembership(id: number, req: PatchMembershipRequest, tenantId: string): Promise<void> {
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
@@ -152,6 +153,7 @@ export async function patchMembership(id: number, req: PatchMembershipRequest): 
         req.state,
         req.zip,
         req.modifiedBy,
+        tenantId,
     ];
 
     let result;
@@ -183,10 +185,11 @@ export async function patchMembership(id: number, req: PatchMembershipRequest): 
     }
 }
 
-export async function markMembershipFormer(id: number, deactivationReason: string) : Promise<number> {
-    const values = [deactivationReason, id];
+export async function markMembershipFormer(id: number, deactivationReason: string, tenantId: string) : Promise<number> {
+    const values = [deactivationReason, id, tenantId];
 
-    const sql = 'update membership set status = \'Former\', cancel_reason = ? where membership_id = ?';
+    // eslint-disable-next-line max-len
+    const sql = 'update membership set status = \'Former\', cancel_reason = ? where membership_id = ? and tenant_id = ?';
     let result;
     try {
         [result] = await getPool().query<RowDataPacket[]>(sql, values);
@@ -198,8 +201,8 @@ export async function markMembershipFormer(id: number, deactivationReason: strin
     return id;
 }
 
-export async function getBaseDues(membershipId: number): Promise<number> {
-    const values = [membershipId];
+export async function getBaseDues(membershipId: number, tenantId: string): Promise<number> {
+    const values = [membershipId, tenantId];
 
     let result;
     try {
@@ -216,11 +219,11 @@ export async function getBaseDues(membershipId: number): Promise<number> {
     return result[0].base_dues_amt;
 }
 
-export async function upgradeMembershipSenior(id: number) : Promise<number> {
-    const values = [id];
+export async function upgradeMembershipSenior(id: number, tenantId: string) : Promise<number> {
+    const values = [id, tenantId];
     const sql = `update membership set membership_type_id = 
         (select membership_type_id from membership_types where type = 'Senior member')
-        where membership_id = ?`;
+        where membership_id = ? and tenant_id = ?`;
     let result;
     try {
         [result] = await getPool().query<RowDataPacket[]>(sql, values);
