@@ -103,13 +103,13 @@ export async function patchBoardMember(id: number, req: PatchBoardMemberRequest)
     if (_.isEmpty(req)) {
         throw new Error('user input error');
     }
-    const values = [req.tenantId, req.year, req.memberId, req.boardMemberTitleId, id];
+    const values = [req.year, req.memberId, req.boardMemberTitleId, id, req.tenantId];
 
     let result;
     try {
         [result] = await getPool().query<OkPacket>(
             // eslint-disable-next-line max-len
-            'UPDATE board_member SET tenant_id = ?, year = ?, member_id = ?, board_title_id = ? WHERE board_id = ?',
+            'UPDATE board_member SET year = ?, member_id = ?, board_title_id = ? WHERE board_id = ? AND tenant_id = ?',
             values,
         );
     } catch (e: any) {

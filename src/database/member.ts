@@ -213,11 +213,11 @@ export async function getMember(searchParam: string, tenantId: string): Promise<
     };
 }
 
-export async function getMemberByPhone(phone: string): Promise<Member> {
+export async function getMemberByPhone(phone: string, tenantId: string): Promise<Member> {
     let results;
     try {
-        const sql = 'SELECT * FROM pradb.v_member where phone_number = ?';
-        [results] = await getPool().query<RowDataPacket[]>(sql, [phone]);
+        const sql = 'SELECT * FROM pradb.v_member where phone_number = ? and tenant_id = ?';
+        [results] = await getPool().query<RowDataPacket[]>(sql, [phone, tenantId]);
     } catch (e) {
         logger.error(e);
         throw e;
@@ -255,11 +255,16 @@ export async function getMemberByPhone(phone: string): Promise<Member> {
     };
 }
 
-export async function getMemberByEmail(email: string): Promise<any> {
+export async function getMemberByEmail(email: string, tenantId?: string): Promise<any> {
     let results;
     try {
-        const sql = `SELECT * FROM pradb.v_member where email like '%${email}%'`;
-        [results] = await getPool().query<RowDataPacket[]>(sql, [email]);
+        let sql = 'SELECT * FROM pradb.v_member where email like ?';
+        const params: any[] = [`%${email}%`];
+        if (tenantId) {
+            sql += ' and tenant_id = ?';
+            params.push(tenantId);
+        }
+        [results] = await getPool().query<RowDataPacket[]>(sql, params);
     } catch (e) {
         logger.error(e);
         throw e;

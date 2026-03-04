@@ -10,7 +10,7 @@ export const INSERTED_EVENT_ID_OUT = '@event_id';
 export const INSERT_EVENT_SQL = `CALL sp_event_job_generation(?, ?, ?, ?, ?, ?, ?, ${INSERTED_EVENT_ID_OUT})`;
 export const GET_INSERTED_EVENT_ID_SQL = `SELECT ${INSERTED_EVENT_ID_OUT}`;
 export const GET_EVENT_LIST_SQL = 'SELECT * FROM v_event';
-export const GET_EVENT_LIST_DATERANGE_SQL = `${GET_EVENT_LIST_SQL} WHERE end >= ? order by start`;
+export const GET_EVENT_LIST_DATERANGE_SQL = `${GET_EVENT_LIST_SQL} WHERE end >= ? and tenant_id = ? order by start`;
 export const GET_EVENT_SQL = `${GET_EVENT_LIST_SQL} WHERE event_id = ?`;
 
 export async function insertEvent(tenantId:string, req: PostNewEventRequest): Promise<number> {
@@ -73,10 +73,10 @@ export async function getEventList(tenantId:string, startDate?: string, endDate?
             eDate = sDate;
         }
         sql = GET_EVENT_LIST_DATERANGE_SQL;
-        values = [sDate, eDate];
+        values = [sDate, tenantId];
     } else {
-        sql = `${GET_EVENT_LIST_SQL} order by start`;
-        values = [];
+        sql = `${GET_EVENT_LIST_SQL} where tenant_id = ? order by start`;
+        values = [tenantId];
     }
 
     let results;

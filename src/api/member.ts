@@ -153,7 +153,7 @@ member.get('/phone/:phoneNumber', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { phoneNumber } = req.params;
-            response = await getMemberByPhone(phoneNumber);
+            response = await getMemberByPhone(phoneNumber, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -185,7 +185,7 @@ member.get('/email/:email', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { email } = req.params;
-            response = await getMemberByEmail(email);
+            response = await getMemberByEmail(email, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -389,7 +389,7 @@ member.get('/card/create/:memberId', async (req: Request, res: Response) => {
         logger.info('Generating membership card - verifying token.');
         await verify(headerCheck.token, 'Member', Number(memberId));
         const memberForCard = await getMember(memberId, req.user.tenantId);
-        const boardMembers = await getBoardMemberList(new Date().getFullYear().toString());
+        const boardMembers = await getBoardMemberList(req.user.tenantId, new Date().getFullYear().toString());
         const president = boardMembers.find((m) => m.title === 'President');
 
         logger.info('Generating membership card - got all card data.');

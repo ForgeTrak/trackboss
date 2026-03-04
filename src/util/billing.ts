@@ -120,7 +120,7 @@ export async function runBillingComplete(
 ) {
     const { threshold } = await getWorkPointThreshold(year, tenantId || '');
     // to protect against generating duplicate bills
-    const cleanedUp = await cleanBilling(year, membershipId);
+    const cleanedUp = await cleanBilling(year, membershipId, tenantId);
     const preGeneratedBills = await getBillList({ year, membershipId }, tenantId || '');
     const generatedBills = await generateNewBills(membershipList, preGeneratedBills, threshold, year, tenantId || '');
     return generatedBills;

@@ -193,8 +193,8 @@ billing.post('/', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token, 'Admin');
             const curYear = new Date().getFullYear();
-            const membershipList = await getMembershipList('active');
-            const generatedBills = await runBillingComplete(curYear, membershipList);
+            const membershipList = await getMembershipList('active', req.user.tenantId);
+            const generatedBills = await runBillingComplete(curYear, membershipList, undefined, req.user.tenantId);
             res.status(201);
             response = generatedBills;
         } catch (e: any) {
@@ -452,10 +452,10 @@ billing.post('/webhook/incoming', async (req: Request, res: Response) => {
         if (!ourBill.curYearPaid) {
             if (completed) {
                 logger.info(`Processing payment on our side for ${squareOrderId}, ${ourBill.billId}`);
-                billResponse = await processBillPayment(ourBill.billId, 'Square', req.user.tenantId);
+                billResponse = await processBillPayment(ourBill.billId, 'Square', ourBill.tenantId);
             } else {
                 logger.error(`Marking bill ${ourBill.billId} as paid, but there could be a problem - verify manually`);
-                billResponse = await processBillPayment(ourBill.billId, 'Square', req.user.tenantId);
+                billResponse = await processBillPayment(ourBill.billId, 'Square', ourBill.tenantId);
             }
         } else {
             logger.info(`Got another webhook for ${ourBill.billId} as order Id ${ourBill.squareOrderId}. Ignoring.`);

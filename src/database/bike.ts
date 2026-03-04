@@ -7,7 +7,7 @@ import { Bike, PatchBikeRequest, PostNewBikeRequest } from '../typedefs/bike';
 
 export const GET_BIKE_LIST_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike';
 export const GET_BIKE_LIST_BY_MEMBERSHIP_SQL = `${GET_BIKE_LIST_SQL} WHERE membership_id = ? and tenant_id = ?`;
-export const GET_BIKE_SQL = 'SELECT bike_id, year, make, model, membership_admin FROM v_bike WHERE bike_id = ?';
+export const GET_BIKE_SQL = `${GET_BIKE_LIST_SQL} WHERE bike_id = ? and tenant_id = ?`;
 export const DELETE_BIKE_SQL = 'DELETE FROM member_bikes WHERE bike_id = ? and tenant_id = ?';
 
 export async function insertBike(req: PostNewBikeRequest): Promise<number> {
