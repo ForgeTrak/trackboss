@@ -52,8 +52,8 @@ export async function deletePaidLaborById(id: number, tenantId: string): Promise
 
     let result;
     try {
-        [result] = await getPool().query<OkPacket>(
-            'delete from paid_labor where paid_labor_id = ? and tenant_id = ?', values);
+        // eslint-disable-next-line max-len
+        [result] = await getPool().query<OkPacket>('delete from paid_labor where paid_labor_id = ? and tenant_id = ?', values);
     } catch (e) {
         logger.error(`DB error deleting paid labor: ${e}`);
         throw new Error('internal server error');

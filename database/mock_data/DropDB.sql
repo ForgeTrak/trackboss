@@ -1,1 +1,0 @@
-DROP database IF EXISTS pradb;

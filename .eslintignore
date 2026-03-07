@@ -5,3 +5,4 @@ devops/deploy/backend
 lambda/
 database/migrations/migrations
 frontend/src/mocks
+__tests__/
