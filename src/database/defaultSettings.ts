@@ -64,6 +64,7 @@ export async function deleteDefaultSetting(id: number, tenantId: string): Promis
 
     let result;
     try {
+        // eslint-disable-next-line max-len
         [result] = await getPool().query<OkPacket>('delete from default_settings where default_setting_id = ? and tenant_id = ?', values);
     } catch (e) {
         logger.error(`DB error deleting default setting: ${e}`);
