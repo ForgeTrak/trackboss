@@ -12,7 +12,7 @@ export default function startBillingJob() {
         );
         logger.info(`Starting billing with billing setting of ${billingOn}`);
         if (billingOn) {
-            const membershipList = await getMembershipList('active');
+            const membershipList = await getMembershipList('active', 'ad6a18d1-d963-11f0-858e-1284e6c74c95');
             logger.info(`Running billing for year ${billingYear} and ${membershipList.length} memberships`);
             const generatedBills = await runBillingComplete(billingYear, membershipList);
             logger.debug(JSON.stringify(generatedBills));
