@@ -119,6 +119,7 @@ export async function runBillingComplete(
     membershipId?: number, tenantId?: string,
 ) {
     const { threshold } = await getWorkPointThreshold(year, tenantId || '');
+    logger.info(`billing - Running billing for year ${year} with threshold of ${threshold}`);
     // to protect against generating duplicate bills
     const cleanedUp = await cleanBilling(year, membershipId, tenantId);
     const preGeneratedBills = await getBillList({ year, membershipId }, tenantId || '');
