@@ -23,6 +23,7 @@ import logger from '../logger';
 import { ErrorResponse } from '../typedefs/errorResponse';
 import { MembershipTag } from '../typedefs/membershipTag';
 import { runBillingCompleteCurrent } from '../util/billing';
+import logAuditEvent from '../database/auditLog';
 
 const membership = Router();
 
@@ -142,6 +143,7 @@ membership.patch('/:membershipID', async (req: Request, res: Response) => {
                 console.log(`old ${priorToUpdate.membershipType} new ${response.membershipType}`);
                 runBillingCompleteCurrent([response], response.membershipId, req.user.tenantId);
             }
+            logAuditEvent(req, 'Membership', membershipID, 'PATCH', priorToUpdate, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

@@ -38,6 +38,7 @@ const addTenantToRequest = async (req : any, res : any, next : () => void) => {
         req.user = {
             tenantId,
             uuid,
+            email: verifiedToken.email,
         };
     }
     next();
