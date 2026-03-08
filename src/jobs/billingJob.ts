@@ -5,16 +5,17 @@ import { generateSquareLinks, runBillingComplete } from '../util/billing';
 import logger from '../logger';
 
 export default function startBillingJob() {
-    schedule('30 22 * * *', async () => {
+    schedule('47 19 * * *', async () => {
         const billingYear = new Date().getFullYear();
+        const billingTenant = 'ad6a18d1-d963-11f0-858e-1284e6c74c95';
         const billingOn = (
-            (await getDefaultSettingValue('BILLING_ENABLED', 'ad6a18d1-d963-11f0-858e-1284e6c74c95')) === 'true'
+            (await getDefaultSettingValue('BILLING_ENABLED', billingTenant)) === 'true'
         );
         logger.info(`Starting billing with billing setting of ${billingOn}`);
         if (billingOn) {
-            const membershipList = await getMembershipList('active', 'ad6a18d1-d963-11f0-858e-1284e6c74c95');
+            const membershipList = await getMembershipList('active', billingTenant);
             logger.info(`Running billing for year ${billingYear} and ${membershipList.length} memberships`);
-            const generatedBills = await runBillingComplete(billingYear, membershipList);
+            const generatedBills = await runBillingComplete(billingYear, membershipList, undefined, billingTenant);
             logger.debug(JSON.stringify(generatedBills));
             // in November, generate billing links for next year
             const month = new Date().getMonth() + 1;
