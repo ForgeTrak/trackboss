@@ -79,7 +79,7 @@ const verify = async (token: string, permissionLevel?: string, targetActingAs?: 
         if (e.message === 'Forbidden') {
             throw new Error('Forbidden');
         }
-        throw e;
+        throw new Error('Authorization Failed');
     }
 };
 
