@@ -32,14 +32,18 @@ AWS.config.update({ region: 'us-east-1' });
 const addTenantToRequest = async (req : any, res : any, next : () => void) => {
     const headerCheck = checkHeader(req.headers.authorization);
     if (headerCheck.token) {
-        const verifiedToken = await verify(headerCheck.token);
-        const tenantId = verifiedToken.active_tenant_id as string;
-        const uuid = verifiedToken['cognito:username'];
-        req.user = {
-            tenantId,
-            uuid,
-            email: verifiedToken.email,
-        };
+        try {
+            const verifiedToken = await verify(headerCheck.token);
+            const tenantId = verifiedToken.active_tenant_id as string;
+            const uuid = verifiedToken['cognito:username'];
+            req.user = {
+                tenantId,
+                uuid,
+                email: verifiedToken.email,
+            };
+        } catch (e: any) {
+            logger.warn(`Token verification failed in middleware: ${e.message}`);
+        }
     }
     next();
 };
