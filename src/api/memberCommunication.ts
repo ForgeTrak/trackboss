@@ -10,6 +10,7 @@ import { getMemberList, getMembersWithTag } from '../database/member';
 import { MemberCommunication } from '../typedefs/memberCommunication';
 import { getEnvironmentParameter } from '../util/environmentWrapper';
 import { getBoardMemberList } from '../database/boardMember';
+import logAuditEvent from '../database/auditLog';
 
 const memberCommunication = Router();
 
@@ -108,7 +109,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
             });
         }
         const response = await insertMemberCommunication(communication, req.user.tenantId);
-
+        logAuditEvent(req, 'memberCommunication', response.memberCommunicationId, null, req.body);
         // now stick the message in the respective SQS queue for further processing.
         const outboundQueueName = `trackboss-queue-${communication.mechanism}`;
         AWS.config.update({ region: process.env.AWS_REGION });

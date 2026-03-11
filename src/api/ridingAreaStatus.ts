@@ -5,6 +5,7 @@ import {
     GetRidingAreaStatusResponse,
 } from '../typedefs/ridingAreaStatus';
 import { getRidingAreaStatuses, flipRidingAreaStatus } from '../database/ridingAreaStatus';
+import logAuditEvent from '../database/auditLog';
 
 /**
  * All in one function to validate administrative access for a given user token. This will throw
@@ -66,7 +67,9 @@ ridingAreaStatus.patch('/:id', async (req: Request, res: Response) => {
         const { id } = req.params;
         const ridingArea = req.body;
         await validateAdminAccess(req, res);
+        const before = await getRidingAreaStatuses(req.user.tenantId);
         const updatedArea = await flipRidingAreaStatus(Number(id), ridingArea, req.user.tenantId);
+        logAuditEvent(req, 'ridingAreaStatus', Number(id), before, updatedArea);
         res.send(updatedArea);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);

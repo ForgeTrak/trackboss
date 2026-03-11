@@ -10,6 +10,7 @@ import {
     PostNewEventTypeResponse,
 } from '../typedefs/eventType';
 import { insertEventType, getEventType, getEventTypeList, patchEventType } from '../database/eventType';
+import logAuditEvent from '../database/auditLog';
 
 const eventType = Router();
 
@@ -25,6 +26,7 @@ eventType.post('/new', async (req: Request, res: Response) => {
             await verify(headerCheck.token, 'Admin');
             const insertId = await insertEventType(req.user.tenantId, req.body);
             response = await getEventType(insertId, req.user.tenantId);
+            logAuditEvent(req, 'eventType', insertId, null, req.body);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -117,8 +119,10 @@ eventType.patch('/:eventTypeID', async (req: Request, res: Response) => {
         try {
             const { eventTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
+            const before = await getEventType(Number(eventTypeID), req.user.tenantId);
             await patchEventType(Number(eventTypeID), req.user.tenantId, req.body);
             response = await getEventType(Number(eventTypeID), req.user.tenantId);
+            logAuditEvent(req, 'eventType', Number(eventTypeID), before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

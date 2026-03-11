@@ -12,6 +12,7 @@ import { checkHeader, validateAdminAccess } from '../util/auth';
 import getBackupFile from '../util/s3';
 
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const defaultSetting = Router();
 
@@ -69,7 +70,9 @@ defaultSetting.get('/applications/enabled', async (req: Request, res: Response) 
 defaultSetting.put('/:id', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
+        const before = await getDefaultSetting(req.body.settingName, req.user.tenantId);
         const patchedSetting = await updateDefaultSetting(Number(req.params.id), req.body, req.user.tenantId);
+        logAuditEvent(req, 'defaultSetting', Number(req.params.id), before, patchedSetting);
         res.json(patchedSetting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -85,6 +88,7 @@ defaultSetting.post('/', async (req: Request, res: Response) => {
         const newSetting : DefaultSetting = req.body;
         await insertDefaultSetting(newSetting, req.user.tenantId);
         const savedNewSetting = await getDefaultSetting(newSetting.settingName, req.user.tenantId);
+        logAuditEvent(req, 'defaultSetting', null, null, savedNewSetting);
         res.json(savedNewSetting);
     } catch (error: any) {
         logger.error(`Error at path ${req.path}`);
@@ -97,7 +101,9 @@ defaultSetting.post('/', async (req: Request, res: Response) => {
 defaultSetting.delete('/:id', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
+        const before = await getDefaultSettingValue((req.params.id), req.user.tenantId);
         await deleteDefaultSetting(Number(req.params.id), req.user.tenantId);
+        logAuditEvent(req, 'defaultSetting', Number(req.params.id), before, null);
         res.status(200);
         res.send('deleted default setting');
     } catch (error: any) {

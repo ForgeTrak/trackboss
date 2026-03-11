@@ -23,6 +23,7 @@ import { formatWorkbook, httpOutputWorkbook, startWorkbook } from '../excel/work
 import { markMembershipFormer } from '../database/membership';
 import { getBoardMemberList } from '../database/boardMember';
 import { getDefaultSettingValue } from '../database/defaultSettings';
+import logAuditEvent from '../database/auditLog';
 
 const member = Router();
 
@@ -236,6 +237,7 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
             const prePatchMember = await getMember(memberId, req.user.tenantId);
             await patchMember(memberId, req.body, req.user.tenantId);
             const updatedMember = await getMember(memberId, req.user.tenantId);
+            await logAuditEvent(req, 'Member', memberId, prePatchMember, updatedMember);
             response = updatedMember;
             // if it's a family member ("member") and inactivated, then delete the cognito user
             // and the member record.  This is just cleanup stuff. and may change later.

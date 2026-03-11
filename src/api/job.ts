@@ -29,6 +29,7 @@ import { formatWorkbook, httpOutputWorkbook, startWorkbook } from '../excel/work
 import logger from '../logger';
 import { runBillingComplete } from '../util/billing';
 import { getMembership } from '../database/membership';
+import logAuditEvent from '../database/auditLog';
 
 async function GetJobList(req: Request, res:Response) {
     const { authorization } = req.headers;
@@ -161,6 +162,7 @@ job.post('/new', async (req: Request, res: Response) => {
             const jobInsertRequest : PostNewJobRequest = req.body;
             const insertId = await insertJob(req.user.tenantId, jobInsertRequest);
             response = await getJob(insertId, req.user.tenantId);
+            logAuditEvent(req, 'job', insertId, null, response);
             // we have added the job so update the user's billing immediately so we can backdate stuff which happens.
             // it also keeps stuff instantly up to date for verification.
             const workYear = parse(jobInsertRequest.jobStartDate || '', 'yyyy-MM-dd HH:mm', new Date()).getFullYear();
@@ -203,6 +205,9 @@ job.patch('/event/:eventId/:memberId', async (req: Request, res: Response) => {
             const eventJob = await getOpenEventJob(parseInt(eventId, 10), req.user.tenantId);
             eventJob.memberId = parseInt(memberId, 10);
             await patchJob(eventJob.jobId, req.user.tenantId, eventJob);
+            const updatedJob = await getJob(eventJob.jobId, req.user.tenantId);
+            logAuditEvent(req, 'job.signup', eventJob.jobId, eventJob, updatedJob);
+            res.status(200);
             response = eventJob;
         } catch (error: any) {
             logger.error(`Error at path ${req.path}`);
@@ -316,8 +321,10 @@ job.patch('/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const before = await getJob(id, req.user.tenantId);
             await patchJob(Number(jobId), req.user.tenantId, req.body);
             response = await getJob(id, req.user.tenantId);
+            logAuditEvent(req, 'job', Number(jobId), before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -359,8 +366,10 @@ job.patch('/verify/:jobId/:state', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const before = await getJob(id, req.user.tenantId);
             await setJobVerifiedState(id, verifiedState, req.user.tenantId);
             response = await getJob(id, req.user.tenantId);
+            logAuditEvent(req, 'job.verify', id, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -395,8 +404,10 @@ job.patch('/remove/signup/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const before = await getJob(id, req.user.tenantId);
             await removeSignup(id, req.user.tenantId);
             response = await getJob(id, req.user.tenantId);
+            logAuditEvent(req, 'job.remove.signup', id, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -416,14 +427,6 @@ job.patch('/remove/signup/:jobId', async (req: Request, res: Response) => {
     res.send(response);
 });
 
-//  Cloning Jobs is a feature that got lost in the shuffle along the way
-//  The front end does not currently support cloning jobs so we decided
-//  It would not be worth the risk of introducing new bugs at this point
-//
-// job.post('/:jobId', (req: Request, res: Response) => {
-//     res.status(501).send();
-// });
-
 job.delete('/:jobId', async (req: Request, res: Response) => {
     const { authorization } = req.headers;
     let response: DeleteJobResponse;
@@ -439,8 +442,10 @@ job.delete('/:jobId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getJob(id, req.user.tenantId);
             await deleteJob(id, req.user.tenantId);
             response = { jobId: id };
+            logAuditEvent(req, 'job', id, before, null);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

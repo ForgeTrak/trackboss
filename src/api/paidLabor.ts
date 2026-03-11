@@ -12,6 +12,7 @@ import {
 } from '../database/paidLabor';
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const paidLabor = Router();
 
@@ -90,8 +91,10 @@ paidLabor.delete('/:paidLaborId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getPaidLaborById(id, req.user.tenantId);
             await deletePaidLaborById(id, req.user.tenantId);
             response = { paidLaborId: id };
+            logAuditEvent(req, 'paidLabor', id, before, null);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -129,7 +132,10 @@ paidLabor.patch('/:paidLaborId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getPaidLaborById(id, req.user.tenantId);
             await updatePaidLabor(id, req.body, req.user.tenantId);
+            const after = await getPaidLaborById(id, req.user.tenantId);
+            logAuditEvent(req, 'paidLabor', id, before, after);
             response = req.body;
             res.status(200);
         } catch (e: any) {
@@ -164,6 +170,7 @@ paidLabor.post('/', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token, 'Admin');
             response = await createPaidLabor(req.body, req.user.tenantId);
+            logAuditEvent(req, 'paidLabor', null, null, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

@@ -100,7 +100,6 @@ export async function getJobList(filters: GetJobListRequestFilters, tenantId: st
     sql += ' order by job_day_number, sort_order, job_id';
     let results;
     try {
-        logger.info(`running sql ${sql}`);
         [results] = await getPool().query<RowDataPacket[]>(sql, values);
     } catch (e) {
         logger.error(`DB error getting job list: ${e}`);

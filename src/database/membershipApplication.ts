@@ -20,16 +20,16 @@ export async function insertMembershipApplication(membershipApplication: any): P
     return result.insertId;
 }
 
-export async function getMembershipApplications(year: number) : Promise<MembershipApplication[]> {
+export async function getMembershipApplications(year: number, tenantId: string) : Promise<MembershipApplication[]> {
     let results;
     try {
         const applicationsQuery =
             // eslint-disable-next-line max-len
-            'select * from membership_application where application_season = ? order by application_status desc, application_date';
+            'select * from membership_application where application_season = ? and tenant_id = ? order by application_status desc, application_date';
         [results] = await getPool()
-            .query<RowDataPacket[]>(applicationsQuery, [year]);
+            .query<RowDataPacket[]>(applicationsQuery, [year, tenantId]);
     } catch (e) {
-        logger.error(`DB error getting bike list: ${e}`);
+        logger.error(`DB error getting application list: ${e}`);
         throw new Error('internal server error');
     }
     const applications : MembershipApplication[] = [];
@@ -45,14 +45,14 @@ export async function getMembershipApplications(year: number) : Promise<Membersh
     return applications;
 }
 
-export async function getMembershipApplication(id: number) : Promise<MembershipApplication> {
+export async function getMembershipApplication(id: number, tenantId: string) : Promise<MembershipApplication> {
     let results;
     try {
         const applicationsQuery =
             // eslint-disable-next-line max-len
-            'select * from membership_application where membership_application_id = ?';
+            'select * from membership_application where membership_application_id = ? and tenant_id = ?';
         // eslint-disable-next-line max-len
-        [results] = await getPool().query<RowDataPacket[]>(applicationsQuery, [id]);
+        [results] = await getPool().query<RowDataPacket[]>(applicationsQuery, [id, tenantId]);
     } catch (e) {
         logger.error(`DB error getting bike list: ${e}`);
         throw new Error('internal server error');
@@ -86,14 +86,16 @@ export async function updateApplicationStatus(
     newStatus: string,
     internalNotes: string,
     applicantNotes: string,
+    tenantId: string,
 ) : Promise<MembershipApplication> {
     let results;
     try {
         const updateQuery =
             `update membership_application set application_status = ?, application_notes_internal = ?,
-              application_notes_shared = ? where membership_application_id = ?`;
-        [results] = await getPool().query<OkPacket>(updateQuery, [newStatus, internalNotes, applicantNotes, id]);
-        return getMembershipApplication(id);
+              application_notes_shared = ? where membership_application_id = ? and tenant_id = ?`;
+        // eslint-disable-next-line max-len
+        [results] = await getPool().query<OkPacket>(updateQuery, [newStatus, internalNotes, applicantNotes, id, tenantId]);
+        return getMembershipApplication(id, tenantId);
     } catch (e) {
         logger.error(`DB error updating application status: ${e}`);
         throw new Error('Internal server error');

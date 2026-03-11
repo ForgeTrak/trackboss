@@ -17,11 +17,12 @@ import { Member, PatchMemberRequest, PostNewMemberRequest } from '../typedefs/me
 import { MembershipApplication } from '../typedefs/membershipApplication';
 import { PostNewMembershipRequest } from '../typedefs/membership';
 import { insertMembership } from '../database/membership';
-import { generateBill, getWorkPointThreshold } from '../database/billing';
+import { generateBill, getBill, getWorkPointThreshold } from '../database/billing';
 import { getMembershipType } from '../database/memberType';
 import { generateSquareLinks } from '../util/billing';
 import { calculateBillingYear } from '../util/dateHelper';
 import { formatWorkbook, httpOutputWorkbook, startWorkbook } from '../excel/workbookHelper';
+import logAuditEvent from '../database/auditLog';
 
 const membershipApplication = Router();
 
@@ -64,7 +65,9 @@ const sendApplicationStatus = async (req: Request, res: Response, status: string
     }
     const id = parseInt(req.params.id, 10);
     const { internalNotes, applicantNotes } = req.body;
-    const updatedApplication = await updateApplicationStatus(id, status, internalNotes, applicantNotes);
+    const updatedApplication =
+        await updateApplicationStatus(id, status, internalNotes, applicantNotes, req.user.tenantId);
+    logAuditEvent(req, 'membershipApplication.updateStatus', id, null, updatedApplication);
     res.send(updatedApplication);
 };
 
@@ -78,6 +81,7 @@ membershipApplication.post('/', async (req: Request, res: Response) => {
         const insertId = await insertMembershipApplication(application);
         application.id = insertId;
         await sendAppConfirmationEmail(application);
+        logAuditEvent(req, 'membershipApplication.new', insertId, null, application);
         res.send(application);
     } catch (error: any) {
         logger.error(error);
@@ -106,7 +110,7 @@ membershipApplication.get('/', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
         const { year } = req.query;
-        const allApplications = await getMembershipApplications(parseInt(year as string, 10));
+        const allApplications = await getMembershipApplications(parseInt(year as string, 10), req.user.tenantId);
         res.send(allApplications);
     } catch (error: any) {
         logger.error(error);
@@ -134,7 +138,8 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
         await sendApplicationStatus(req, res, applicationStatus);
         // get the application, and convert the primary member to a member. This call will create a
         // Cognito user, and send an email to the user letting them know they have one.
-        const application : MembershipApplication = await getMembershipApplication(Number(req.params.id));
+        const application : MembershipApplication =
+            await getMembershipApplication(Number(req.params.id), req.user.tenantId);
         // phone number processing with valid country code etc.
         let phoneNumber = application.phone || application.phoneNumber;
         phoneNumber = phoneNumber.replace(/-/g, '');
@@ -188,7 +193,9 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             workDetail: [],
             billingYear,
         }, req.user.tenantId);
-        await generateSquareLinks(billingYear, newMembershipId);
+        await generateSquareLinks(billingYear, newMembershipId, req.user.tenantId);
+        const bill = await getBill(billId, req.user.tenantId);
+        logAuditEvent(req, 'membershipApplication.newBill', bill.billId, null, bill);
         // TODO: this really needs type checking, otherwise it is prone to typeos and speling erors can mess it up.
         application.familyMembers.forEach(async (familyMember) => {
             // set required fields
@@ -207,6 +214,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
         });
         logger.info(`Generated bill ${billId} for membership ${newMembershipId} - application converted to member.`);
         const newMemberRecord = await getMember(`${primaryMemberId}`, req.user.tenantId);
+        logAuditEvent(req, 'membershipApplication.convertToMember', req.params.id, null, newMemberRecord);
     } catch (error: any) {
         logger.error(error);
         res.status(500);
@@ -218,7 +226,8 @@ membershipApplication.post('/reject/:id', async (req: Request, res: Response) =>
     try {
         // update the last_modified_date field in here.
         await sendApplicationStatus(req, res, 'Rejected');
-        const application : MembershipApplication = await getMembershipApplication(Number(req.params.id));
+        const application : MembershipApplication =
+            await getMembershipApplication(Number(req.params.id), req.user.tenantId);
         // send an email saying they were rejected, with the application_notes_shared as the primary
         // field in the email
         await sendAppRejectedEmail(application);
@@ -245,7 +254,8 @@ membershipApplication.get('/list/excel', async (req: Request, res: Response) => 
         await validateAdminAccess(req, res);
         logger.info('Getting membership application list.');
         const { year } = req.query;
-        let applications : MembershipApplication[] = await getMembershipApplications(parseInt(year as string, 10));
+        let applications : MembershipApplication[] =
+            await getMembershipApplications(parseInt(year as string, 10), req.user.tenantId);
         applications = applications.filter((app) => app.status !== 'Accepted');
         const workbookTitle = 'PRA applications';
         const workbook = startWorkbook(workbookTitle);

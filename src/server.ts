@@ -39,6 +39,7 @@ const addTenantToRequest = async (req : any, res : any, next : () => void) => {
             req.user = {
                 tenantId,
                 uuid,
+                email: verifiedToken.email,
             };
         } catch (e: any) {
             logger.warn(`Token verification failed in middleware: ${e.message}`);

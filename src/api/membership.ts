@@ -23,6 +23,7 @@ import logger from '../logger';
 import { ErrorResponse } from '../typedefs/errorResponse';
 import { MembershipTag } from '../typedefs/membershipTag';
 import { runBillingCompleteCurrent } from '../util/billing';
+import logAuditEvent from '../database/auditLog';
 
 const membership = Router();
 
@@ -142,6 +143,7 @@ membership.patch('/:membershipID', async (req: Request, res: Response) => {
                 console.log(`old ${priorToUpdate.membershipType} new ${response.membershipType}`);
                 runBillingCompleteCurrent([response], response.membershipId, req.user.tenantId);
             }
+            logAuditEvent(req, 'Membership', membershipID, priorToUpdate, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -178,7 +180,10 @@ membership.post('/tags', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipId, tags } = req.body;
+            const before = await getMembershipTags(membershipId, req.user.tenantId);
             response = await createMembershipTag(membershipId, tags, req.user.tenantId);
+            const after = await getMembershipTags(membershipId, req.user.tenantId);
+            logAuditEvent(req, 'MembershipTag', membershipId, before, after);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -240,7 +245,10 @@ membership.delete('/tags', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { membershipId, tags } = req.body;
+            const before = await getMembershipTags(membershipId, req.user.tenantId);
             response = await deleteMembershipTag(membershipId, tags, req.user.tenantId);
+            const after = await getMembershipTags(membershipId, req.user.tenantId);
+            logAuditEvent(req, 'MembershipTag', membershipId, before, after);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

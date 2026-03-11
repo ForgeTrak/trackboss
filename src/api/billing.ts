@@ -24,6 +24,7 @@ import logger from '../logger';
 import { calculateBillingYear } from '../util/dateHelper';
 import { formatWorkbook, httpOutputWorkbook, startWorkbook } from '../excel/workbookHelper';
 import createPaymentLink from '../integrations/square';
+import logAuditEvent from '../database/auditLog';
 
 //
 // TODO: Emails are not sent for generated bills (see emailBills helper function in util)
@@ -158,7 +159,10 @@ billing.post('/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
+            const before = await getBill(billId, req.user.tenantId);
             await processBillPayment(billId, paymentMethod?.toString() || '', req.user.tenantId);
+            const after = await getBill(billId, req.user.tenantId);
+            logAuditEvent(req, 'bill', billId, before, after);
             response = {};
             res.status(200);
         } catch (e: any) {
@@ -244,6 +248,7 @@ billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {
                 await markContactedAndRenewing(billId, req.user.tenantId);
             }
             response = {};
+            logAuditEvent(req, 'bill', billId, originalBill, bill);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -280,8 +285,11 @@ billing.patch('/markContacted/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
+            const before = await getBill(billId, req.user.tenantId);
             await markContactedAndRenewing(billId, req.user.tenantId);
+            const after = await getBill(billId, req.user.tenantId);
             response = {};
+            logAuditEvent(req, 'bill', billId, before, after);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -329,7 +337,9 @@ billing.patch('/discount/:billId', async (req: Request, res: Response) => {
             bill.squareLink = paymentLink.squareUrl;
             bill.squareOrderId = paymentLink.squareOrderId;
             await addSquareAttributes(bill, req.user.tenantId);
+            const after = await getBill(billId, req.user.tenantId);
             response = {};
+            logAuditEvent(req, 'bill', Number(req.params.billId), bill, after);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -461,6 +471,8 @@ billing.post('/webhook/incoming', async (req: Request, res: Response) => {
             logger.info(`Got another webhook for ${ourBill.billId} as order Id ${ourBill.squareOrderId}. Ignoring.`);
         }
         logger.info(`Payment complete for ${squareOrderId} and ${ourBill.membershipAdmin}`);
+        logAuditEvent(req, 'bill', Number(req.params.billId), ourBill, billResponse);
+
         res.json(billResponse);
     } catch (error) {
         logger.error(`Error at path ${req.path}`);
