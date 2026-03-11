@@ -8,6 +8,7 @@ import {
     PatchMemberTypeResponse,
 } from '../typedefs/memberType';
 import { getMemberType, getMembershipTypeCounts, getMemberTypeList, patchMemberType } from '../database/memberType';
+import logAuditEvent from '../database/auditLog';
 
 const memberType = Router();
 
@@ -109,8 +110,10 @@ memberType.patch('/:memberTypeID', async (req: Request, res: Response) => {
         try {
             const { memberTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
+            const before = await getMemberType(Number(memberTypeID), req.user.tenantId);
             await patchMemberType(Number(memberTypeID), req.user.tenantId, req.body);
             response = await getMemberType(Number(memberTypeID), req.user.tenantId);
+            logAuditEvent(req, 'memberType', Number(memberTypeID), before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

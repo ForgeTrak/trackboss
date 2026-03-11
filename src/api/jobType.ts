@@ -9,6 +9,7 @@ import {
     PostNewJobTypeResponse,
 } from '../typedefs/jobType';
 import { getJobType, getJobTypeList, getJobTypesEventList, insertJobType, patchJobType } from '../database/jobType';
+import logAuditEvent from '../database/auditLog';
 
 const jobType = Router();
 
@@ -24,6 +25,7 @@ jobType.post('/new', async (req: Request, res: Response) => {
             await verify(headerCheck.token, 'Admin');
             const insertId = await insertJobType(req.user.tenantId, req.body);
             response = await getJobType(insertId, req.user.tenantId);
+            logAuditEvent(req, 'jobType', insertId, null, response);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -144,8 +146,10 @@ jobType.patch('/:jobTypeID', async (req: Request, res: Response) => {
         try {
             const { jobTypeID } = req.params;
             await verify(headerCheck.token, 'Admin');
+            const before = await getJobType(Number(jobTypeID), req.user.tenantId);
             await patchJobType(req.user.tenantId, Number(jobTypeID), req.body);
             response = await getJobType(Number(jobTypeID), req.user.tenantId);
+            logAuditEvent(req, 'jobType', Number(jobTypeID), before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

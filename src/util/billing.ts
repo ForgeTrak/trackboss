@@ -51,7 +51,7 @@ export async function generateNewBills(
             try {
                 logger.info(`Running billing for membership with id ${membership.membershipId}`);
                 const baseDues = await getBaseDues(membership.membershipId, tenantId);
-                const earned = (await getWorkPointsByMembership(membership.membershipId, year)).total;
+                const earned = (await getWorkPointsByMembership(membership.membershipId, year, tenantId)).total;
                 let owed = Math.max((1 - earned / threshold) * baseDues, 0);
                 // the Paypal Fee is 0.0290%, plus $0.30.  We hard code this here, with a big ole comment
                 // describing what it is.  It's not great but their rule is generally static.

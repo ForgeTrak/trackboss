@@ -16,6 +16,7 @@ import {
 } from '../database/boardMember';
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const boardMember = Router();
 
@@ -32,6 +33,7 @@ boardMember.post('/new', async (req: Request, res: Response) => {
             req.body.tenantId = req.user.tenantId;
             const insertId = await insertBoardMember(req.body);
             response = await getBoardMember(req.user.tenantId, insertId);
+            logAuditEvent(req, 'boardMember', insertId, null, response);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -134,8 +136,10 @@ boardMember.patch('/:boardMemberId', async (req: Request, res: Response) => {
             }
             await verify(headerCheck.token, 'Admin');
             req.body.tenantId = req.user.tenantId;
+            const before = await getBoardMember(req.user.tenantId, id);
             await patchBoardMember(id, req.body);
             response = await getBoardMember(req.user.tenantId, id);
+            logAuditEvent(req, 'boardMember', id, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -176,7 +180,9 @@ boardMember.delete('/:boardMemberId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getBoardMember(req.user.tenantId, id);
             await deleteBoardMember(req.user.tenantId, id);
+            logAuditEvent(req, 'boardMember', id, before, null);
             response = { boardMemberId: id };
             res.status(200);
         } catch (e: any) {

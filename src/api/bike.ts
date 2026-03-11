@@ -10,6 +10,7 @@ import {
 } from '../typedefs/bike';
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const bike = Router();
 
@@ -28,6 +29,7 @@ bike.post('/new', async (req: Request, res: Response) => {
             bikeRequest.tenantId = tenantId;
             const insertId = await insertBike(req.body);
             response = await getBike(insertId, tenantId);
+            logAuditEvent(req, 'bike', insertId.toString(), null, response);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -133,8 +135,10 @@ bike.patch('/:bikeID', async (req: Request, res: Response) => {
             const tenantId = token.active_tenant_id as string;
             const bikeRequest = req.body;
             bikeRequest.tenantId = tenantId;
+            const before = await getBike(bikeIdNum, tenantId);
             await patchBike(bikeIdNum, bikeRequest);
             response = await getBike(bikeIdNum, tenantId);
+            logAuditEvent(req, 'bike', bikeIdNum.toString(), before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -176,7 +180,9 @@ bike.delete('/:bikeID', async (req: Request, res: Response) => {
             }
             const token = await verify(headerCheck.token, 'Membership Admin');
             const tenantId = token.active_tenant_id as string;
+            const before = await getBike(bikeIdNum, tenantId);
             await deleteBike(bikeIdNum, tenantId);
+            logAuditEvent(req, 'bike', bikeIdNum.toString(), before, null);
             response = { bikeId: bikeIdNum };
             res.status(200);
         } catch (e: any) {

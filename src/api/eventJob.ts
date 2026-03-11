@@ -8,6 +8,7 @@ import {
 } from '../typedefs/eventJob';
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const eventJob = Router();
 
@@ -24,6 +25,7 @@ eventJob.post('/new', async (req: Request, res: Response) => {
             const tenantId = token.active_tenant_id as string;
             const insertId = await insertEventJob(req.body, tenantId);
             response = await getEventJob(insertId, req.user.tenantId);
+            logAuditEvent(req, 'eventJob', insertId, null, response);
             res.status(201);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -92,8 +94,10 @@ eventJob.patch('/:eventJobID', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getEventJob(eventJobIdNum, req.user.tenantId);
             await patchEventJob(eventJobIdNum, req.user.tenantId, req.body);
             response = await getEventJob(eventJobIdNum, req.user.tenantId);
+            logAuditEvent(req, 'eventJob', eventJobIdNum, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -134,7 +138,9 @@ eventJob.delete('/:eventJobID', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             await verify(headerCheck.token, 'Admin');
+            const before = await getEventJob(eventJobIdNum, req.user.tenantId);
             await deleteEventJob(eventJobIdNum, req.user.tenantId);
+            logAuditEvent(req, 'eventJob', eventJobIdNum, before, null);
             response = { eventJobId: eventJobIdNum };
             res.status(200);
         } catch (e: any) {

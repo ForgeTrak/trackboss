@@ -16,6 +16,7 @@ import {
 } from '../typedefs/event';
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
+import logAuditEvent from '../database/auditLog';
 
 const event = Router();
 
@@ -28,17 +29,20 @@ event.post('/new', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            const token = await verify(headerCheck.token, 'Admin');
             const newEvent = req.body as Event;
             const insertId = await insertEvent(req.user.tenantId, newEvent);
             response = await getEvent(insertId, req.user.tenantId);
+            logAuditEvent(req, 'event', insertId, null, response);
             const relatedEvents = await getRelatedEvents(req.user.tenantId, response);
             // awaiting all this on purpose because a) it is fast and b) I want the UI to update when all of this
             // is done. We are in mañuel transmission mode here.
             // eslint-disable-next-line no-restricted-syntax
             for (const childEvent of relatedEvents) {
                 // eslint-disable-next-line no-await-in-loop
-                await insertEvent(req.user.tenantId, childEvent);
+                const childEventId = await insertEvent(req.user.tenantId, childEvent);
+                // eslint-disable-next-line no-await-in-loop
+                const newBornChildEvent = await getEvent(childEventId, req.user.tenantId);
+                logAuditEvent(req, 'event', childEventId, null, newBornChildEvent);
             }
             res.status(201);
         } catch (e: any) {
@@ -192,10 +196,12 @@ event.patch('/:eventID', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const before = await getEvent(id, req.user.tenantId);
             const token = await verify(headerCheck.token, 'Admin');
             const tenantId = token.active_tenant_id as string;
             await patchEvent(id, tenantId, req.body);
             response = await getEvent(id, tenantId);
+            logAuditEvent(req, 'event', id, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -235,9 +241,11 @@ event.delete('/:eventID', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const before = await getEvent(id, req.user.tenantId);
             const token = await verify(headerCheck.token, 'Admin');
             const tenantId = token.active_tenant_id as string;
             await deleteEvent(id, tenantId);
+            logAuditEvent(req, 'event', id, before, null);
             response = { eventId: id };
             res.status(200);
         } catch (e: any) {

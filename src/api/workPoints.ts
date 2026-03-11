@@ -40,7 +40,7 @@ workPoints.get('/byMember/:memberID', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token);
             const { id, year } = parseInputs(req.params.memberID, req.query.year as string);
-            response = await getWorkPointsByMember(id, year);
+            response = await getWorkPointsByMember(id, year, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -78,7 +78,7 @@ workPoints.get('/byMembership/:membershipID', async (req: Request, res: Response
         try {
             await verify(headerCheck.token);
             const { id, year } = parseInputs(req.params.membershipID, req.query.year as string);
-            response = await getWorkPointsByMembership(id, year);
+            response = await getWorkPointsByMembership(id, year, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);
@@ -108,7 +108,7 @@ workPoints.get('/byMembership/:membershipID', async (req: Request, res: Response
 workPoints.get('/list/excel', async (req: Request, res: Response) => {
     try {
         const rightNow = new Date();
-        const workPointsByMember = await getWorkPointsList(rightNow.getFullYear()) as WorkPoints[];
+        const workPointsByMember = await getWorkPointsList(rightNow.getFullYear(), req.user.tenantId) as WorkPoints[];
         const workbookTitle = `PRA members ${new Date().toLocaleDateString().replace(/\//gi, '-')}`;
         const workbook = startWorkbook(workbookTitle);
         const worksheet = workbook.getWorksheet(1);

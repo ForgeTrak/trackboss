@@ -237,7 +237,7 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
             const prePatchMember = await getMember(memberId, req.user.tenantId);
             await patchMember(memberId, req.body, req.user.tenantId);
             const updatedMember = await getMember(memberId, req.user.tenantId);
-            await logAuditEvent(req, 'Member', memberId, 'PATCH', prePatchMember, updatedMember);
+            await logAuditEvent(req, 'Member', memberId, prePatchMember, updatedMember);
             response = updatedMember;
             // if it's a family member ("member") and inactivated, then delete the cognito user
             // and the member record.  This is just cleanup stuff. and may change later.
