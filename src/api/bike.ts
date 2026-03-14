@@ -32,8 +32,7 @@ bike.post('/new', async (req: Request, res: Response) => {
             logAuditEvent(req, 'bike', insertId.toString(), null, response);
             res.status(201);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`asset - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -68,8 +67,7 @@ bike.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = bikeList;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`asset - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -100,8 +98,7 @@ bike.get('/:bikeID', async (req: Request, res: Response) => {
             response = await getBike(Number(bikeID), tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`asset - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -141,8 +138,7 @@ bike.patch('/:bikeID', async (req: Request, res: Response) => {
             logAuditEvent(req, 'bike', bikeIdNum.toString(), before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`asset - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -186,8 +182,7 @@ bike.delete('/:bikeID', async (req: Request, res: Response) => {
             response = { bikeId: bikeIdNum };
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`asset - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };

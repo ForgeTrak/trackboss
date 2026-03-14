@@ -45,3 +45,19 @@ export default async function logAuditEvent(
     );
     logger.info(`Audit log: ${JSON.stringify(requestInfo)}`);
 }
+
+export async function getAuditLogById(tenantId: string, entityType: string, entityId: string) {
+    const [rows] = await getPool().query<RowDataPacket[]>(
+        'select * from audit_log where tenant_id = ? and entity_type = ? and entity_id = ? order by created_at desc',
+        [tenantId, entityType, entityId],
+    );
+    return rows;
+}
+
+export async function getAuditLog(tenantId: string, entityTypes: string[]) {
+    const [rows] = await getPool().query<RowDataPacket[]>(
+        'select * from audit_log where tenant_id = ? and entity_type in ? order by created_at desc',
+        [tenantId, `'${entityTypes.join('\',\'')}'`],
+    );
+    return rows;
+}

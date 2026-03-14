@@ -25,8 +25,7 @@ defaultSetting.get('/', async (req: Request, res: Response) => {
         response = settings;
         res.send(response);
     } catch (e: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(e);
+        logger.error(`defaultSetting - Error at path ${req.path}`, e);
         if (e.message === 'Authorization Failed') {
             res.status(401);
             response = { reason: 'not authorized' };
@@ -48,8 +47,7 @@ defaultSetting.get('/:settingName', async (req: Request, res: Response) => {
         const setting = await getDefaultSetting(settingName, req.user.tenantId);
         res.send(setting);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -60,8 +58,7 @@ defaultSetting.get('/applications/enabled', async (req: Request, res: Response) 
         const setting = await getDefaultSetting('ALLOW_APPLICATIONS', 'ad6a18d1-d963-11f0-858e-1284e6c74c95');
         res.send(setting);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -75,8 +72,7 @@ defaultSetting.put('/:id', async (req: Request, res: Response) => {
         logAuditEvent(req, 'defaultSetting', Number(req.params.id), before, patchedSetting);
         res.json(patchedSetting);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -91,8 +87,7 @@ defaultSetting.post('/', async (req: Request, res: Response) => {
         logAuditEvent(req, 'defaultSetting', null, null, savedNewSetting);
         res.json(savedNewSetting);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -107,8 +102,7 @@ defaultSetting.delete('/:id', async (req: Request, res: Response) => {
         res.status(200);
         res.send('deleted default setting');
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -121,14 +115,16 @@ defaultSetting.get('/admin/databackup', async (req: Request, res: Response) => {
         if (!headerCheck.valid) {
             res.status(401);
         } else {
+            // eslint-disable-next-line max-len
+            logger.info(`defaultSetting - Data backup requested by ${req.ip} and ${req.user.uuid} on tenant ${req.user.tenantId}`);
             const dataBackupBuffer = await getBackupFile();
             res.setHeader('Content-Disposition', 'attachment; filename=databackup.sql.gz');
             res.setHeader('Content-Type', 'application/gzip');
             res.send(dataBackupBuffer);
+            logAuditEvent(req, 'defaultSetting', null, null, { action: 'data backup' });
         }
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`defaultSetting - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
