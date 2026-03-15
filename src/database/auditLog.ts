@@ -43,6 +43,7 @@ export default async function logAuditEvent(
         values (?, ?, ?, ?, ?, ?, ?)`,
         values,
     );
+    logger.info(`${entityType} - ran action ${action} for id ${entityId}`);
     logger.info(`Audit log: ${JSON.stringify(requestInfo)}`);
 }
 

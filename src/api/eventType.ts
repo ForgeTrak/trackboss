@@ -29,8 +29,7 @@ eventType.post('/new', async (req: Request, res: Response) => {
             logAuditEvent(req, 'eventType', insertId, null, req.body);
             res.status(201);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`eventType - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -63,8 +62,7 @@ eventType.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = eventTypeList;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`eventType - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -91,8 +89,7 @@ eventType.get('/:eventTypeID', async (req: Request, res: Response) => {
             response = await getEventType(Number(eventTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`eventType - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -125,8 +122,7 @@ eventType.patch('/:eventTypeID', async (req: Request, res: Response) => {
             logAuditEvent(req, 'eventType', Number(eventTypeID), before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`eventType - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
