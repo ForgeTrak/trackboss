@@ -1,6 +1,5 @@
 import { format } from 'date-fns';
 import { Request, Response, Router } from 'express';
-import ical from 'ical-generator';
 
 import {
     deleteEvent, getClosestEvent, getEvent, getEventList, getRelatedEvents,
@@ -33,6 +32,7 @@ event.post('/new', async (req: Request, res: Response) => {
             const insertId = await insertEvent(req.user.tenantId, newEvent);
             response = await getEvent(insertId, req.user.tenantId);
             logAuditEvent(req, 'event', insertId, null, response);
+            logger.info(`event - event created with ID ${insertId} for tenant ${req.user.tenantId}`);
             const relatedEvents = await getRelatedEvents(req.user.tenantId, response);
             // awaiting all this on purpose because a) it is fast and b) I want the UI to update when all of this
             // is done. We are in mañuel transmission mode here.
@@ -42,12 +42,12 @@ event.post('/new', async (req: Request, res: Response) => {
                 const childEventId = await insertEvent(req.user.tenantId, childEvent);
                 // eslint-disable-next-line no-await-in-loop
                 const newBornChildEvent = await getEvent(childEventId, req.user.tenantId);
+                logger.info(`event - created child event ${newBornChildEvent.eventId} as a child of ${insertId}`);
                 logAuditEvent(req, 'event', childEventId, null, newBornChildEvent);
             }
             res.status(201);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`event - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -125,8 +125,7 @@ event.get('/list', async (req: Request, res: Response) => {
             }
             response = eventList;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`event - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -165,8 +164,7 @@ event.get('/:eventID', async (req: Request, res: Response) => {
             }
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`event - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -204,8 +202,7 @@ event.patch('/:eventID', async (req: Request, res: Response) => {
             logAuditEvent(req, 'event', id, before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`event - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -249,8 +246,7 @@ event.delete('/:eventID', async (req: Request, res: Response) => {
             response = { eventId: id };
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`event - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };

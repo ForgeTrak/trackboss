@@ -182,8 +182,7 @@ membership.post('/tags', async (req: Request, res: Response) => {
             const { membershipId, tags } = req.body;
             const before = await getMembershipTags(membershipId, req.user.tenantId);
             response = await createMembershipTag(membershipId, tags, req.user.tenantId);
-            const after = await getMembershipTags(membershipId, req.user.tenantId);
-            logAuditEvent(req, 'MembershipTag', membershipId, before, after);
+            logAuditEvent(req, 'MembershipTag', membershipId, before, response);
             res.status(200);
         } catch (e: any) {
             logger.error(`Error at path ${req.path}`);

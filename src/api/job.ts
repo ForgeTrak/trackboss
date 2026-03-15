@@ -130,8 +130,7 @@ async function GetJobList(req: Request, res:Response) {
                 response = jobList;
             }
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -171,8 +170,7 @@ job.post('/new', async (req: Request, res: Response) => {
             runBillingComplete(workYear, [membership], membership.membershipId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -210,8 +208,7 @@ job.patch('/event/:eventId/:memberId', async (req: Request, res: Response) => {
             res.status(200);
             response = eventJob;
         } catch (error: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(error);
+            logger.error(`job - Error at path ${req.path}`, error);
             res.status(500);
             response = { reason: error.getMessage() };
         }
@@ -224,8 +221,7 @@ job.get('/list', async (req: Request, res: Response) => {
     try {
         response = await GetJobList(req, res);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`job - Error at path ${req.path}`, error);
         res.status(500);
         response = { reason: error.getMessage() };
     }
@@ -264,8 +260,7 @@ job.get('/list/excel', async (req: Request, res: Response) => {
         // write workbook to buffer.
         httpOutputWorkbook(workbook, res, `signups${new Date().getTime()}.xlsx`);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`job - Error at path ${req.path}`, error);
         res.status(500);
         res.send({ reason: error.getMessage() });
     }
@@ -289,8 +284,7 @@ job.get('/:jobId', async (req: Request, res: Response) => {
             response = await getJob(id, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -327,8 +321,7 @@ job.patch('/:jobId', async (req: Request, res: Response) => {
             logAuditEvent(req, 'job', Number(jobId), before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -372,8 +365,7 @@ job.patch('/verify/:jobId/:state', async (req: Request, res: Response) => {
             logAuditEvent(req, 'job.verify', id, before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -410,8 +402,7 @@ job.patch('/remove/signup/:jobId', async (req: Request, res: Response) => {
             logAuditEvent(req, 'job.remove.signup', id, before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -444,12 +435,12 @@ job.delete('/:jobId', async (req: Request, res: Response) => {
             await verify(headerCheck.token, 'Admin');
             const before = await getJob(id, req.user.tenantId);
             await deleteJob(id, req.user.tenantId);
+            logger.info(`job - removed signup from job ${id} for tenant ${req.user.tenantId}`);
             response = { jobId: id };
             logAuditEvent(req, 'job', id, before, null);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`job - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };

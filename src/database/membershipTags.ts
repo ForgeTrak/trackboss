@@ -41,9 +41,9 @@ export async function createMembershipTag(
 ) : Promise<MembershipTag[]> {
     try {
         const insertSql = 'insert into membership_tags(membership_id, membership_tag, tenant_id) values (?, ?, ?)';
-        tags.forEach(async (tag) => {
+        await Promise.all(tags.map(async (tag) => {
             await getPool().query<OkPacket>(insertSql, [membershipId, tag, tenantId]);
-        });
+        }));
     } catch (error) {
         logger.error(`Error inserting tags ${tags.join(',')} for membershipID ${membershipId}`, error);
     }

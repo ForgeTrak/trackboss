@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express';
-import _, { create } from 'lodash';
 // import { format } from 'date-fns';
 import { getMembershipList } from '../database/membership';
 import {
@@ -50,8 +49,7 @@ billing.get('/yearlyWorkPointThreshold', async (req: Request, res: Response) => 
             response = await getWorkPointThreshold(year, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -73,12 +71,12 @@ billing.get('/list', async (req: Request, res: Response) => {
         response = { reason: headerCheck.reason };
     } else {
         try {
-            logger.info('Getting billing list.');
+            logger.info('billing - Getting billing list.');
             const { paymentStatus, year } = req.query;
             let billingYear = Number(year);
             if (!billingYear) {
                 billingYear = calculateBillingYear();
-                logger.info(`Billing year was undefined so we calculated it as ${billingYear} at request time.`);
+                logger.info(`billing - Billing year was undefined we calculated it as ${billingYear}.`);
             }
             const billingList: Bill[] = await getBillList({
                 paymentStatus: paymentStatus as string,
@@ -88,8 +86,7 @@ billing.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = billingList;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -124,8 +121,7 @@ billing.get('/:membershipID', async (req: Request, res: Response) => {
             response = results;
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -159,6 +155,7 @@ billing.post('/:billId', async (req: Request, res: Response) => {
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
+            logger.info(`billing - Processing payment for bill ${billId} with payment method ${paymentMethod}`);
             const before = await getBill(billId, req.user.tenantId);
             await processBillPayment(billId, paymentMethod?.toString() || '', req.user.tenantId);
             const after = await getBill(billId, req.user.tenantId);
@@ -166,8 +163,7 @@ billing.post('/:billId', async (req: Request, res: Response) => {
             response = {};
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -197,13 +193,13 @@ billing.post('/', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token, 'Admin');
             const curYear = new Date().getFullYear();
+            logger.info(`billing - Running billing for year ${curYear} on tenant ${req.user.tenantId}`);
             const membershipList = await getMembershipList('active', req.user.tenantId);
             const generatedBills = await runBillingComplete(curYear, membershipList, undefined, req.user.tenantId);
             res.status(201);
             response = generatedBills;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -234,25 +230,29 @@ billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {
                 throw new Error('not found');
             }
             const originalBill = await getBill(billId, req.user.tenantId);
+            const billingLog = `user ${req.user.uuid} on tenant ${req.user.tenantId} for bill ${billId}`;
             if (!originalBill.curYearIns) {
+                // eslint-disable-next-line max-len
+                logger.info(`billing - Marking insurance attestation as complete for ${billingLog}`);
                 await markInsuranceAttestation(billId, req.user.tenantId);
             }
             const bill = await getBill(billId, req.user.tenantId);
             // if they marked the attestation as complete, send an email.
             if (!originalBill.curYearIns && bill.curYearIns) {
                 await sendInsuranceConfirmEmail(bill);
+                logger.info(`billing - Sent insurance confirmation email for ${billingLog}`);
             }
             // if the bill is zero, mark the member as contacted because because they are done and there
             // is no need to check them.
             if (bill.amount === 0) {
                 await markContactedAndRenewing(billId, req.user.tenantId);
+                logger.info(`billing - Marked bill ${billId} as contacted and renewing because the amount is zero`);
             }
             response = {};
             logAuditEvent(req, 'bill', billId, originalBill, bill);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -292,8 +292,7 @@ billing.patch('/markContacted/:billId', async (req: Request, res: Response) => {
             logAuditEvent(req, 'bill', billId, before, after);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -339,11 +338,11 @@ billing.patch('/discount/:billId', async (req: Request, res: Response) => {
             await addSquareAttributes(bill, req.user.tenantId);
             const after = await getBill(billId, req.user.tenantId);
             response = {};
+            logger.info(`billing - Discounted bill ${billId} for user ${req.user.uuid} on tenant ${req.user.tenantId}`);
             logAuditEvent(req, 'bill', Number(req.params.billId), bill, after);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -405,8 +404,7 @@ billing.get('/list/excel', async (req: Request, res: Response) => {
         // write workbook to buffer.
         httpOutputWorkbook(workbook, res, `billing${new Date().getTime()}`);
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`billing - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -428,13 +426,13 @@ billing.put('/create/checkoutlinks', async (req: Request, res: Response) => {
         let billingYear = Number(year);
         if (!billingYear) {
             billingYear = calculateBillingYear();
-            logger.info(`Billing year was undefined so we calculated it as ${billingYear} at request time.`);
+            logger.info(`billing -Billing year was undefined so we calculated it as ${billingYear} at request time.`);
         }
         const billingList = await generateSquareLinks(billingYear, Number(membershipId));
+        logger.info(`billing - Generated ${billingList.length} checkout links for year ${billingYear}`);
         res.json(billingList);
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`billing - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -445,38 +443,39 @@ billing.post('/webhook/incoming', async (req: Request, res: Response) => {
         const orderUpdate = req.body;
         const paymentData = orderUpdate.data.object.payment;
         const squareOrderId = paymentData.order_id;
-        logger.info(`Got webhook for square order ID ${squareOrderId}`);
+        logger.info(`billing - Got webhook for square order ID ${squareOrderId}`);
         const ourBill = await getBillByOrderId(squareOrderId);
         if (!ourBill) {
-            logger.info(`Square order ID ${squareOrderId} does not have an associated bill so ignoring it`);
+            logger.info(`billing - Square order ID ${squareOrderId} does not have an associated bill so ignoring it`);
             logger.info(JSON.stringify(paymentData));
             res.json({});
             return;
         }
-        logger.info(`Payment webhook incoming for ${squareOrderId}`);
-        logger.info(orderUpdate);
+        logger.info(`billing - Payment webhook incoming for ${squareOrderId}`);
+        logger.debug(orderUpdate);
         // verify payment amount, status
         const paymentInFull = (paymentData.total_money.amount === (ourBill.amountWithFee * 100));
         const completed = (paymentData.status === 'COMPLETED');
         let billResponse;
         if (!ourBill.curYearPaid) {
             if (completed) {
-                logger.info(`Processing payment on our side for ${squareOrderId}, ${ourBill.billId}`);
+                logger.info(`billing - Processing payment on our side for ${squareOrderId}, ${ourBill.billId}`);
                 billResponse = await processBillPayment(ourBill.billId, 'Square', ourBill.tenantId);
             } else {
-                logger.error(`Marking bill ${ourBill.billId} as paid, but there could be a problem - verify manually`);
+                // eslint-disable-next-line max-len
+                logger.error(`billing - Marking bill ${ourBill.billId} as paid, but there could be a problem - verify manually`);
                 billResponse = await processBillPayment(ourBill.billId, 'Square', ourBill.tenantId);
             }
         } else {
-            logger.info(`Got another webhook for ${ourBill.billId} as order Id ${ourBill.squareOrderId}. Ignoring.`);
+            // eslint-disable-next-line max-len
+            logger.info(`billing - Got another webhook for ${ourBill.billId} as order Id ${ourBill.squareOrderId}. Ignoring.`);
         }
-        logger.info(`Payment complete for ${squareOrderId} and ${ourBill.membershipAdmin}`);
+        logger.info(`billing - Payment complete for ${squareOrderId} and ${ourBill.membershipAdmin}`);
         logAuditEvent(req, 'bill', Number(req.params.billId), ourBill, billResponse);
 
         res.json(billResponse);
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`billing - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
