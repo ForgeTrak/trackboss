@@ -8,11 +8,12 @@ import { Member } from '../typedefs/member';
 import { getEnvironmentParameter } from './environmentWrapper';
 import { calculateApplicationYear } from './dateHelper';
 
-async function getEmailById(purpose: string) {
-    const values = [purpose];
+async function getEmailById(purpose: string, tenantId: string) {
+    const values = [purpose, tenantId];
     let results;
     try {
-        [results] = await getPool().query<RowDataPacket[]>('select * from emails where purpose = ?', values);
+        // eslint-disable-next-line max-len
+        [results] = await getPool().query<RowDataPacket[]>('select * from emails where purpose = ? and tenant_id = ?', values);
     } catch (e: any) {
         logger.error(`DB error gettting email with ID ${purpose}`, e);
     }
@@ -70,8 +71,8 @@ function addNameToEmail(firstName: string, lastName: string, emailText: string) 
     return emailText.replace(/firstName/, firstName).replace(/lastName/, lastName);
 }
 
-export async function sendAppConfirmationEmail(application: any) {
-    const confirmEmail = await getEmailById('APP_CONFIRMATION');
+export async function sendAppConfirmationEmail(application: any, tenantId: string) {
+    const confirmEmail = await getEmailById('APP_CONFIRMATION', tenantId);
     confirmEmail.text = confirmEmail.text.replace(/firstName/, application.firstName);
     confirmEmail.text = confirmEmail.text.replace(/lastName/, application.lastName);
     confirmEmail.text = confirmEmail.text.replace(/appId/, application.id);
@@ -83,8 +84,8 @@ export async function sendAppConfirmationEmail(application: any) {
     logger.info(`application emails sent for application ${application.id}`);
 }
 
-export async function sendNewMemberEmail(application: any) {
-    const newMemberEmail = await getEmailById('NEW_MEMBERSHIP');
+export async function sendNewMemberEmail(application: any, tenantId: string) {
+    const newMemberEmail = await getEmailById('NEW_MEMBERSHIP', tenantId);
     newMemberEmail.text = addNameToEmail(application.firstName, application.lastName, newMemberEmail.text);
     if (application.applicationNotesShared) {
         newMemberEmail.text = newMemberEmail.text.replace(/applicationNotesShared/, application.applicationNotesShared);
@@ -94,8 +95,8 @@ export async function sendNewMemberEmail(application: any) {
     logger.info(`new applicant acceptance sent for application ${application.id} (${application.lastName})`);
 }
 
-export async function sendAppRejectedEmail(application: any) {
-    const appRejectedEmail = await getEmailById('APPLICATION_REJECTED');
+export async function sendAppRejectedEmail(application: any, tenantId: string) {
+    const appRejectedEmail = await getEmailById('APPLICATION_REJECTED', tenantId);
     appRejectedEmail.text = addNameToEmail(application.firstName, application.lastName, appRejectedEmail.text);
     if (application.applicationNotesShared) {
         appRejectedEmail.text =
@@ -106,24 +107,24 @@ export async function sendAppRejectedEmail(application: any) {
     logger.info(`new applicant rejection sent for application ${application.id} (${application.lastName})`);
 }
 
-async function sendConfirmationEmail(bill: Bill, id: string) {
-    const confirmationEmail = await getEmailById(id);
+async function sendConfirmationEmail(bill: Bill, id: string, tenantId: string) {
+    const confirmationEmail = await getEmailById(id, tenantId);
     confirmationEmail.text = addNameToEmail(bill.firstName, bill.lastName, confirmationEmail.text);
     confirmationEmail.to = bill.membershipAdminEmail;
     await sendTextEmail(confirmationEmail);
     logger.info(`${confirmationEmail.purpose} sent to ${bill.membershipAdminEmail}`);
 }
 
-export async function sendPaymentConfirmationEmail(bill: Bill) {
-    await sendConfirmationEmail(bill, 'PAYMENT_CONFIRMED');
+export async function sendPaymentConfirmationEmail(bill: Bill, tenantId: string) {
+    await sendConfirmationEmail(bill, 'PAYMENT_CONFIRMED', tenantId);
 }
 
-export async function sendInsuranceConfirmEmail(bill: Bill) {
-    await sendConfirmationEmail(bill, 'INSURANCE_CONFIRMED');
+export async function sendInsuranceConfirmEmail(bill: Bill, tenantId: string) {
+    await sendConfirmationEmail(bill, 'INSURANCE_CONFIRMED', tenantId);
 }
 
-export async function sendPasswordReset(member: Member, newValue: string) {
-    const resetEmail = await getEmailById('PASSWORD_RESET');
+export async function sendPasswordReset(member: Member, newValue: string, tenantId: string) {
+    const resetEmail = await getEmailById('PASSWORD_RESET', tenantId);
     resetEmail.text = addNameToEmail(member.firstName, member.lastName, resetEmail.text);
     resetEmail.text = resetEmail.text.replace('PASSWORD', newValue);
     resetEmail.text = resetEmail.text.replace('EMAIL', member.email);

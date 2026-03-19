@@ -108,7 +108,7 @@ export async function processBillPayment(billId: number, paymentMethod: string, 
     // if they marked the attestation as complete, send an email.
     if (bill.curYearPaid) {
         logger.info(`Sending email for bill ID ${billId}`);
-        await sendPaymentConfirmationEmail(bill);
+        await sendPaymentConfirmationEmail(bill, tenantId);
         logger.info(`bill ID ${billId} confirmation email was sent.`);
     }
     return bill;

@@ -239,7 +239,7 @@ billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {
             const bill = await getBill(billId, req.user.tenantId);
             // if they marked the attestation as complete, send an email.
             if (!originalBill.curYearIns && bill.curYearIns) {
-                await sendInsuranceConfirmEmail(bill);
+                await sendInsuranceConfirmEmail(bill, req.user.tenantId);
                 logger.info(`billing - Sent insurance confirmation email for ${billingLog}`);
             }
             // if the bill is zero, mark the member as contacted because because they are done and there

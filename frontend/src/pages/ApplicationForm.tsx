@@ -475,6 +475,7 @@ function ApplicationForm() {
                                 occupation,
                                 referredBy,
                                 familyMembers,
+                                tenantId: 'ad6a18d1-d963-11f0-858e-1284e6c74c95',
                             };
                             setApplicationJson(JSON.stringify(application));
 

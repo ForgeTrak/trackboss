@@ -3,6 +3,7 @@ import { Job } from './job';
 
 export type Bill = {
     billId: number,
+    tenantId: string,
     generatedDate: string,
     year: number,
     amount: number,

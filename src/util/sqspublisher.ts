@@ -9,7 +9,7 @@ export default async function publishCommunicationSqs(communication : MemberComm
     AWS.config.update({ region: process.env.AWS_REGION });
     const sqs = new AWS.SQS();
 
-    logger.info(`sending communication ${communication.memberCommunicationId} to outbound queue`);
+    logger.info(`sqspublisher -sending communication ${communication.memberCommunicationId} to outbound queue`);
     const region = await getEnvironmentParameter('region');
     const account = await getEnvironmentParameter('account');
     const sqsUrl = `https://sqs.${region}.amazonaws.com/${account}/${outboundQueueName}`;
@@ -19,12 +19,14 @@ export default async function publishCommunicationSqs(communication : MemberComm
         QueueUrl: sqsUrl,
     }, (error, messageResult) => {
         if (error) {
-            logger.error(`queue send failed for communication ${communication.memberCommunicationId} due to `, error);
-            logger.error(`The message with subject ${communication.subject} will not be delivered.`);
+            // eslint-disable-next-line max-len
+            logger.error(`sqspublisher - queue send failed for communication ${communication.memberCommunicationId} due to `, error);
+            logger.error(`sqspublisher - The message with subject ${communication.subject} will not be delivered.`);
             return;
         }
         result = messageResult;
-        logger.info(`Communication is ${communication.memberCommunicationId} enqueued as ${messageResult.MessageId}`);
+        // eslint-disable-next-line max-len
+        logger.info(`sqspublisher - Communication is ${communication.memberCommunicationId} enqueued as ${messageResult.MessageId}`);
     });
     return result;
 }
