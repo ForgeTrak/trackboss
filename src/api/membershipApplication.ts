@@ -80,7 +80,7 @@ membershipApplication.post('/', async (req: Request, res: Response) => {
         application.googleLink = `https://www.google.com/search?q=${application.firstName}+${application.lastName}+${application.city}+${application.state}`;
         const insertId = await insertMembershipApplication(application);
         application.id = insertId;
-        await sendAppConfirmationEmail(application);
+        await sendAppConfirmationEmail(application, application.tenantId);
         logAuditEvent(req, 'membershipApplication.new', insertId, null, application);
         res.send(application);
     } catch (error: any) {
@@ -230,7 +230,7 @@ membershipApplication.post('/reject/:id', async (req: Request, res: Response) =>
             await getMembershipApplication(Number(req.params.id), req.user.tenantId);
         // send an email saying they were rejected, with the application_notes_shared as the primary
         // field in the email
-        await sendAppRejectedEmail(application);
+        await sendAppRejectedEmail(application, req.user.tenantId);
         res.json(application);
     } catch (error: any) {
         logger.error(error);

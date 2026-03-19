@@ -29,7 +29,7 @@ export async function createCognitoUser(email: string, isMembershipAdmin: boolea
         ],
     }).promise();
     logger.debug(JSON.stringify(createResponse));
-    logger.info(`created Cognito user ${createResponse.User?.Username}`);
+    logger.info(`cognito - created Cognito user ${createResponse.User?.Username}`);
     const uuid = createResponse.User?.Username;
     if (uuid) {
         try {
@@ -38,7 +38,7 @@ export async function createCognitoUser(email: string, isMembershipAdmin: boolea
                 GroupName: 'member',
                 Username: uuid,
             }).promise();
-            logger.info(`User ${email} added to group member`);
+            logger.info(`cognito - User ${email} added to group member`);
             logger.debug(JSON.stringify(groupResponse));
             if (isMembershipAdmin) {
                 const adminGroupResponse = await cognitoIdp.adminAddUserToGroup({
@@ -46,11 +46,12 @@ export async function createCognitoUser(email: string, isMembershipAdmin: boolea
                     GroupName: 'membershipAdmin',
                     Username: uuid,
                 }).promise();
-                logger.info(`User ${email} added to group membershipAdmin`);
+                logger.info(`cognito - User ${email} added to group membershipAdmin`);
                 logger.debug(JSON.stringify(adminGroupResponse));
             }
         } catch (error) {
-            logger.error(`Unable to add ${email} to group member.  User still exists but login may not work correctly`);
+            // eslint-disable-next-line max-len
+            logger.error(`cognito - Unable to add ${email} to group member.  User still exists but login may not work correctly`);
             logger.error(error);
             throw error;
         }
@@ -59,19 +60,19 @@ export async function createCognitoUser(email: string, isMembershipAdmin: boolea
 }
 
 export async function deleteCognitoUser(uuid: string) {
-    logger.info(`Removing user ${uuid} from Cognito`);
+    logger.info(`cognito - Removing user ${uuid} from Cognito`);
     const poolId = await getCognitoPoolId() || '';
     const cognitoIdp = new AWS.CognitoIdentityServiceProvider();
     const deleteResponse = await cognitoIdp.adminDeleteUser({
         UserPoolId: poolId,
         Username: uuid,
     }).promise();
-    logger.info(`Removed user ${uuid} from Cognito`);
+    logger.info(`cognito - Removed user ${uuid} from Cognito`);
     logger.debug(deleteResponse);
 }
 
 export async function updateCognitoUserEmail(member: Member) {
-    logger.info(`Updating an email address for ${member.uuid} in Cognito`);
+    logger.info(`cognito - Updating an email address for ${member.uuid} in Cognito`);
     const poolId = await getCognitoPoolId() || '';
     const cognitoIdp = new AWS.CognitoIdentityServiceProvider();
     const updateResponse = cognitoIdp.adminUpdateUserAttributes({
@@ -88,12 +89,12 @@ export async function updateCognitoUserEmail(member: Member) {
             },
         ],
     }).promise();
-    logger.info(`Updated user ${member.uuid}'s email to ${member.email}`);
+    logger.info(`cognito - Updated user ${member.uuid}'s email to ${member.email}`);
     logger.debug(updateResponse);
 }
 
 export async function resetCognitoPassword(member: Member, defaultValue: string) {
-    logger.info(`Resetting password for user ${member.uuid} in Cognito`);
+    logger.info(`cognito - Resetting password for user ${member.uuid} in Cognito`);
     const poolId = await getCognitoPoolId() || '';
     const cognitoIdp = new AWS.CognitoIdentityServiceProvider();
     let resetResponse;
@@ -110,7 +111,7 @@ export async function resetCognitoPassword(member: Member, defaultValue: string)
             Permanent: false,
         }).promise();
     }
-    await sendPasswordReset(member, defaultValue);
-    logger.info(`reset password for user ${member.email} (${member.firstName} ${member.lastName})`);
+    await sendPasswordReset(member, defaultValue, member.tenantId);
+    logger.info(`cognito - reset password for user ${member.email} (${member.firstName} ${member.lastName})`);
     logger.debug(resetResponse);
 }

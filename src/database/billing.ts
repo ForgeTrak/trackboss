@@ -246,6 +246,7 @@ export async function getBill(billId: number, tenantId: string) : Promise<Bill> 
     const billResultSingle = results[0];
     const bill = {
         billId: billResultSingle.bill_id,
+        tenantId: billResultSingle.tenant_id,
         generatedDate: billResultSingle.generated_date,
         year: billResultSingle.year,
         amount: billResultSingle.amount,
@@ -328,6 +329,7 @@ export async function getLatestBillMembership(membershipId: number, tenantId: st
     const billResultSingle = results[0];
     const bill = {
         billId: billResultSingle.bill_id,
+        tenantId: billResultSingle.tenant_id,
         generatedDate: billResultSingle.generated_date,
         year: billResultSingle.year,
         amount: billResultSingle.amount,

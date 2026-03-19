@@ -41,7 +41,7 @@ member.post('/new', async (req: Request, res: Response) => {
             response = await getMember(`${insertId}`, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
-            logger.error('Error adding new member', e);
+            logger.error('member - Error adding new member', e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -97,8 +97,7 @@ member.get('/list', async (req: Request, res: Response) => {
                 response = memberList;
             }
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`member - Error at path ${req.path}, e`);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -125,8 +124,7 @@ member.get('/:memberId', async (req: Request, res: Response) => {
             response = await getMember(memberId, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`member - Error at path ${req.path}`, e);
 
             if (e.message === 'not found') {
                 res.status(404);
@@ -157,8 +155,7 @@ member.get('/phone/:phoneNumber', async (req: Request, res: Response) => {
             response = await getMemberByPhone(phoneNumber, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`member - Error at path ${req.path}`, e);
 
             if (e.message === 'not found') {
                 res.status(404);
@@ -189,8 +186,7 @@ member.get('/email/:email', async (req: Request, res: Response) => {
             response = await getMemberByEmail(email, req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`member - Error at path ${req.path}`, e);
 
             if (e.message === 'not found') {
                 res.status(404);
@@ -217,8 +213,7 @@ member.get('/email/exists/:email', async (req: Request, res: Response) => {
         response.exists = (foundMember.active === true);
         res.status(200);
     } catch (e: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(e);
+        logger.error(`member - Error at path ${req.path}`, e);
     }
     res.send(response);
 });
@@ -245,24 +240,24 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
                 try {
                     const removeCount = await deleteFamilyMember(updatedMember.memberId, req.user.tenantId);
                     const userEmail = updatedMember.email;
-                    logger.info(`Removed ${removeCount} rows for user ${updatedMember.email}`);
+                    logger.info(`member - Removed ${removeCount} rows for user ${updatedMember.email}`);
                     if (updatedMember.email) {
                         // use this loathesome promises hipster syntax here because I want this to run
                         // asychronously so the UI doesn't wait 5 seconds for the cognito delete to work.
                         deleteCognitoUser(updatedMember.uuid)
                             .then((
                                 () => {
-                                    logger.info(`Deactivated Cognito user for ${userEmail}`);
+                                    logger.info(`member - Deactivated Cognito user for ${userEmail}`);
                                 }))
                             .catch((error) => {
                                 // eslint-disable-next-line max-len
-                                logger.error(`Error deleting Cognito user ${userEmail}.  User will be abandoned in Cognito.`);
+                                logger.error(`member - Error deleting Cognito user ${userEmail}.  User will be abandoned in Cognito.`);
                                 logger.error(error);
                             });
                     }
                 } catch (error: any) {
-                    logger.error('Error deleting user from database. Something is probably really wrong!');
-                    logger.error(error);
+                    // eslint-disable-next-line max-len
+                    logger.error('member - Error deleting user from database. Something is probably really wrong!', error);
                 }
             }
             if (!updatedMember.active && (updatedMember.memberId === updatedMember.membershipAdminId)) {
@@ -274,17 +269,17 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
                     req.user.tenantId,
                 );
                 // eslint-disable-next-line max-len
-                logger.info(`${updatedMember.firstName} ${updatedMember.lastName} set to Former member, reason code ${req.body.deactivationReason}`);
+                logger.info(`member - ${updatedMember.firstName} ${updatedMember.lastName} set to Former member, reason code ${req.body.deactivationReason}`);
                 // not all members have users, especially older ones who are still in our data, so check for dat.
                 if (updatedMember.uuid) {
                     deleteCognitoUser(updatedMember.uuid)
                         .then((
                             () => {
-                                logger.info(`Deactivated Cognito user for ${updatedMember.email}`);
+                                logger.info(`member - Deactivated Cognito user for ${updatedMember.email}`);
                             }))
                         .catch((error) => {
                             // eslint-disable-next-line max-len
-                            logger.error(`Error deleting Cognito user ${updatedMember.email}.  User will be abandoned in Cognito.`);
+                            logger.error(`member - Error deleting Cognito user ${updatedMember.email}.  User will be abandoned in Cognito.`);
                             logger.error(error);
                         });
                 }
@@ -295,19 +290,19 @@ member.patch('/:memberId', async (req: Request, res: Response) => {
                 updateCognitoUserEmail(updatedMember)
                     .then((
                         () => {
-                            logger.info(`Changed user email for ${updatedMember.memberId} to ${updatedMember.email}`);
+                            // eslint-disable-next-line max-len
+                            logger.info(`member - Changed user email for ${updatedMember.memberId} to ${updatedMember.email}`);
                         }
                     ))
                     .catch((error) => {
-                        logger.error(`Error updating Cognito user email for member ID ${updatedMember.memberId}.`);
-                        logger.error('As a result their login is probably broken now.');
-                        logger.error(error);
+                        // eslint-disable-next-line max-len
+                        logger.error(`member - Error updating Cognito user email for member ID ${updatedMember.memberId}.`);
+                        logger.error('member - As a result their login is probably broken now.', error);
                     });
             }
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`member - Error at path ${req.path}`, e);
 
             if (e.message === 'user input error') {
                 res.status(400);
@@ -373,8 +368,7 @@ member.get('/list/voterEligibility/excel', async (req: Request, res: Response) =
         // write workbook to buffer.
         httpOutputWorkbook(workbook, res, `members${new Date().getTime()}`);
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`member - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
@@ -383,12 +377,12 @@ member.get('/list/voterEligibility/excel', async (req: Request, res: Response) =
 member.get('/card/create/:memberId', async (req: Request, res: Response) => {
     const { memberId } = req.params;
     const authorization = req.query.id as string;
-    logger.info(`Generating membership card for ${memberId}`);
+    logger.info(`member - Generating membership card for ${memberId}`);
     const headerCheck = checkHeader(`Bearer ${authorization}`);
     if (!headerCheck.valid) {
         res.status(401);
     } else {
-        logger.info('Generating membership card - verifying token.');
+        logger.info('member - Generating membership card - verifying token.');
         await verify(headerCheck.token, 'Member', Number(memberId));
         const memberForCard = await getMember(memberId, req.user.tenantId);
         const boardMembers = await getBoardMemberList(req.user.tenantId, new Date().getFullYear().toString());
@@ -436,11 +430,11 @@ member.get('/card/create/:memberId', async (req: Request, res: Response) => {
         doc.font(signatureFontPath).fontSize(24).text(`${president?.firstName} ${president?.lastName}`);
         doc.font('Helvetica');
         doc.fontSize(12).text('President, Palmyra Racing Association');
-        logger.info('Generating membership card - Card generated, sending to front end.');
+        logger.info('member - Generating membership card - Card generated, sending to front end.');
 
         // Finalize the PDF
         doc.end();
-        logger.info('Generating membership card - card genertion completed and sent to front end.');
+        logger.info('member - Generating membership card - card genertion completed and sent to front end.');
     }
 });
 
@@ -457,8 +451,7 @@ member.put('/resetpassword/:memberId', async (req: Request, res: Response) => {
             value: defaultResetValue,
         });
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`member - Error at path ${req.path}`, error);
         res.status(500);
         res.send(error);
     }
