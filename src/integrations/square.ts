@@ -59,8 +59,7 @@ export default async function createPaymentLink(memberBill: Bill) {
             squareOrderId: response?.paymentLink?.orderId,
         };
     } catch (error) {
-        logger.error(JSON.stringify(memberBill));
-        logger.error(error);
+        logger.error('square - Error creating payment link', { memberBill, error });
         throw (error);
     }
 }

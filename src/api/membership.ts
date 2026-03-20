@@ -41,8 +41,7 @@ membership.post('/new', async (req: Request, res: Response) => {
             response = await getMembership(insertId, req.user.tenantId);
             res.status(201);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -76,8 +75,7 @@ membership.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = membershipList;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -104,8 +102,7 @@ membership.get('/:membershipID', async (req: Request, res: Response) => {
             response = await getMembership(Number(membershipID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -140,14 +137,13 @@ membership.patch('/:membershipID', async (req: Request, res: Response) => {
             await patchMembership(membershipIdNum, req.body, req.user.tenantId);
             response = await getMembership(membershipIdNum, req.user.tenantId);
             if (priorToUpdate.membershipType !== response.membershipType) {
-                console.log(`old ${priorToUpdate.membershipType} new ${response.membershipType}`);
+                logger.info(`membership - old ${priorToUpdate.membershipType} new ${response.membershipType}`);
                 runBillingCompleteCurrent([response], response.membershipId, req.user.tenantId);
             }
             logAuditEvent(req, 'Membership', membershipID, priorToUpdate, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'user input error') {
                 res.status(400);
                 response = { reason: 'bad request' };
@@ -185,8 +181,7 @@ membership.post('/tags', async (req: Request, res: Response) => {
             logAuditEvent(req, 'MembershipTag', membershipId, before, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -216,8 +211,7 @@ membership.get('/tags/:membershipID', async (req: Request, res: Response) => {
             response = await getMembershipTags(Number(membershipID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -250,8 +244,7 @@ membership.delete('/tags', async (req: Request, res: Response) => {
             logAuditEvent(req, 'MembershipTag', membershipId, before, after);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`membership - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };

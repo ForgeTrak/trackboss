@@ -44,8 +44,7 @@ ridingAreaStatus.get('/', async (req: Request, res: Response) => {
             response = await getRidingAreaStatuses(req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`ridingAreaStatus - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -54,7 +53,7 @@ ridingAreaStatus.get('/', async (req: Request, res: Response) => {
                 response = { reason: 'not authorized' };
             } else {
                 res.status(500);
-                logger.error('error getting track statuses', e);
+                logger.error(`ridingAreaStatus - Error at path ${req.path}`, e);
                 response = { reason: 'internal server error' };
             }
         }
@@ -72,8 +71,7 @@ ridingAreaStatus.patch('/:id', async (req: Request, res: Response) => {
         logAuditEvent(req, 'ridingAreaStatus', Number(id), before, updatedArea);
         res.send(updatedArea);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`ridingAreaStatus - Error at path ${req.path}`, error);
         res.status(500);
         res.send('Unable to process application due to error');
     }

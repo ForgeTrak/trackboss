@@ -30,8 +30,7 @@ paidLabor.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = links;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`paidLabor - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
@@ -58,8 +57,7 @@ paidLabor.get('/:paidLaborId', async (req: Request, res: Response) => {
             response = await getPaidLaborById(Number(memberTypeID), req.user.tenantId);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`paidLabor - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -97,8 +95,7 @@ paidLabor.delete('/:paidLaborId', async (req: Request, res: Response) => {
             logAuditEvent(req, 'paidLabor', id, before, null);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`paidLabor - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -139,8 +136,7 @@ paidLabor.patch('/:paidLaborId', async (req: Request, res: Response) => {
             response = req.body;
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`paidLabor - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };
@@ -173,8 +169,7 @@ paidLabor.post('/', async (req: Request, res: Response) => {
             logAuditEvent(req, 'paidLabor', null, null, response);
             res.status(200);
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`paidLabor - Error at path ${req.path}`, e);
             if (e.message === 'not found') {
                 res.status(404);
                 response = { reason: 'not found' };

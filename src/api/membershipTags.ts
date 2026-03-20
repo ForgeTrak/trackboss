@@ -11,8 +11,7 @@ membershipTags.get('/unique', async (req: Request, res: Response) => {
         const uniqueTags = await getUniqueTags(req.user.tenantId);
         res.json(uniqueTags);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`membershipTags - Error at path ${req.path}`, error);
         res.status(500);
     }
 });

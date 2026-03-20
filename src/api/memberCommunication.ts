@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Request, Response, Router } from 'express';
 import AWS from 'aws-sdk';
 import sanitizeHtml from 'sanitize-html';
@@ -20,8 +21,7 @@ memberCommunication.get('/', async (req: Request, res: Response) => {
         const allCommunications = await getMemberCommunications(req.user.tenantId);
         res.send(allCommunications);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`memberCommunication - Error at path ${req.path}`, error);
         res.status(500);
     }
 });
@@ -33,8 +33,7 @@ memberCommunication.get('/:communicationId', async (req: Request, res: Response)
         const singleCommunication = await getMemberCommunicationById(id, req.user.tenantId);
         res.send(singleCommunication);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`memberCommunication - Error at path ${req.path}`, error);
         res.status(500);
     }
 });
@@ -115,7 +114,8 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
         AWS.config.update({ region: process.env.AWS_REGION });
         const sqs = new AWS.SQS();
 
-        logger.info(`sending communication id ${response.memberCommunicationId} to outbound queue`);
+        // eslint-disable-next-line max-len
+        logger.info(`memberCommunication - Sending communication id ${response.memberCommunicationId} to outbound queue`);
         const region = await getEnvironmentParameter('region');
         const account = await getEnvironmentParameter('account');
         const sqsUrl = `https://sqs.${region}.amazonaws.com/${account}/${outboundQueueName}`;
@@ -124,17 +124,16 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
             QueueUrl: sqsUrl,
         }, (error, messageResult) => {
             if (error) {
-                logger.error(`queue send failed for communication ${response.memberCommunicationId} due to `, error);
-                logger.error(`The message with subject ${response.subject} will not be delivered.`);
+                logger.error(`memberCommunication - Queue send failed for communication ${response.memberCommunicationId} due to `, error);
+                logger.error(`memberCommunication - The message with subject ${response.subject} will not be delivered.`);
                 return;
             }
-            logger.info(`Communication is ${response.memberCommunicationId} enqueued as ${messageResult.MessageId}`);
+            logger.info(`memberCommunication - Communication is ${response.memberCommunicationId} enqueued as ${messageResult.MessageId}`);
         });
 
         res.json(response);
     } catch (error: any) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error(`memberCommunication - Error at path ${req.path}`, error);
         res.status(500);
     }
 });

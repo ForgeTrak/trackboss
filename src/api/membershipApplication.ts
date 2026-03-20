@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Request, Response, Router } from 'express';
 import { parseISO, format, differenceInYears } from 'date-fns';
 import { sendAppConfirmationEmail, sendAppRejectedEmail, sendNewMemberEmail } from '../util/email';
@@ -42,7 +43,7 @@ async function validateAdminAccess(req: Request, res: Response) : Promise<any> {
         try {
             token = await verify(headerCheck.token, 'Admin');
         } catch (error: any) {
-            logger.error('Error authorizing user token as admin', error);
+            logger.error('membershipApplication - Error authorizing user token as admin', error);
             throw error;
         }
     }
@@ -59,7 +60,7 @@ const sendApplicationStatus = async (req: Request, res: Response, status: string
     try {
         await validateAdminAccess(req, res);
     } catch (error) {
-        logger.error('Error updating application status', error);
+        logger.error('membershipApplication - Error updating application status', error);
         res.status(500);
         res.send(error);
     }
@@ -84,7 +85,7 @@ membershipApplication.post('/', async (req: Request, res: Response) => {
         logAuditEvent(req, 'membershipApplication.new', insertId, null, application);
         res.send(application);
     } catch (error: any) {
-        logger.error(error);
+        logger.error('membershipApplication - Error creating application', error);
         res.status(500);
         res.send(error);
     }
@@ -99,7 +100,7 @@ membershipApplication.get('/exists/:emailAddress', async (req: Request, res: Res
         const exists = await applicationExistsForEmail(applicantEmail);
         applicationExists.exists = exists;
     } catch (error: any) {
-        logger.error(error);
+        logger.error('membershipApplication - Error checking application existence', error);
         res.status(500);
         res.send(error);
     }
@@ -113,7 +114,7 @@ membershipApplication.get('/', async (req: Request, res: Response) => {
         const allApplications = await getMembershipApplications(parseInt(year as string, 10), req.user.tenantId);
         res.send(allApplications);
     } catch (error: any) {
-        logger.error(error);
+        logger.error('membershipApplication - Error fetching applications', error);
         res.status(500);
         res.send('Unable to process application due to error');
     }
@@ -122,6 +123,7 @@ membershipApplication.get('/', async (req: Request, res: Response) => {
 membershipApplication.post('/accept/:id', async (req: Request, res: Response) => {
     let newMemberId : number;
     try {
+        logger.info(`membershipApplication - User ${req.user.uuid} accepting application ${req.params.id} on tenant ${req.user.tenantId}`);
         const isGuest = req.query.guest;
         let applicationStatus = 'Accepted';
         let membershipType = 'Associate Member';
@@ -136,6 +138,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
         const membershipInfo = await getMembershipType(req.user.tenantId, membershipType);
         const actingUser = await validateAdminAccess(req, res);
         await sendApplicationStatus(req, res, applicationStatus);
+        logger.info(`membershipApplication - User ${req.user.uuid} accepted application ${req.params.id} on tenant ${req.user.tenantId}`);
         // get the application, and convert the primary member to a member. This call will create a
         // Cognito user, and send an email to the user letting them know they have one.
         const application : MembershipApplication =
@@ -162,6 +165,8 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             dependentStatus: 'Primary',
         };
         const primaryMemberId = await insertMember(newMember, req.user.tenantId);
+        logger.info(`membershipApplication - User ${req.user.uuid} created member ${primaryMemberId} for application ${req.params.id}`);
+        logAuditEvent(req, 'membershipApplication.newMember', primaryMemberId, null, newMember);
         newMemberId = primaryMemberId;
         const newMembership : PostNewMembershipRequest = {
             // Associate member. Magic numberism again.
@@ -175,12 +180,15 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             modifiedBy: actingUser.memberId,
         };
         const newMembershipId = await insertMembership(newMembership, req.user.tenantId);
+        logAuditEvent(req, 'membershipApplication.newMembership', newMembershipId, null, newMembership);
+        logger.info(`membershipApplication - User ${req.user.uuid} created membership ${newMembershipId} for application ${req.params.id}`);
         const memberUpdate : PatchMemberRequest = {
             membershipId: newMembershipId,
             modifiedBy: actingUser.memberId,
             subscribed: true,
         };
         await patchMember(`${primaryMemberId}`, memberUpdate, req.user.tenantId);
+        logger.info(`membershipApplication - User ${req.user.uuid} updated member ${primaryMemberId} with membership ${newMembershipId} for application ${req.params.id}`);
         // now send a welcome email to the member.
         // await sendNewMemberEmail(application);
         const { threshold } = await getWorkPointThreshold(billingYear, req.user.tenantId);
@@ -194,6 +202,7 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             billingYear,
         }, req.user.tenantId);
         await generateSquareLinks(billingYear, newMembershipId, req.user.tenantId);
+        logger.info(`membershipApplication - User ${req.user.uuid} generated bill ${billId} for membership ${newMembershipId} for application ${req.params.id}`);
         const bill = await getBill(billId, req.user.tenantId);
         logAuditEvent(req, 'membershipApplication.newBill', bill.billId, null, bill);
         // TODO: this really needs type checking, otherwise it is prone to typeos and speling erors can mess it up.
@@ -211,8 +220,9 @@ membershipApplication.post('/accept/:id', async (req: Request, res: Response) =>
             newMemberFamily.lastModifiedBy = actingUser.memberId;
             // now insert the new family member.
             await insertMember(newMemberFamily, req.user.tenantId);
+            logger.info(`membershipApplication - User ${req.user.uuid} created family member ${familyMember.firstName} ${familyMember.lastName} for membership ${newMembershipId} for application ${req.params.id}`);
         });
-        logger.info(`Generated bill ${billId} for membership ${newMembershipId} - application converted to member.`);
+        logger.info(`memberhip - Generated bill ${billId} for membership ${newMembershipId} - application converted to member.`);
         const newMemberRecord = await getMember(`${primaryMemberId}`, req.user.tenantId);
         logAuditEvent(req, 'membershipApplication.convertToMember', req.params.id, null, newMemberRecord);
     } catch (error: any) {
@@ -231,9 +241,10 @@ membershipApplication.post('/reject/:id', async (req: Request, res: Response) =>
         // send an email saying they were rejected, with the application_notes_shared as the primary
         // field in the email
         await sendAppRejectedEmail(application, req.user.tenantId);
+        logAuditEvent(req, 'membershipApplication.reject', req.params.id, null, application);
         res.json(application);
     } catch (error: any) {
-        logger.error(error);
+        logger.error('membershipApplication - Error rejecting application', error);
         res.status(500);
         res.send('Unable to process application due to error');
     }
@@ -243,7 +254,7 @@ membershipApplication.post('/review/:id', async (req: Request, res: Response) =>
     try {
         await sendApplicationStatus(req, res, 'Review');
     } catch (error: any) {
-        logger.error(error);
+        logger.error('membershipApplication - Error reviewing application', error);
         res.status(500);
         res.send('Unable to process application due to error');
     }
@@ -285,8 +296,7 @@ membershipApplication.get('/list/excel', async (req: Request, res: Response) => 
         // write workbook to buffer.
         httpOutputWorkbook(workbook, res, `applications${new Date().getTime()}`);
     } catch (error) {
-        logger.error(`Error at path ${req.path}`);
-        logger.error(error);
+        logger.error('membershipApplication - Error generating Excel list', error);
         res.status(500);
         res.send(error);
     }

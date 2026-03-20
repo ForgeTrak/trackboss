@@ -388,7 +388,7 @@ member.get('/card/create/:memberId', async (req: Request, res: Response) => {
         const boardMembers = await getBoardMemberList(req.user.tenantId, new Date().getFullYear().toString());
         const president = boardMembers.find((m) => m.title === 'President');
 
-        logger.info('Generating membership card - got all card data.');
+        logger.info('member - Generating membership card - got all card data.');
 
         // Create a PDF document
         const doc = new PDFDocument();
@@ -444,6 +444,7 @@ member.put('/resetpassword/:memberId', async (req: Request, res: Response) => {
         const { memberId } = req.params;
         const memberForReset = await getMember(memberId, req.user.tenantId);
         const defaultResetValue = await getDefaultSettingValue('USER_DEFAULT_PW', req.user.tenantId);
+        logger.info(`member - Resetting password for ${memberForReset.email} to default value.`);
         // fire and forget, the back to the UI immediately so this call isn't slow.
         resetCognitoPassword(memberForReset, defaultResetValue);
         res.send({

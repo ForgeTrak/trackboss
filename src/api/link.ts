@@ -24,8 +24,7 @@ link.get('/list', async (req: Request, res: Response) => {
             res.status(200);
             response = links;
         } catch (e: any) {
-            logger.error(`Error at path ${req.path}`);
-            logger.error(e);
+            logger.error(`link - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
                 res.status(401);
                 response = { reason: 'not authorized' };
