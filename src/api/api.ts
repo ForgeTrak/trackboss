@@ -25,6 +25,7 @@ import membershipTags from './membershipTags';
 import link from './link';
 import paidLabor from './paidLabor';
 import defaultSetting from './defaultSetting';
+import auditLog from './auditLog';
 
 const api = Router();
 
@@ -93,5 +94,5 @@ api.use('/membershipTags', membershipTags);
 api.use('/link', link);
 api.use('/paidLabor', paidLabor);
 api.use('/defaultSettings', defaultSetting);
-
+api.use('/auditLog', auditLog);
 export default api;

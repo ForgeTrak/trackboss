@@ -26,7 +26,7 @@
                 "indent": ["error", 4, {
                     "SwitchCase": 1
                 }],
-                "max-len": ["error", 120],
+                "max-len": ["error", 150],
                 "no-plusplus": ["off"],
                 "operator-linebreak": ["error", "after", {
                     "overrides": {

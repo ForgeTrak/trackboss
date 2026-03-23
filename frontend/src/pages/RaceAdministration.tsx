@@ -7,6 +7,7 @@ import EventSignupSheet from '../components/EventSignupSheet';
 import PaidLaborList from '../components/PaidLaborList';
 import CustomTabPanel from '../components/shared/CustomTabPanel';
 import SiteSettings from '../components/tabpanels/SiteSettings';
+import AuditLog from '../components/tabpanels/AuditLog';
 
 function RaceAdministration() {
     return (
@@ -18,9 +19,10 @@ function RaceAdministration() {
                         { label: 'Event Job Structure', icon: <FaTeamspeak /> },
                         { label: 'Paid Labor', icon: <FaMoneyCheck /> },
                         { label: 'Site Settings', icon: <BsTools /> },
+                        { label: 'Audit Log', icon: <BsTools /> },
                     ]
                 }
-                panels={[<EventSignupSheet />, <PaidLaborList />, <SiteSettings />]}
+                panels={[<EventSignupSheet />, <PaidLaborList />, <SiteSettings />, <AuditLog />]}
             />
         </>
     );

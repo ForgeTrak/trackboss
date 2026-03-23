@@ -55,10 +55,11 @@ export async function getAuditLogById(tenantId: string, entityType: string, enti
     return rows;
 }
 
-export async function getAuditLog(tenantId: string, entityTypes: string[]) {
-    const [rows] = await getPool().query<RowDataPacket[]>(
-        'select * from audit_log where tenant_id = ? and entity_type in ? order by created_at desc',
-        [tenantId, `'${entityTypes.join('\',\'')}'`],
-    );
+export async function getAuditLogByTenant(tenantId: string) {
+    // This gets the whole audit log, and we'll just allow filtering on the API and front end for now.
+    // works because it's a small dataset.  If this becomes a problem we can add filtering here.
+    const [rows] = await getPool().query<RowDataPacket[]>(`select al.*, m.last_name, m.first_name from
+         audit_log al, member m 
+         where al.user_id = m.uuid and al.tenant_id = ? order by al.created_at desc`, [tenantId]);
     return rows;
 }
