@@ -4,11 +4,15 @@ import DataTable from 'react-data-table-component';
 import { UserContext } from '../../contexts/UserContext';
 import { apiRequest } from '../../controller/utils';
 import dataTableStyles from '../shared/DataTableStyles';
+import { useAppDisclosure } from '../../hooks/useAppDisclosure';
+import ViewAuditLogModal from '../modals/ViewAuditLogModal';
 
 function AuditLog() {
     const { state } = useContext(UserContext);
 
     const [auditLogData, setAuditLogData] = useState<any[]>([]);
+    const [selectedLog, setSelectedLog] = useState<any>();
+    const { isOpen, onOpen, onClose } = useAppDisclosure();
 
     async function getAuditLogData() {
         let allAuditLogs : any[] = [];
@@ -23,6 +27,21 @@ function AuditLog() {
     useEffect(() => {
         getAuditLogData();
     }, []);
+
+    const truncateJson = (data: any) => {
+        if (!data) return 'N/A';
+        const displayData = Array.isArray(data)
+            ? data.map((item) => {
+                if (item && typeof item === 'object' && 'members' in item) {
+                    const { members, ...rest } = item;
+                    return rest;
+                }
+                return item;
+            })
+            : data;
+        const str = JSON.stringify(displayData);
+        return str.length > 100 ? `${str.substring(0, 100)}...` : str;
+    };
 
     const columns: any = [
         {
@@ -57,8 +76,8 @@ function AuditLog() {
             maxWidth: '10%',
         },
         {
-            name: 'Change Details',
-            selector: (row: any) => (row.change_details ? JSON.stringify(row.change_details) : 'N/A'),
+            name: 'Change Details (Click row to view)',
+            selector: (row: any) => truncateJson(row.change_details),
             sortable: false,
             wrap: true,
         },
@@ -67,8 +86,7 @@ function AuditLog() {
     return (
         <Box>
             <Text fontSize="2xl" mb={4}>Audit Log</Text>
-            <Text fontSize="sm" mb={4}>Audit log is a new feature, and this interface will change</Text>
-            <Text fontSize="xs">Audit log only shows data for events after March, 2025.</Text>
+            <Text fontSize="sm">Audit log only shows data for events after March, 2025.</Text>
             <Box mt={4}>
                 <DataTable
                     columns={columns}
@@ -85,8 +103,19 @@ function AuditLog() {
                     defaultSortFieldId="timestamp"
                     defaultSortAsc={false}
                     noDataComponent={<Text mt={4}>No audit log data available.</Text>}
+                    onRowClicked={
+                        (row: any) => {
+                            setSelectedLog(row);
+                            onOpen();
+                        }
+                    }
                 />
             </Box>
+            <ViewAuditLogModal
+                auditLog={selectedLog}
+                isOpen={isOpen}
+                onClose={onClose}
+            />
         </Box>
     );
 }
