@@ -82,6 +82,11 @@ membershipApplication.post('/', async (req: Request, res: Response) => {
         const insertId = await insertMembershipApplication(application);
         application.id = insertId;
         await sendAppConfirmationEmail(application, application.tenantId);
+        req.user = {
+            tenantId: application.tenantId,
+            uuid: 'system',
+            email: 'system',
+        };
         logAuditEvent(req, 'membershipApplication.new', insertId, null, application);
         res.send(application);
     } catch (error: any) {

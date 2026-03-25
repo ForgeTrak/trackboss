@@ -6,6 +6,7 @@ declare global {
       user: {
         tenantId: string;
         uuid: string;
+        email: string;
       };
     }
   }

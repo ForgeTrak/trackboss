@@ -6,10 +6,10 @@ import { calculateApplicationYear } from '../util/dateHelper';
 
 export async function insertMembershipApplication(membershipApplication: any): Promise<number> {
     const applicationYear = calculateApplicationYear();
-    const values = ['Review', membershipApplication.email, JSON.stringify(membershipApplication), applicationYear];
+    const values = ['Review', membershipApplication.email, JSON.stringify(membershipApplication), applicationYear, membershipApplication.tenantId];
     let result;
     // eslint-disable-next-line max-len
-    const insertSql = 'insert into membership_application (application_status, application_email, application_json, application_season) values (?, ?, ?, ?)';
+    const insertSql = 'insert into membership_application (application_status, application_email, application_json, application_season, tenant_id) values (?, ?, ?, ?, ?)';
     try {
         [result] = await getPool().query<OkPacket>(insertSql, values);
         logger.info(`Inserted application with id ${result.insertId}`);
