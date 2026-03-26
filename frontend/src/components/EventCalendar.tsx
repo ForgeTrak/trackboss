@@ -5,27 +5,22 @@ import { Box, Button } from '@chakra-ui/react';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import SelectedEventModal from './SelectedEventModal';
-import FamilySignUpModal from './FamilySignUpModal';
 import { UserContext } from '../contexts/UserContext';
 import { deleteJob, updateJob } from '../controller/job';
-import { getFamilyMembers } from '../controller/member';
 import { DeleteEventResponse, Event, PostNewEventRequest } from '../../../src/typedefs/event';
 import { Job, PatchJobRequest } from '../../../src/typedefs/job';
 import { createEvent, deleteEvent, getCalendarEventsAndJobs, getNextEvent } from '../controller/event';
 import { ErrorResponse } from '../../../src/typedefs/errorResponse';
 import CreateEventModal from './CreateEventModal';
-import { GetMemberListResponse } from '../../../src/typedefs/member';
 
 const localizer: DateLocalizer = momentLocalizer(moment);
 
 export default function EventCalendar() {
     const { state } = useContext(UserContext);
     const { onClose: onViewEventClose, isOpen: isViewEventOpen, onOpen: onViewEventOpen } = useAppDisclosure();
-    const { onClose: onSignUpClose, isOpen: isSignUpOpen } = useAppDisclosure();
     const { onClose: onCreateClose, isOpen: isCreateOpen, onOpen: onCreateOpen } = useAppDisclosure();
 
     const [selectedEvent, setSelectedEvent] = useState<Event | Job>();
-    const [familyMembers, setFamilyMembers] = useState<any>();
     const [calendarEvents, setCalendarEvents] = useState<Array<Job | Event>>([]);
     const [error, setError] = useState<string>('');
     const [defaultDate, setDefaultDate] = useState<Date>();
@@ -80,14 +75,6 @@ export default function EventCalendar() {
 
     useEffect(() => {
         async function getData() {
-            if (state.user) {
-                const res: GetMemberListResponse = await getFamilyMembers(state.token, state.user.membershipId);
-                if ('reason' in res) {
-                    setError(res.reason);
-                } else {
-                    setFamilyMembers(res);
-                }
-            }
             const calendarEventsAndJobs = await getCalendarEventsAndJobs(state.token);
             setCalendarEvents(calendarEventsAndJobs);
         }
@@ -195,18 +182,6 @@ export default function EventCalendar() {
                         signUpForJob={signUpForJob}
                         // eslint-disable-next-line react/jsx-no-bind
                         eventsRefresh={refreshEvents}
-                    />
-                )
-            }
-            {
-                familyMembers && selectedEvent && (
-                    <FamilySignUpModal
-                        isOpen={isSignUpOpen}
-                        onClose={onSignUpClose}
-                        familyMembers={familyMembers}
-                        selectedEvent={selectedEvent}
-                        // eslint-disable-next-line react/jsx-no-bind
-                        signUpForJob={signUpForJob}
                     />
                 )
             }
