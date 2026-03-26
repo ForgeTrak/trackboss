@@ -66,7 +66,7 @@ export async function insertMember(req: PostNewMemberRequest, tenantId: string):
         logger.info(`Creating new user for email ${req.email} on membership ${req.membershipId}`);
         try {
             const isMembershipAdmin = (req.memberTypeId === 8);
-            const uuid = await createCognitoUser(req.email, isMembershipAdmin);
+            const uuid = await createCognitoUser(req.email, isMembershipAdmin, tenantId);
             req.uuid = uuid;
             logger.info(`Successfully created ${req.email} in cognito as ${uuid}`);
         } catch (error: any) {

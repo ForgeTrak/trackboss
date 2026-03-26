@@ -9,11 +9,13 @@ import { getCognitoPoolId } from './environmentWrapper';
  *
  * @param email user email address.
  * @param isMembershipAdmin if the user should be a membership admin (used to create new members from applicants).
+ * @param tenantId the tenant ID to associate with the user.
  * @returns the user UUID in cognito.
  */
-export async function createCognitoUser(email: string, isMembershipAdmin: boolean) {
+export async function createCognitoUser(email: string, isMembershipAdmin: boolean, tenantId: string) {
     const poolId = await getCognitoPoolId() || '';
     const cognitoIdp = new AWS.CognitoIdentityServiceProvider();
+    const tenantIds = [tenantId];
     const createResponse = await cognitoIdp.adminCreateUser({
         UserPoolId: poolId,
         Username: email,
@@ -25,6 +27,10 @@ export async function createCognitoUser(email: string, isMembershipAdmin: boolea
             {
                 Name: 'email_verified',
                 Value: 'True',
+            },
+            {
+                Name: 'custom:tenant_ids',
+                Value: JSON.stringify(tenantIds),
             },
         ],
     }).promise();

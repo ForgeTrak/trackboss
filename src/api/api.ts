@@ -52,10 +52,10 @@ api.get('/me', async (req: Request, res: Response) => {
             try {
                 // TODO: tenant ID
                 response = await getMember(uuid, tenantId);
-                logger.info(`Login successful for ${response.email} (user id: ${uuid}) on tenant ${tenantId}`);
+                logger.info(`login - Login successful for ${response.email} (user id: ${uuid}) on tenant ${tenantId}`);
                 res.status(200);
             } catch (e: any) {
-                logger.error(e);
+                logger.error('login - Error occurred while fetching member', e);
                 if (e.message === 'not found') {
                     res.status(404);
                     response = { reason: 'not found' };
