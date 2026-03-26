@@ -25,7 +25,11 @@ export default function Header(props:pageProps) {
         const path = '/members';
         navigate(path);
     };
-
+    let loggedInAs = `Logged in as ${state?.user?.firstName} ${state?.user?.lastName}`;
+    if (state.storedUser) {
+        loggedInAs = `Logged in as ${state.storedUser.firstName} ${state.storedUser.lastName} 
+            (acting as ${state.user?.firstName} ${state.user?.lastName})`;
+    }
     return (
         <div>
             <Flex bg="white" boxShadow="lg" padding="6">
@@ -38,6 +42,7 @@ export default function Header(props:pageProps) {
                 <Box>
                     <Heading pr={90} size="lg">{`Trackboss - ${props.title}`}</Heading>
                     <Text fontSize="sm">Powered by ForgeTrak</Text>
+                    <Text fontSize="xs">{`${loggedInAs}`}</Text>
                     <Text fontSize="xs">{`Tenant ID: ${state.user?.tenantId}`}</Text>
                 </Box>
                 <Spacer />
