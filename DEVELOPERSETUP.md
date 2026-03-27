@@ -6,7 +6,7 @@ Trackboss is a NodeJS (express) back end with a React 18 front end. All the code
 
 Once that is done you can `npm install` and run normally in an IDE.  I use VSCode so there is even a `.vscode/` directory attached to the project.
 
-I use `nvm` to manage Node versions. Currently this project is using Node 20.
+I use `nvm` to manage Node versions. Currently this project is using Node 24.
 
 ### Environment
 The project runs off of a `.env` file that has to be sourced by the IDE at startup.  To do this on a Mac I run `source .env` on the project root, then `vscode` to get into the project.

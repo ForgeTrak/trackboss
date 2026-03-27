@@ -131,3 +131,4 @@ devops/cognito/*.csv
 trackboss-env
 lambda/local.js
 nohup.out
+seeddump.sql
