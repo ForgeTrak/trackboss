@@ -27,6 +27,8 @@ AWS_REGION=us-east-1
 Your access key will handle getting access to AWS resources, including those stored in Parameter Store and Secrets Manger.  The builds handle the rest.
 
 ## Steps to get running
+* Clone this repo: `git clone https://github.com/ForgeTrak/trackboss.git`
+* `npm install`
 * Copy the dumpfile to your git repo's root folder as seeddump.sql IE: `cp ~/dumps/Dump20260326.sql seeddump.sql`
 * `source .env`
 * `npm run run-migrations` - this gets the database's default (and latest) state
