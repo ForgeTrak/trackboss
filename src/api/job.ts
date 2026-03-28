@@ -30,6 +30,7 @@ import logger from '../logger';
 import { runBillingComplete } from '../util/billing';
 import { getMembership } from '../database/membership';
 import logAuditEvent from '../database/auditLog';
+import { getMember } from '../database/member';
 
 async function GetJobList(req: Request, res:Response) {
     const { authorization } = req.headers;
@@ -315,6 +316,8 @@ job.patch('/:jobId', async (req: Request, res: Response) => {
             if (Number.isNaN(id)) {
                 throw new Error('not found');
             }
+            const member = await getMember(req.user.uuid, req.user.tenantId);
+            req.body.modifiedBy = member.memberId;
             const before = await getJob(id, req.user.tenantId);
             await patchJob(Number(jobId), req.user.tenantId, req.body);
             response = await getJob(id, req.user.tenantId);
