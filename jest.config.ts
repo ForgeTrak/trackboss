@@ -39,7 +39,7 @@ export default {
   // coverageProvider: "babel",
 
   // text = table in the terminal; html/lcov = open coverage/lcov-report/index.html after a run
-  coverageReporters: ['text', 'text-summary', 'lcov', 'html', 'json'],
+  coverageReporters: ['text', 'text-summary', 'lcov', 'json'],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
