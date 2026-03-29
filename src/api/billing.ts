@@ -151,7 +151,7 @@ billing.post('/:billId', async (req: Request, res: Response) => {
         try {
             await verify(headerCheck.token, 'Membership Admin');
             const billId = Number(req.params.billId);
-            const { paymentMethod } = req.query || '';
+            const { paymentMethod } = req.query;
             if (Number.isNaN(billId)) {
                 throw new Error('not found');
             }
@@ -414,11 +414,9 @@ billing.put('/create/checkoutlinks', async (req: Request, res: Response) => {
     try {
         const { authorization } = req.headers;
         const { membershipId } = req.query;
-        let response: GetBillListResponse;
         const headerCheck = checkHeader(authorization);
         if (!headerCheck.valid) {
-            res.status(401);
-            response = { reason: headerCheck.reason };
+            res.status(401).send({ reason: headerCheck.reason });
             return;
         }
         logger.info('Getting billing list.');
@@ -426,7 +424,7 @@ billing.put('/create/checkoutlinks', async (req: Request, res: Response) => {
         let billingYear = Number(year);
         if (!billingYear) {
             billingYear = calculateBillingYear();
-            logger.info(`billing -Billing year was undefined so we calculated it as ${billingYear} at request time.`);
+            logger.info(`billing - Billing year was undefined so we calculated it as ${billingYear} at request time.`);
         }
         const billingList = await generateSquareLinks(billingYear, Number(membershipId));
         logger.info(`billing - Generated ${billingList.length} checkout links for year ${billingYear}`);

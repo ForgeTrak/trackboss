@@ -6,3 +6,4 @@ lambda/
 database/migrations/migrations
 frontend/src/mocks
 __tests__/
+tests/

@@ -18,7 +18,9 @@
         "hard-update": "rm package-lock.json && rm -rf node_modules/ && cd frontend && rm package-lock.json && rm -rf node_modules/ && cd .. && npm run update",
         "new-migration": "cd database/migrations && npx knex migrate:make $npm_config_name",
         "run-migrations": "cd database/migrations && npx knex migrate:latest",
-        "seed-db": "mysql -u $MYSQL_USER -p$MYSQL_PASS -h $MYSQL_HOST < seeddump.sql"
+        "seed-db": "mysql -u $MYSQL_USER -p$MYSQL_PASS -h $MYSQL_HOST < seeddump.sql",
+        "test": "jest", 
+        "test:coverage": "jest --coverage"
     },
     "repository": {
         "type": "git",
