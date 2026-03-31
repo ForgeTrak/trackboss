@@ -3,6 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
+import path from 'path';
+
 export default {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -23,25 +25,21 @@ export default {
   // collected
   // collectCoverageFrom: undefined,
 
-  // The directory where Jest should output its coverage files
-  coverageDirectory: 'coverage',
+  // Repo-root output: rootDir is `src`, so plain `coverage` would become src/coverage.
+  coverageDirectory: path.join(__dirname, 'coverage'),
 
   // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '__tests__/',
+    'tests/',
   ],
 
   // Indicates which provider should be used to instrument code for coverage
   // coverageProvider: "babel",
 
-  // A list of reporter names that Jest uses when writing coverage reports
-  // coverageReporters: [
-  //   "json",
-  //   "text",
-  //   "lcov",
-  //   "clover"
-  // ],
+  // text = table in the terminal; html/lcov = open coverage/lcov-report/index.html after a run
+  coverageReporters: ['text', 'text-summary', 'lcov', 'json'],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -136,7 +134,7 @@ export default {
 
   // A list of paths to modules that run some code to configure or set up the
   // testing framework before each test
-  // setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
 
   // The number of seconds after which a test is considered as slow and reported
   // as such in the results.
@@ -156,7 +154,7 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '**/__tests__/**/?(*.)+(spec|test).[tj]s',
+    '**/tests/**/?(*.)+(spec|test).[tj]s',
   ],
 
   // An array of regexp pattern strings that are matched against all test paths,
@@ -181,8 +179,14 @@ export default {
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
   // timers: "real",
 
-  // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  // Pin Babel to repo-root config so `npx jest` works when cwd is `src/` (otherwise Babel
+  // resolves from cwd and misses preset-typescript → "Missing semicolon" on `as` assertions).
+  transform: {
+    '^.+\\.[tj]sx?$': [
+      'babel-jest',
+      { configFile: path.join(__dirname, 'babel.config.js') },
+    ],
+  },
 
   // An array of regexp pattern strings that are matched against all source file
   // paths, matched files will skip transformation

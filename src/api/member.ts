@@ -380,7 +380,7 @@ member.get('/card/create/:memberId', async (req: Request, res: Response) => {
     logger.info(`member - Generating membership card for ${memberId}`);
     const headerCheck = checkHeader(`Bearer ${authorization}`);
     if (!headerCheck.valid) {
-        res.status(401);
+        res.status(401).send({ reason: headerCheck.reason });
     } else {
         logger.info('member - Generating membership card - verifying token.');
         await verify(headerCheck.token, 'Member', Number(memberId));
