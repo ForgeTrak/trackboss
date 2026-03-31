@@ -5,10 +5,6 @@
     "main": "server.ts",
     "bin": "build/server.js",
     "scripts": {
-        "unit-test": "cross-env PORT=0 jest --testPathIgnorePatterns=integration",
-        "integration-test": "cross-env PORT=0 jest --testPathPattern=integration",
-        "ci-unit-test": "cross-env PORT=0 CW_LOGS_OFF=true jest --verbose --testPathIgnorePatterns=integration --reporters $(pwd)/.github/jest-reporter.js",
-        "ci-integration-test": "cross-env PORT=0 jest --ci --reporters $(pwd)/.github/jest-reporter.js --testPathPattern=integration",
         "dev": "concurrently \"npm run frontend\" \"npm run server\"",
         "server": "nodemon --exec npx ts-node src/server.ts",
         "server-prod": "npx ts-node src/server.ts",
