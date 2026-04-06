@@ -41,16 +41,18 @@ describe('MembershipTypeSelector', () => {
     const renderWithContext = (component: React.ReactElement) => (
         render(
             <UserContext.Provider
-                value={{
-                    state: {
-                        loggedIn: true,
-                        token: 'test-token',
-                        user: undefined,
-                        storedUser: undefined,
-                        isInitializing: false,
-                    },
-                    update: vi.fn(),
-                }}
+                value={
+                    {
+                        state: {
+                            loggedIn: true,
+                            token: 'test-token',
+                            user: undefined,
+                            storedUser: undefined,
+                            isInitializing: false,
+                        },
+                        update: vi.fn(),
+                    }
+                }
             >
                 {component}
             </UserContext.Provider>,
