@@ -1,7 +1,11 @@
 FROM node:22-alpine
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0 /lambda-adapter /opt/extensions/lambda-adapter
+
 ENV TZ="America/New_York"
 
 ENV PORT=3000
+ENV AWS_LWA_PORT=3000
+
 ENV MYSQL_DB=pradb
 
 # Create app directory
