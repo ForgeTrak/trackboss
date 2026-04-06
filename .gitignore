@@ -106,6 +106,7 @@ typings/
 
 # testing
 /coverage/lcov-report
+frontend/coverage
 
 # production
 **/build

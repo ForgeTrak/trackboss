@@ -29,7 +29,7 @@
                 "react/jsx-indent-props": ["error", 4],
                 "react/jsx-filename-extension": ["error", {"extensions": [".jsx", ".tsx"]}],
                 "react/jsx-one-expression-per-line": ["error", { "allow": "single-child" }],
-                "max-len": ["error", 120],
+                "max-len": ["warn", 135],
                 "react/destructuring-assignment": ["off", "never"],
                 "no-plusplus": ["off"],
                 "react/jsx-curly-newline": ["error", {

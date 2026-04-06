@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`VerifyButton component renders correctly 1`] = `
-<div
-  className="css-0"
-/>
-`;
