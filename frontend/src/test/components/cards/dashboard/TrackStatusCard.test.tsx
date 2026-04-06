@@ -13,10 +13,12 @@ describe('TrackStatusCard', () => {
     it('renders the title and area names', () => {
         renderWithProviders(
             <TrackStatusCard
-                areaStatusList={[
-                    { name: 'Main Track', isOpen: true },
-                    { name: 'Pee Wee', isOpen: false },
-                ]}
+                areaStatusList={
+                    [
+                        { name: 'Main Track', isOpen: true },
+                        { name: 'Pee Wee', isOpen: false },
+                    ]
+                }
                 isAdmin={false}
                 updateArea={vi.fn()}
             />,

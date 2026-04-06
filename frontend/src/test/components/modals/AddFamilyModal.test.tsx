@@ -19,11 +19,13 @@ vi.mock('react-date-picker', () => ({
 vi.mock('react-select', () => ({
     default: ({ onChange, options }: any) => (
         <select onChange={(e) => onChange(options.find((opt: any) => opt.value === e.target.value))} data-testid="select">
-            {options.map((opt: any) => (
-                <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                </option>
-            ))}
+            {
+                options.map((opt: any) => (
+                    <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                    </option>
+                ))
+            }
         </select>
     ),
 }));

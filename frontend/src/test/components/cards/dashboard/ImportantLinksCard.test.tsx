@@ -40,15 +40,17 @@ describe('ImportantLinksCard', () => {
     it('renders dashboard links from props', () => {
         renderWithProviders(
             <ImportantLinksCard
-                dashboardLinks={[
-                    {
-                        linkId: 1,
-                        tenantId: 't1',
-                        linkTitle: 'Member Rules',
-                        linkUrl: 'https://example.com/rules',
-                        linkDisplayOrder: 1,
-                    },
-                ]}
+                dashboardLinks={
+                    [
+                        {
+                            linkId: 1,
+                            tenantId: 't1',
+                            linkTitle: 'Member Rules',
+                            linkUrl: 'https://example.com/rules',
+                            linkDisplayOrder: 1,
+                        },
+                    ]
+                }
                 memberId={1}
                 jwt="x"
             />,
