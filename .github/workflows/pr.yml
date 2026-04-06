@@ -31,7 +31,7 @@ jobs:
     - name: Run ESLint
       run: npx eslint .
     - name: Run tests
-      run: npm test
+      run: npm test && (cd frontend && npm test)
  # jest-backend-unit-tests:
  #   runs-on: ubuntu-latest
  #   steps:
