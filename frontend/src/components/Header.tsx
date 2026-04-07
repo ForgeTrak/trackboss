@@ -4,8 +4,8 @@ import {
     Flex,
     Spacer,
     Box,
-    Button,
     Text,
+    Button,
 } from '@chakra-ui/react';
 
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +46,21 @@ export default function Header(props:pageProps) {
                     <Text fontSize="xs">{`Tenant ID: ${state.user?.tenantId}`}</Text>
                 </Box>
                 <Spacer />
+                <Button
+                    backgroundColor="white"
+                    onClick={
+                        () => {
+                            localStorage.removeItem('trackboss_auth_token');
+                            update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
+                            const { VITE_AUTH_URL, VITE_CLIENT_ID } = import.meta.env;
+                            const { origin } = window.location;
+                            const authTarget = `${VITE_AUTH_URL}/login?client_id=${VITE_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${origin}`;
+                            window.location.href = authTarget;
+                        }
+                    }
+                >
+                    Logout
+                </Button>
             </Flex>
             {
                 state.storedUser !== undefined && (
