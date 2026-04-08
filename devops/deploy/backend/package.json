@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apprunner-alpha": "^2.233.0-alpha.0",
-    "aws-cdk": "^2.1106.1",
+    "aws-cdk": "^2.1117.0",
     "aws-cdk-lib": "^2.47.0",
     "constructs": "^10.4.4"
   }

@@ -32,7 +32,7 @@ export default function Header(props:pageProps) {
     }
     return (
         <div>
-            <Flex bg="white" boxShadow="lg" padding="6">
+            <Flex bg="white" boxShadow="lg" padding="4">
                 <HamburgerMenu
                     activeButtonId={props.activeButtonId}
                     admin={state.user?.memberType === 'Admin'}
@@ -40,7 +40,7 @@ export default function Header(props:pageProps) {
                 />
                 <Spacer />
                 <Box>
-                    <Heading pr={90} size="lg">{`Trackboss - ${props.title}`}</Heading>
+                    <Heading pr={90} size="md">{`Trackboss: ${props.title}`}</Heading>
                     <Text fontSize="sm">Powered by ForgeTrak</Text>
                     <Text fontSize="xs">{`${loggedInAs}`}</Text>
                     <Text fontSize="xs">{`Tenant ID: ${state.user?.tenantId}`}</Text>
@@ -70,9 +70,9 @@ export default function Header(props:pageProps) {
                             ml={10}
                             fontStyle="bold"
                             color="white"
-                            fontSize="xl"
+                            fontSize="md"
                         >
-                            Currently acting as:
+                            Acting as:
                             {' '}
                             { `${state.user?.firstName} ${state.user?.lastName}`}
                         </Text>
