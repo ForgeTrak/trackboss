@@ -24,6 +24,7 @@ export class DeployStack extends Stack {
         versioned: false,
         encryption: s3.BucketEncryption.S3_MANAGED,
         // it is a public website after all!
+        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS_ONLY,
         publicReadAccess: true,
         websiteIndexDocument: 'index.html',
         websiteErrorDocument: 'error.html',
