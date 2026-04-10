@@ -307,6 +307,22 @@ export class DeployStack extends Stack {
         sourceArn: cognitoPool.userPoolArn,
     });
 
+    const forgeTrakApiLambda = new lambda.DockerImageFunction(this, 'forgeTrakApiLambda', {
+        code: lambda.DockerImageCode.fromEcr(ecr.Repository.fromRepositoryName(this, 'forgetrak-lambda-repo', 'pra/trackbossapi'), {
+            tagOrDigest: 'latest',
+        }),
+        memorySize: 1024,
+        timeout: Duration.minutes(10),
+        vpc,
+        allowPublicSubnet: true,
+        environment: {
+            MYSQL_DB: 'pradb',
+            MYSQL_HOST: rdsInstance.instanceEndpoint.hostname,
+            MYSQL_USER: 'user',
+            MYSQL_PASS: 'pass',
+        },
+        role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
+    });
     // The next last resource goes here (adding this so I don't forget in a year when I inevitably need to add more infra and forget about this comment)
   };
 }
