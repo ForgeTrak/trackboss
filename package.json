@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "concurrently \"npm run frontend\" \"npm run server\"",
         "server": "nodemon --exec npx ts-node src/server.ts",
-        "server-prod": "npx ts-node src/server.ts",
+        "server-prod": "node build/server.js",
         "frontend": "cd frontend && npm start",
         "build": "rm -rf build && tsc --project tsconfig.json",
         "update": "npm install && cd frontend && npm install && cd ..",
