@@ -19,7 +19,7 @@ export async function initConfig() {
     const connectionObject = await getConnectionObject();
     const { host, username, password, dbname } = connectionObject;
     const { MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
-    if (MYSQL_USER || MYSQL_PASS) {
+    if (MYSQL_USER && MYSQL_PASS) {
         logger.warn('pool - database connection info found in both env vars and secrets manager. Environment variables will take precedence.');
     } else if (connectionObject) {
         logger.info('pool - database connection info pulled from secrets manager');
@@ -28,11 +28,10 @@ export async function initConfig() {
     dbConnection.password = MYSQL_PASS || password || '';
     dbConnection.host = MYSQL_HOST || host || '';
     dbConnection.dbname = MYSQL_DB || dbname || '';
+    logger.info(`pool - connected to DB on host ${dbConnection.host} with username ${dbConnection.username} and dbname ${dbConnection.dbname}`);
 }
 
-(async () => {
-    await initConfig();
-})();
+export const configReady = initConfig();
 
 export function getPool(): Pool {
     if (!pool) {

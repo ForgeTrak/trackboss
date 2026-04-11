@@ -5,6 +5,7 @@ import api from './api/api';
 import logger from './logger';
 import { checkHeader, createVerifier, verify } from './util/auth';
 import { getEnvironmentParameter } from './util/environmentWrapper';
+import { configReady } from './database/pool';
 import startBillingJob from './jobs/billingJob';
 
 process.on('uncaughtException', (error, origin) => {
@@ -57,11 +58,13 @@ app.use((err: any, req: any, res: any, next: () => void) => {
     next();
 });
 
-const server = app.listen(port, async () => {
-    const envName = await getEnvironmentParameter('trackbossEnvironmentName');
-    logger.info(`PRA Club Manager API environment ${envName} 
-        listening on port ${port}`);
-});
+const server = (async () => {
+    await configReady;
+    return app.listen(port, async () => {
+        const envName = await getEnvironmentParameter('trackbossEnvironmentName');
+        logger.info(`Forgetrak API environment ${envName} listening on port ${port}`);
+    });
+})();
 
 startBillingJob();
 
