@@ -7,8 +7,6 @@ ENV PORT=3000
 ENV AWS_LWA_PORT=3000
 ENV AWS_LWA_READINESS_CHECK_PATH=/api/health
 
-ENV MYSQL_DB=pradb
-
 # Create app directory
 WORKDIR /usr/src/app
 
