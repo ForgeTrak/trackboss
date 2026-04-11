@@ -24,8 +24,57 @@ export class DeployStack extends Stack {
     const region = Stack.of(this).region;
 
     const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC',{isDefault: true});
-    
+
     const environmentName = process.env.TRACKBOSS_ENVIRONMENT_NAME || 'trackboss';
+
+    // fck-nat: cheap NAT instance in the default VPC for Lambda outbound internet
+    const fckNatSg = new ec2.SecurityGroup(this, 'FckNatSg', {
+      vpc,
+      description: 'fck-nat instance security group',
+      allowAllOutbound: true,
+    });
+    fckNatSg.addIngressRule(ec2.Peer.ipv4(vpc.vpcCidrBlock), ec2.Port.allTraffic(), 'Allow VPC traffic through NAT');
+
+    const fckNatInstance = new ec2.Instance(this, 'FckNatInstance', {
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.lookup({
+        name: 'fck-nat-al2023-*-arm64-*',
+        owners: ['568608671756'],
+      }),
+      securityGroup: fckNatSg,
+    });
+    (fckNatInstance.node.defaultChild as ec2.CfnInstance).sourceDestCheck = false;
+
+    // Private subnets in the default VPC for Lambda placement
+    const privateRouteTable = new ec2.CfnRouteTable(this, 'PrivateRouteTable', {
+      vpcId: vpc.vpcId,
+      tags: [{ key: 'Name', value: `${environmentName}-private-rt` }],
+    });
+    new ec2.CfnRoute(this, 'NatRoute', {
+      routeTableId: privateRouteTable.ref,
+      destinationCidrBlock: '0.0.0.0/0',
+      instanceId: fckNatInstance.instanceId,
+    });
+
+    const privateSubnets = [`${region}b`, `${region}c`].map((az, i) => {
+      const cfnSubnet = new ec2.CfnSubnet(this, `PrivateSubnet${i}`, {
+        vpcId: vpc.vpcId,
+        cidrBlock: `172.31.${128 + i}.0/24`,
+        availabilityZone: az,
+        tags: [{ key: 'Name', value: `${environmentName}-private-${az}` }],
+      });
+      new ec2.CfnSubnetRouteTableAssociation(this, `PrivateRtAssoc${i}`, {
+        subnetId: cfnSubnet.ref,
+        routeTableId: privateRouteTable.ref,
+      });
+      return ec2.Subnet.fromSubnetAttributes(this, `LambdaSubnet${i}`, {
+        subnetId: cfnSubnet.ref,
+        availabilityZone: az,
+        routeTableId: privateRouteTable.ref,
+      });
+    });
 
     const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'trackbossZone', 
         {
@@ -278,7 +327,7 @@ export class DeployStack extends Stack {
         memorySize: 1024,
         timeout: Duration.minutes(10),
         vpc,
-        allowPublicSubnet: true,
+        vpcSubnets: { subnets: privateSubnets },
         environment: {
             DB_HOST: rdsInstance.instanceEndpoint.hostname,
             DB_NAME: 'pradb',
@@ -314,7 +363,7 @@ export class DeployStack extends Stack {
         memorySize: 1024,
         timeout: Duration.minutes(10),
         vpc,
-        allowPublicSubnet: true,
+        vpcSubnets: { subnets: privateSubnets },
         environment: {
             MYSQL_DB: 'pradb',
             MYSQL_HOST: rdsInstance.instanceEndpoint.hostname,
@@ -323,6 +372,15 @@ export class DeployStack extends Stack {
         },
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
     });
+
+    const forgeTrakApiUrl = forgeTrakApiLambda.addFunctionUrl({
+        authType: lambda.FunctionUrlAuthType.NONE,
+    });
+
+    new CfnOutput(this, 'forgeTrakApiLambdaUrl', {
+        value: forgeTrakApiUrl.url,
+    });
+
     // The next last resource goes here (adding this so I don't forget in a year when I inevitably need to add more infra and forget about this comment)
   };
 }
