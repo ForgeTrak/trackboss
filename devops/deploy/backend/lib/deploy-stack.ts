@@ -364,6 +364,12 @@ export class DeployStack extends Stack {
         timeout: Duration.minutes(10),
         vpc,
         vpcSubnets: { subnets: privateSubnets },
+        environment: {
+            MYSQL_DB: 'pradb',
+            MYSQL_HOST: rdsInstance.instanceEndpoint.hostname,
+            MYSQL_USER: 'user',
+            MYSQL_PASS: 'pass',
+        },
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
     });
 
