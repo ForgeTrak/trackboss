@@ -11,6 +11,10 @@ jest.mock('mysql2/promise', () => ({
     },
 }));
 
+jest.mock('../../util/environmentWrapper', () => ({
+    getConnectionObject: jest.fn().mockResolvedValue({}),
+}));
+
 describe('database/pool (implementation)', () => {
     const ORIGINAL_ENV = process.env;
 
