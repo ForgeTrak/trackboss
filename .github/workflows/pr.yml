@@ -15,7 +15,7 @@ env:
   SQUARE_TOKEN: ${{ secrets.SQUARE_TOKEN }}
   SQUARE_LOCATION: ${{ secrets.SQUARE_LOCATION }}
 jobs:
-  eslint:
+  lintAndTest:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
