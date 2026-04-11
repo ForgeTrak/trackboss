@@ -19,7 +19,10 @@ jest.mock('../../util/auth', () => ({
 jest.mock('../../database/memberCommunication');
 jest.mock('../../database/member');
 jest.mock('../../database/boardMember');
-jest.mock('../../util/environmentWrapper', () => ({ getEnvironmentParameter: jest.fn() }));
+jest.mock('../../util/environmentWrapper', () => ({
+    getEnvironmentParameter: jest.fn(),
+    getConnectionObject: jest.fn().mockResolvedValue({}),
+}));
 jest.mock('../../database/auditLog', () => ({
     __esModule: true,
     default: jest.fn(),

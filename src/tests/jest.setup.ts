@@ -8,3 +8,12 @@ jest.mock('../logger', () => ({
         debug: jest.fn(),
     },
 }));
+
+/** Prevent any test from reaching AWS Secrets Manager / SSM. */
+jest.mock('../util/environmentWrapper', () => ({
+    getEnvironmentParameter: jest.fn().mockResolvedValue(''),
+    getCognitoPoolId: jest.fn().mockResolvedValue(''),
+    getCognitoClientId: jest.fn().mockResolvedValue(''),
+    getSquareObject: jest.fn().mockResolvedValue({}),
+    getConnectionObject: jest.fn().mockResolvedValue({}),
+}));

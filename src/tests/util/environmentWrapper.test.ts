@@ -1,4 +1,6 @@
 /* eslint-disable no-var */
+jest.unmock('../../util/environmentWrapper');
+
 var mockSsmResult: unknown = { Parameter: { Value: 'param-value' } };
 var mockSsmReject: unknown;
 var mockSecretString = '{"accessToken":"t"}';
