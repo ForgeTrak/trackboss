@@ -16,12 +16,18 @@ const dbConnection = {
 };
 
 export async function initConfig() {
-    logger.info('Unable to get connection from SM so getting it from env');
+    const connectionObject = await getConnectionObject();
+    const { host, username, password, dbname } = connectionObject;
     const { MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
-    dbConnection.username = MYSQL_USER || '';
-    dbConnection.password = MYSQL_PASS || '';
-    dbConnection.host = MYSQL_HOST || '';
-    dbConnection.dbname = MYSQL_DB || '';
+    if (MYSQL_HOST || MYSQL_USER || MYSQL_PASS || MYSQL_DB) {
+        logger.warn('pool - database connection info found in both env vars and secrets manager. Environment variables will take precedence.');
+    } else if (connectionObject) {
+        logger.info('pool - database connection info pulled from secrets manager');
+    }
+    dbConnection.username = MYSQL_USER || username || '';
+    dbConnection.password = MYSQL_PASS || password || '';
+    dbConnection.host = MYSQL_HOST || host || '';
+    dbConnection.dbname = MYSQL_DB || dbname || '';
 }
 
 (async () => {
@@ -38,7 +44,7 @@ export function getPool(): Pool {
 
         Object.keys(dbConnection).forEach((requiredEnvVar) => {
             if (!requiredEnvVar) {
-                logger.error(`Fatal: error in database connection env vars. ${requiredEnvVar} missing!  Check config`);
+                logger.error(`pool - Fatal: error in database connection env vars. ${requiredEnvVar} missing!  Check config`);
                 throw new Error('Terminating server');
             }
         });
@@ -58,7 +64,8 @@ export function getPool(): Pool {
             connectionLimit,
             queueLimit,
         });
-        logger.info(`Build a connection pool to ${dbConnection.dbname}`);
+        // eslint-disable-next-line max-len
+        logger.info(`pool - connected to ${dbConnection.dbname} on ${dbConnection.host} with a connection limit of ${connectionLimit}`);
     }
     return pool;
 }

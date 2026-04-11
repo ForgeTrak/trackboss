@@ -15,7 +15,7 @@ export async function getEnvironmentParameter(name: string) {
             Name: `/${name}`,
             WithDecryption: true,
         }).promise();
-        logger.info(`Retrieved environment parameter ${name}`);
+        logger.info(`environmentWrapper - Retrieved environment parameter ${name}`);
         return envData.Parameter?.Value;
     } catch (error) {
         logger.error(error);
@@ -37,7 +37,7 @@ export async function getSquareObject() {
         const secretValue = await secretsClient.getSecretValue({
             SecretId: '/trackboss/app/square',
         }).promise();
-        logger.info('Pulled Square login info');
+        logger.info('environmentWrapper - Pulled Square login info');
         squareObject = JSON.parse(secretValue.SecretString || '');
     }
     return squareObject;
@@ -48,6 +48,6 @@ export async function getConnectionObject() {
     const secretValue = await secretsClient.getSecretValue({
         SecretId: '/trackboss/app/rds',
     }).promise();
-    logger.info('Pulled database connection info');
+    logger.info(`environmentWrapper - Pulled database connection info from ${secretValue.Name}`);
     return JSON.parse(secretValue.SecretString || '');
 }
