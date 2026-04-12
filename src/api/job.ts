@@ -56,11 +56,11 @@ async function GetJobList(req: Request, res:Response) {
         try {
             await verify(headerCheck.token);
 
-            const { range } = req.headers;
+            const dateRange = req.query.dateRange as string | undefined;
             let startDate: string | undefined;
             let endDate: string | undefined;
-            if (typeof range !== 'undefined') {
-                const [start, end] = range.split('-');
+            if (typeof dateRange !== 'undefined') {
+                const [start, end] = dateRange.split('-');
                 if (start === undefined || end === undefined) {
                     throw new Error('user input error');
                 }

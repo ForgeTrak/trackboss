@@ -100,34 +100,34 @@ describe('api/job', () => {
         expect(mockedGetMember).toHaveBeenCalledWith('user-test', 'tenant-test');
     });
 
-    it('returns 206 when list range header is set', async () => {
+    it('returns 206 when list dateRange query param is set', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({} as any);
         mockedGetJobList.mockResolvedValue([] as any);
         const res = await request(app)
             .get('/job/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101-20261231');
+            .query({ dateRange: '20260101-20261231' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(206);
     });
 
-    it('returns 400 when range header has no separator', async () => {
+    it('returns 400 when dateRange has no separator', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({} as any);
         const res = await request(app)
             .get('/job/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101');
+            .query({ dateRange: '20260101' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(400);
     });
 
-    it('returns 400 when range dates are not numeric yyyymmdd', async () => {
+    it('returns 400 when dateRange dates are not numeric yyyymmdd', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({} as any);
         const res = await request(app)
             .get('/job/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', 'abcdefgh-20261231');
+            .query({ dateRange: 'abcdefgh-20261231' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(400);
     });
 

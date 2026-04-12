@@ -86,24 +86,24 @@ describe('api/event', () => {
         expect(mockedGetClosestEvent).toHaveBeenCalledWith('tenant-test');
     });
 
-    it('GET /list with range returns 206', async () => {
+    it('GET /list with dateRange returns 206', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
         mockedGetEventList.mockResolvedValue([] as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101-20261231');
+            .query({ dateRange: '20260101-20261231' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(206);
     });
 
-    it('GET /list returns 400 for malformed range', async () => {
+    it('GET /list returns 400 for malformed dateRange', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', 'bad');
+            .query({ dateRange: 'bad' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(400);
     });
 
@@ -113,8 +113,8 @@ describe('api/event', () => {
         mockedGetEventList.mockResolvedValue([] as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '-20261231');
+            .query({ dateRange: '-20261231' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(206);
     });
 
@@ -200,23 +200,23 @@ describe('api/event', () => {
         expect(res.status).toBe(500);
     });
 
-    it('GET /list returns 400 when range has no hyphen pair', async () => {
+    it('GET /list returns 400 when dateRange has no hyphen pair', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101');
+            .query({ dateRange: '20260101' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(400);
     });
 
-    it('GET /list returns 400 when range dates are invalid', async () => {
+    it('GET /list returns 400 when dateRange dates are invalid', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', 'abcd0101-20261231');
+            .query({ dateRange: 'abcd0101-20261231' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(400);
     });
 
@@ -226,20 +226,20 @@ describe('api/event', () => {
         mockedGetEventList.mockResolvedValue([] as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101-');
+            .query({ dateRange: '20260101-' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(206);
         expect(mockedGetEventList).toHaveBeenCalledWith('tenant-test', '2026-01-01');
     });
 
-    it('GET /list with both range bounds calls getEventList with start and end', async () => {
+    it('GET /list with both dateRange bounds calls getEventList with start and end', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
         mockedGetEventList.mockResolvedValue([] as any);
         const res = await request(app)
             .get('/ev/list')
-            .set('Authorization', 'Bearer t')
-            .set('range', '20260101-20260131');
+            .query({ dateRange: '20260101-20260131' })
+            .set('Authorization', 'Bearer t');
         expect(res.status).toBe(206);
         expect(mockedGetEventList).toHaveBeenCalledWith('tenant-test', '2026-01-01', '2026-01-31');
     });

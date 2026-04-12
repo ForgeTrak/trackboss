@@ -90,13 +90,13 @@ event.get('/list', async (req: Request, res: Response) => {
         try {
             const token = await verify(headerCheck.token);
             const tenantId = token.active_tenant_id as string;
-            const { range } = req.headers;
+            const dateRange = req.query.dateRange as string | undefined;
             let eventList: Event[];
-            if (typeof range === 'undefined') {
+            if (typeof dateRange === 'undefined') {
                 eventList = await getEventList(tenantId);
                 res.status(200);
             } else {
-                const [start, end] = range.split('-');
+                const [start, end] = dateRange.split('-');
                 if (start === undefined || end === undefined) {
                     throw new Error('user input error');
                 }

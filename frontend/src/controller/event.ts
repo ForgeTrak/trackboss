@@ -35,7 +35,7 @@ export async function makeEvent(name: string, description: string, start: Date, 
 
 export function getEventList(token: string, listType?: string): Promise<GetEventListResponse> {
     if (listType) {
-        return apiRequest(token, 'GET', '/api/event/list', undefined, { range: listType });
+        return apiRequest(token, 'GET', '/api/event/list', undefined, { dateRange: listType });
     }
     return apiRequest(token, 'GET', '/api/event/list');
 }

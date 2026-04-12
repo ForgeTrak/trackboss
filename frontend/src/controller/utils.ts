@@ -3,17 +3,10 @@ import moment from 'moment';
 export const API_BASE = import.meta.env.VITE_API_URL;
 
 /* eslint-disable radix */
-export function generateHeaders(token: string, range?: string): Headers {
-    if (typeof range === 'undefined') {
-        return new Headers({
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        });
-    }
+export function generateHeaders(token: string): Headers {
     return new Headers({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-        Range: `${range}`,
     });
 }
 
@@ -22,12 +15,16 @@ export async function apiRequest<T>(
     method: string,
     path: string,
     body?: any,
-    options?: { range?: string; mode?: 'cors' | 'no-cors' },
+    options?: { dateRange?: string; mode?: 'cors' | 'no-cors' },
 ): Promise<T> {
-    const response = await fetch(`${API_BASE}${path}`, {
+    let url = `${API_BASE}${path}`;
+    if (options?.dateRange) {
+        url += `?dateRange=${encodeURIComponent(options.dateRange)}`;
+    }
+    const response = await fetch(url, {
         method,
         mode: options?.mode || 'cors',
-        headers: generateHeaders(token, options?.range),
+        headers: generateHeaders(token),
         ...(body !== undefined && { body: JSON.stringify(body) }),
     });
     return response.json();
