@@ -1,3 +1,4 @@
+import * as cdk from 'aws-cdk-lib';
 import { App, CfnOutput, Duration, RemovalPolicy, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
@@ -374,7 +375,7 @@ export class DeployStack extends Stack {
         authType: lambda.FunctionUrlAuthType.NONE,
     });
 
-    const forgeTrakApiDomain = forgeTrakApiUrl.url.replace('https://', '').replace('/', '');
+    const forgeTrakApiDomain = cdk.Fn.select(2, cdk.Fn.split('/', forgeTrakApiUrl.url));
 
     const forgeTrakDistribution = new cloudfront.Distribution(this, 'forgeTrakApiDistribution', {
         defaultBehavior: {
