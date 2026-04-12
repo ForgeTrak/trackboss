@@ -16,6 +16,9 @@ import { aws_s3 as s3 } from 'aws-cdk-lib';
 import * as apprunner from '@aws-cdk/aws-apprunner-alpha';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 
 export class DeployStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
@@ -371,8 +374,36 @@ export class DeployStack extends Stack {
         authType: lambda.FunctionUrlAuthType.NONE,
     });
 
+    const forgeTrakApiDomain = forgeTrakApiUrl.url.replace('https://', '').replace('/', '');
+
+    const forgeTrakDistribution = new cloudfront.Distribution(this, 'forgeTrakApiDistribution', {
+        defaultBehavior: {
+            origin: new origins.HttpOrigin(forgeTrakApiDomain, {
+                protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+            }),
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+            cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+            originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+        },
+        domainNames: ['api.forgetrak.com'],
+        certificate: forgeTrakCert,
+    });
+
+    new route53.ARecord(this, 'forgeTrakApiAlias', {
+        zone: forgeTrakZone,
+        recordName: 'api',
+        target: route53.RecordTarget.fromAlias(
+            new route53Targets.CloudFrontTarget(forgeTrakDistribution),
+        ),
+    });
+
     new CfnOutput(this, 'forgeTrakApiLambdaUrl', {
         value: forgeTrakApiUrl.url,
+    });
+
+    new CfnOutput(this, 'forgeTrakApiCustomDomain', {
+        value: 'https://api.forgetrak.com',
     });
 
     // The next last resource goes here (adding this so I don't forget in a year when I inevitably need to add more infra and forget about this comment)
