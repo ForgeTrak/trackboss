@@ -15,6 +15,7 @@ import billing from '../../api/billing';
 import createPaymentLink from '../../integrations/square';
 import { createJsonRouterApp } from './testUtils';
 import { generateSquareLinks, processBillPayment, runBillingComplete } from '../../util/billing';
+import startBillingJob from '../../jobs/billingJob';
 
 jest.mock('../../util/auth', () => ({
     checkHeader: jest.fn(),
@@ -36,6 +37,10 @@ jest.mock('../../util/billing', () => ({
     generateSquareLinks: jest.fn(),
     processBillPayment: jest.fn(),
     runBillingComplete: jest.fn().mockResolvedValue({ created: 0 }),
+}));
+jest.mock('../../jobs/billingJob', () => ({
+    __esModule: true,
+    default: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('../../util/email', () => ({ sendInsuranceConfirmEmail: jest.fn() }));
 jest.mock('../../integrations/square', () => ({
@@ -73,6 +78,7 @@ const mockedAddSquare = addSquareAttributes as jest.MockedFunction<typeof addSqu
 const mockedProcessPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 const mockedGenLinks = generateSquareLinks as jest.MockedFunction<typeof generateSquareLinks>;
 const mockedRunBilling = runBillingComplete as jest.MockedFunction<typeof runBillingComplete>;
+const mockedStartBillingJob = startBillingJob as jest.MockedFunction<typeof startBillingJob>;
 const mockedCreatePaymentLink = createPaymentLink as jest.MockedFunction<typeof createPaymentLink>;
 
 describe('api/billing', () => {
@@ -110,10 +116,9 @@ describe('api/billing', () => {
     it('POST / runs billing as Admin', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({} as any);
-        mockedMembershipList.mockResolvedValue([] as any);
         const res = await request(app).post('/bill/').set('Authorization', 'Bearer t').send({});
         expect(res.status).toBe(201);
-        expect(mockedMembershipList).toHaveBeenCalledWith('active', 'tenant-test');
+        expect(mockedStartBillingJob).toHaveBeenCalled();
     });
 
     it('GET /:membershipID returns bills for Member role', async () => {
@@ -430,11 +435,10 @@ describe('api/billing', () => {
         expect(res.status).toBe(403);
     });
 
-    it('POST / returns 500 when runBillingComplete throws', async () => {
+    it('POST / returns 500 when startBillingJob throws', async () => {
         mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
         mockedVerify.mockResolvedValue({} as any);
-        mockedMembershipList.mockResolvedValue([] as any);
-        mockedRunBilling.mockRejectedValue(new Error('billing failed'));
+        mockedStartBillingJob.mockRejectedValue(new Error('billing failed'));
         const res = await request(app).post('/bill/').set('Authorization', 'Bearer t');
         expect(res.status).toBe(500);
     });
