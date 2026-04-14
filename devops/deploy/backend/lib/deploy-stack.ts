@@ -20,6 +20,8 @@ import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 export class DeployStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
@@ -405,6 +407,25 @@ export class DeployStack extends Stack {
 
     new CfnOutput(this, 'forgeTrakApiCustomDomain', {
         value: 'https://api.forgetrak.com',
+    });
+
+    const billingRunnerLambda = new lambda.Function(this, 'billingRunnerLambda', {
+        runtime: lambda.Runtime.NODEJS_24_X,
+        tracing: lambda.Tracing.ACTIVE,
+        code: lambda.Code.fromAsset('../../../lambda/billing'),
+        handler: 'billingRunner.handler',
+        environment: {
+            COGNITO_USERNAME: process.env.BILLING_COGNITO_USERNAME || '',
+            COGNITO_PASSWORD: process.env.BILLING_COGNITO_PASSWORD || '',
+            COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID || '',
+            API_BASE_URL: process.env.BILLING_API_BASE_URL || '',
+        },
+        timeout: Duration.minutes(10),
+    });
+
+    new events.Rule(this, 'billingRunnerSchedule', {
+        schedule: events.Schedule.cron({ minute: '35', hour: '2' }),
+        targets: [new targets.LambdaFunction(billingRunnerLambda)],
     });
 
     // The next last resource goes here (adding this so I don't forget in a year when I inevitably need to add more infra and forget about this comment)
