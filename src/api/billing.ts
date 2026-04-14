@@ -24,6 +24,7 @@ import { calculateBillingYear } from '../util/dateHelper';
 import { formatWorkbook, httpOutputWorkbook, startWorkbook } from '../excel/workbookHelper';
 import createPaymentLink from '../integrations/square';
 import logAuditEvent from '../database/auditLog';
+import startBillingJob from '../jobs/billingJob';
 
 //
 // TODO: Emails are not sent for generated bills (see emailBills helper function in util)
@@ -192,12 +193,8 @@ billing.post('/', async (req: Request, res: Response) => {
     } else {
         try {
             await verify(headerCheck.token, 'Admin');
-            const curYear = new Date().getFullYear();
-            logger.info(`billing - Running billing for year ${curYear} on tenant ${req.user.tenantId}`);
-            const membershipList = await getMembershipList('active', req.user.tenantId);
-            const generatedBills = await runBillingComplete(curYear, membershipList, undefined, req.user.tenantId);
+            await startBillingJob();
             res.status(201);
-            response = generatedBills;
         } catch (e: any) {
             logger.error(`billing - Error at path ${req.path}`, e);
             if (e.message === 'Authorization Failed') {
@@ -212,7 +209,7 @@ billing.post('/', async (req: Request, res: Response) => {
             }
         }
     }
-    res.send(response);
+    res.json({ status: `billing complete on ${new Date().toISOString()}` });
 });
 
 billing.patch('/attestIns/:billId', async (req: Request, res: Response) => {

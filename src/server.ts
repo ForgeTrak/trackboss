@@ -66,7 +66,5 @@ const server = (async () => {
     });
 })();
 
-startBillingJob();
-
 // export the HTTP server so that it can be closed if necessary (mostly for testing)
 export default server;
