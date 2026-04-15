@@ -110,8 +110,8 @@ export class DeployStack extends Stack {
     const dockerReg = `${account}.dkr.ecr.${region}.amazonaws.com`;
     const dockerImg = `${dockerReg}/pra/trackbossapi:latest`;
     
-    // attach to RDS from any VPC resource
-    const vpcRunnerRdsInbound = new ec2.SecurityGroup(this, 'vpcRunnerRdsInbound', {
+    // attach to RDS from app runner
+    const appRunnerRdsInbound = new ec2.SecurityGroup(this, 'appRunnerRdsInbound', {
         vpc,
         allowAllOutbound: true,
         description: 'inbound rules for database',
@@ -121,9 +121,9 @@ export class DeployStack extends Stack {
       instanceIdentifier: 'praclubmanager2-dev',
       instanceEndpointAddress: `arn:aws:rds:${region}:${account}:db:praclubmanager2-dev`,
       port: 3306,
-      securityGroups: [vpcRunnerRdsInbound],
+      securityGroups: [appRunnerRdsInbound],
     });
-    rdsInstance.connections.addSecurityGroup(vpcRunnerRdsInbound);
+    rdsInstance.connections.addSecurityGroup(appRunnerRdsInbound);
 
     const availabilityZones = [`${region}b`, `${region}c`];
 
