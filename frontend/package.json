@@ -71,7 +71,7 @@
     "scripts": {
         "start": "VITE_API_URL=\"http://localhost:8080\" VITE_AUTH_URL=\"https://pratrackboss.auth.us-east-1.amazoncognito.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in vite",
         "build-trackbosstest": "VITE_API_URL=\"https://trackbosstestapi.hogbackmx.com:4443\" VITE_AUTH_URL=\"https://pratrackboss.auth.us-east-1.amazoncognito.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in vite build",
-        "build-trackboss": "VITE_API_URL=\"https://trackboss-api.hogbackmx.com\" VITE_AUTH_URL=\"https://pratrackboss.auth.us-east-1.amazoncognito.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in vite build",
+        "build-trackboss": "VITE_API_URL=\"https://api.forgetrak.com\" VITE_AUTH_URL=\"https://pratrackboss.auth.us-east-1.amazoncognito.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in vite build",
         "build-ci": "VITE_API_URL=\"http://localhost:8080\" VITE_AUTH_URL=\"https://palmyramx-test.auth.us-east-1.amazoncognito.com\" VITE_CLIENT_ID=3q7ile80d2qk4bgt75af9684bq vite build",
         "preview": "vite preview",
         "test": "vitest run --coverage",
