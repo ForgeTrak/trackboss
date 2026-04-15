@@ -14,7 +14,6 @@ import { DatabaseInstanceEngine, MysqlEngineVersion } from 'aws-cdk-lib/aws-rds'
 import { aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
 import { SecretValue } from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
-import * as apprunner from '@aws-cdk/aws-apprunner-alpha';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
@@ -127,43 +126,18 @@ export class DeployStack extends Stack {
     rdsInstance.connections.addSecurityGroup(appRunnerRdsInbound);
 
     const availabilityZones = [`${region}b`, `${region}c`];
-    const vpcConnector = new apprunner.VpcConnector(this, 'VpcConnector', {
-        vpc,
-        vpcSubnets: vpc.selectSubnets({ availabilityZones }),
-        vpcConnectorName: `${environmentName}vpcConnector`,
-    });
- 
-    const trackbossApiService = new apprunner.Service(this, `${environmentName}-api-runner`, {
-        cpu: apprunner.Cpu.ONE_VCPU,
-        instanceRole: iam.Role.fromRoleName(this, 'trackboss-role', 'ec2_aws_access'),
-        source: apprunner.Source.fromEcr({
-          imageConfiguration: {
-            environmentVariables: {
-                MYSQL_DB: 'pradb',
-                MYSQL_HOST: 'instance',
-                MYSQL_USER: 'user',
-                MYSQL_PASS: 'pass',
-            },
-            port: 3000,
-          },
-          repository: ecr.Repository.fromRepositoryName(this, 'trackboss-repo', 'pra/trackbossapi'),
-          tagOrDigest: 'latest',
-        }),
-        vpcConnector,
-    });
 
     vpc.selectSubnets({ availabilityZones }).subnets.forEach(subnet => {
         rdsInstance.connections.allowFrom(ec2.Peer.ipv4(subnet.ipv4CidrBlock), ec2.Port.tcp(3306), 'App runner MySQL');
     });
-    availabilityZones.forEach((az) => {
-        const publicIp = new ec2.CfnEIP(this, `${environmentName}-${az}-elasticIp`);
-    });
+
+    /*
     const taggableInfra = [trackbossApiService];
     taggableInfra.forEach(infraElement => {
         Tags.of(infraElement).add('EnvironmentName', environmentName);
         Tags.of(infraElement).add('Name', `${environmentName}-api`);  
     });
-
+    */
     const applicationLogsGroup = new logs.LogGroup(
       this, 'LogGroup', {
         logGroupName: `${environmentName}-api-logs`
