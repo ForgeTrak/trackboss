@@ -172,6 +172,7 @@ export default function EventCalendar() {
             {
                 selectedEvent && (
                     <SelectedEventModal
+                        key={`${'eventId' in selectedEvent ? selectedEvent.eventId : ''}-${'jobId' in selectedEvent ? selectedEvent.jobId : ''}`}
                         isOpen={isViewEventOpen}
                         onClose={onViewEventClose}
                         selectedEvent={selectedEvent}
