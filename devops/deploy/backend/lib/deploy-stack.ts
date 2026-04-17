@@ -196,13 +196,6 @@ export class DeployStack extends Stack {
       tier: ssm.ParameterTier.STANDARD,
     });
 
-    const clubEmail = new ssm.StringParameter(this, 'clubEmail', {
-      allowedPattern: '.*',
-      parameterName: 'clubEmail',
-      stringValue: process.env.CLUB_EMAIL || '',
-      tier: ssm.ParameterTier.STANDARD,
-    });
-
     const trackbossEnvironmentName = new ssm.StringParameter(this, 'trackbossEnvironmentName', {
         allowedPattern: '.*',
         parameterName: 'trackbossEnvironmentName',
@@ -250,7 +243,7 @@ export class DeployStack extends Stack {
     appRunnerRole.addToPolicy(appRunnerSnsPolicy);
     
     const appRunnerParamStorePolicy = new iam.PolicyStatement();
-    [cognitoClientId, cognitoPoolId, clubEmail, trackbossEnvironmentName, accountParam, regionParam].forEach((ssmParam) => {
+    [cognitoClientId, cognitoPoolId, trackbossEnvironmentName, accountParam, regionParam].forEach((ssmParam) => {
         appRunnerParamStorePolicy.addActions('ssm:GetParameter');
         appRunnerParamStorePolicy.addResources(ssmParam.parameterArn);
     });
