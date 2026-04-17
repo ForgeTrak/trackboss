@@ -243,7 +243,7 @@ export class DeployStack extends Stack {
     appRunnerRole.addToPolicy(appRunnerSnsPolicy);
     
     const appRunnerParamStorePolicy = new iam.PolicyStatement();
-    [cognitoClientId, cognitoPoolId, clubEmail, trackbossEnvironmentName, accountParam, regionParam].forEach((ssmParam) => {
+    [cognitoClientId, cognitoPoolId, trackbossEnvironmentName, accountParam, regionParam].forEach((ssmParam) => {
         appRunnerParamStorePolicy.addActions('ssm:GetParameter');
         appRunnerParamStorePolicy.addResources(ssmParam.parameterArn);
     });
