@@ -2,8 +2,8 @@ jest.mock('../../database/pool', () => ({
     getPool: jest.fn(),
 }));
 
-jest.mock('../../util/environmentWrapper', () => ({
-    getEnvironmentParameter: jest.fn().mockResolvedValue('club@example.com'),
+jest.mock('../../database/tenant', () => ({
+    getTenantById: jest.fn().mockResolvedValue({ contactEmail: 'club@example.com' }),
 }));
 
 jest.mock('../../database/boardMember', () => ({
