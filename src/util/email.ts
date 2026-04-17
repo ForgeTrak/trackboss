@@ -5,8 +5,8 @@ import { getPool } from '../database/pool';
 import { getBoardMemberList } from '../database/boardMember';
 import { Bill } from '../typedefs/bill';
 import { Member } from '../typedefs/member';
-import { getEnvironmentParameter } from './environmentWrapper';
 import { calculateApplicationYear } from './dateHelper';
+import { getTenantById } from '../database/tenant';
 
 async function getEmailById(purpose: string, tenantId: string) {
     const values = [purpose, tenantId];
@@ -25,13 +25,15 @@ async function getEmailById(purpose: string, tenantId: string) {
         to: '',
         bcc: bccList,
         cc: '',
+        tenantId,
     })) || [];
     return emails[0];
 }
 
 export async function sendTextEmail(email: any) {
     AWS.config.update({ region: process.env.AWS_REGION });
-    const clubEmail = await getEnvironmentParameter('clubEmail') || '';
+    const tenant = await getTenantById(email.tenantId);
+    const clubEmail = tenant.contactEmail;
     const ses = new AWS.SES();
     const emailParams = {
         Destination: {

@@ -196,13 +196,6 @@ export class DeployStack extends Stack {
       tier: ssm.ParameterTier.STANDARD,
     });
 
-    const clubEmail = new ssm.StringParameter(this, 'clubEmail', {
-      allowedPattern: '.*',
-      parameterName: 'clubEmail',
-      stringValue: process.env.CLUB_EMAIL || '',
-      tier: ssm.ParameterTier.STANDARD,
-    });
-
     const trackbossEnvironmentName = new ssm.StringParameter(this, 'trackbossEnvironmentName', {
         allowedPattern: '.*',
         parameterName: 'trackbossEnvironmentName',
