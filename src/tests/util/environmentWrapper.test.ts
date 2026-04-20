@@ -59,14 +59,6 @@ describe('util/environmentWrapper', () => {
         await expect(getCognitoClientId()).resolves.toBe('client-y');
     });
 
-    it('getSquareObject parses secret JSON and returns same object on second call', async () => {
-        mockSecretString = '{"square":"one"}';
-        const a = await getSquareObject();
-        const b = await getSquareObject();
-        expect(a).toEqual({ square: 'one' });
-        expect(b).toEqual(a);
-    });
-
     it('getConnectionObject parses RDS secret', async () => {
         mockSecretString = '{"user":"u"}';
         const obj = await getConnectionObject();

@@ -2,11 +2,11 @@ import { v4 } from 'uuid';
 import { SquareClient } from 'square';
 import { Bill } from '../typedefs/bill';
 import logger from '../logger';
-import { getSquareObject } from '../util/environmentWrapper';
+import { getDefaultSettingValue } from '../database/defaultSettings';
 
 export default async function createPaymentLink(memberBill: Bill) {
-    const squareAccess = await getSquareObject();
-    const { locationId, token } = squareAccess;
+    const token = await getDefaultSettingValue('SQUARE_TOKEN', memberBill.tenantId);
+    const locationId = await getDefaultSettingValue('SQUARE_LOCATION', memberBill.tenantId);
 
     // Set Square credentials and environment
     const client = new SquareClient({

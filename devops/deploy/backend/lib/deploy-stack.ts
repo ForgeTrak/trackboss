@@ -216,14 +216,6 @@ export class DeployStack extends Stack {
         stringValue: region,
         tier: ssm.ParameterTier.STANDARD,
     });
-
-    const squareSsm = new secretsmanager.Secret(this, 'squareInfo', {
-        secretName: '/trackboss/app/square',
-        secretObjectValue: {
-          locationId: SecretValue.unsafePlainText(process.env.SQUARE_LOCATION || ''),
-          token: new SecretValue(process.env.SQUARE_TOKEN || ''),
-        },
-    });
     
     const appRunnerRole = new iam.Role(this, 'trackboss-api-role', {
         assumedBy: new iam.ServicePrincipal('tasks.apprunner.amazonaws.com'),
@@ -256,10 +248,6 @@ export class DeployStack extends Stack {
     });
     appRunnerRole.addToPolicy(appRunnerSqsPolicy);
 
-    const appRunnerSecretsManagerPolicy = new iam.PolicyStatement();
-    appRunnerSecretsManagerPolicy.addActions('secretsmanager:GetSecretValue');
-    appRunnerSecretsManagerPolicy.addResources(squareSsm.secretArn);
-    appRunnerRole.addToPolicy(appRunnerSecretsManagerPolicy);
     
     const appRunnerCloudWatchLogsPolicy = new iam.PolicyStatement();
     appRunnerCloudWatchLogsPolicy.addActions('logs:PutLogEvents');

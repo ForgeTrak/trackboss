@@ -31,18 +31,6 @@ export async function getCognitoClientId() {
     return getEnvironmentParameter('cognitoClientId');
 }
 
-export async function getSquareObject() {
-    if (!squareObject) {
-        const secretsClient = new AWS.SecretsManager();
-        const secretValue = await secretsClient.getSecretValue({
-            SecretId: '/trackboss/app/square',
-        }).promise();
-        logger.info('environmentWrapper - Pulled Square login info');
-        squareObject = JSON.parse(secretValue.SecretString || '');
-    }
-    return squareObject;
-}
-
 export async function getConnectionObject() {
     const secretsClient = new AWS.SecretsManager();
     const secretValue = await secretsClient.getSecretValue({
