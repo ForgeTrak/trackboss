@@ -8,10 +8,8 @@ cd $PROJECT_ROOT
 gitCommitId=`git rev-parse --short HEAD`
 backendChanges=`git status --porcelain src/`
 
-imageName="pra/trackbossapi:latest"
-imageNameCommit="pra/trackbossapi:$gitCommitId"
-forgetrakImageName="forgetrak/forgetrakapi:latest"
-forgetrakImageNameCommit="forgetrak/forgetrakapi:$gitCommitId"
+imageName="forgetrak/forgetrakapi:latest"
+imageNameCommit="forgetrak/forgetrak:$gitCommitId"
 dockerRegistry="425610073499.dkr.ecr.us-east-1.amazonaws.com"
 echo "Building docker image for $gitCommitId"
 docker build --platform linux/amd64 -t $imageName .
@@ -20,7 +18,4 @@ docker tag $imageName $dockerRegistry/$imageName
 docker tag $imageName $dockerRegistry/$imageNameCommit
 docker push $dockerRegistry/$imageName
 docker push $dockerRegistry/$imageNameCommit
-docker tag $imageName $dockerRegistry/$forgetrakImageName
-docker tag $imageName $dockerRegistry/$forgetrakImageNameCommit
-docker push $dockerRegistry/$forgetrakImageName
-docker push $dockerRegistry/$forgetrakImageNameCommit
+
