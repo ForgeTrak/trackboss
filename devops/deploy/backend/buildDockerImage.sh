@@ -9,7 +9,7 @@ gitCommitId=`git rev-parse --short HEAD`
 backendChanges=`git status --porcelain src/`
 
 imageName="forgetrak/forgetrakapi:latest"
-imageNameCommit="forgetrak/forgetrak:$gitCommitId"
+imageNameCommit="forgetrak/forgetrakapi:$gitCommitId"
 dockerRegistry="425610073499.dkr.ecr.us-east-1.amazonaws.com"
 echo "Building docker image for $gitCommitId"
 docker build --platform linux/amd64 -t $imageName .
