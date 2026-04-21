@@ -27,7 +27,7 @@ describe('ViewCommunicationModal', () => {
             />,
         );
 
-        expect(screen.getByText('Communication to PRA membership')).toBeInTheDocument();
+        expect(screen.getByText('Communication to membership')).toBeInTheDocument();
         expect(screen.getByText('Subject')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Test Subject')).toBeInTheDocument();
         expect(screen.getByText('Selected Tags')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('ViewCommunicationModal', () => {
             />,
         );
 
-        expect(screen.getByText('Communication to PRA membership')).toBeInTheDocument();
+        expect(screen.getByText('Communication to membership')).toBeInTheDocument();
         expect(screen.getByText('Subject')).toBeInTheDocument();
         expect(screen.getByText('Selected Tags')).toBeInTheDocument();
         expect(screen.getByText('Communication Type')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('ViewCommunicationModal', () => {
             />,
         );
 
-        expect(screen.getByText('Communication to PRA membership')).toBeInTheDocument();
+        expect(screen.getByText('Communication to membership')).toBeInTheDocument();
         expect(screen.getAllByDisplayValue('')).toHaveLength(3); // Should have 3 empty inputs
         expect(screen.getByText('Close')).toBeInTheDocument();
     });
@@ -99,7 +99,7 @@ describe('ViewCommunicationModal', () => {
             />,
         );
 
-        expect(screen.queryByText('Communication to PRA membership')).not.toBeInTheDocument();
+        expect(screen.queryByText('Communication to membership')).not.toBeInTheDocument();
         expect(screen.queryByText('Close')).not.toBeInTheDocument();
     });
 
