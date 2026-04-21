@@ -5,8 +5,6 @@ import { Link as DashboardLink } from '../../../../../src/typedefs/link';
 
 interface cardProps {
     dashboardLinks: DashboardLink[],
-    memberId: number,
-    jwt: string,
 }
 
 export default function ImportantLinksCard(props: cardProps) {
