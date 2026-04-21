@@ -70,7 +70,7 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
             <Heading
                 textAlign="center"
             >
-                Communication to PRA membership
+                Communication to membership
             </Heading>
             <Divider />
             <AppModalBody>

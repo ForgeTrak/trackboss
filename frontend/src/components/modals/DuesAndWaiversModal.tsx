@@ -146,7 +146,7 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
     return (
         <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading m={3}>
-                {`${billingYear + 1} PRA bill and attestation`}
+                {`${billingYear + 1} bill and attestation`}
             </Heading>
             <Box m={3}>
                 <Box mb={2}>

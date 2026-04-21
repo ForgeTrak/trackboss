@@ -107,7 +107,7 @@ export default function PointsLeaderboard() {
                 <YearsDropDown
                     years={yearsList}
                     initialYear={initialYear}
-                    header="PRA Points leaders"
+                    header="Points leaders"
                     setYear={setApplicationYear}
                 />
             </Center>

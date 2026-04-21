@@ -15,7 +15,7 @@ import DaysOfWeekSelect from './input/DaysOfWeekSelect';
 import WrappedSwitchInput from './input/WrappedSwitchInput';
 
 /**
- * A component representing a row in a PRA signup sheet, with all the data to represent a job.
+ * A component representing a row in a signup sheet, with all the data to represent a job.
  *
  * @param props
  * @returns

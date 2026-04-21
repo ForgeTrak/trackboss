@@ -106,9 +106,9 @@ export default function MembershipApplicationModal(props: appModalProps) {
                                 >
                                     {applicantNotes}
                                 </Textarea>
-                                <Text>Internal PRA Notes (not shared)</Text>
+                                <Text>Internal Notes (not shared)</Text>
                                 <Textarea
-                                    placeholder="Internal PRA notes (not shared)"
+                                    placeholder="Internal notes (not shared)"
                                     onChange={
                                         (e) => {
                                             setInternalNotes(e.target.value);

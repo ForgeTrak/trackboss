@@ -18,7 +18,7 @@ export default function ViewCommunicationModal(props: ViewCommunicationModalProp
             <Heading
                 textAlign="center"
             >
-                Communication to PRA membership
+                Communication to membership
             </Heading>
             <Divider />
             <AppModalBody>

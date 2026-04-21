@@ -373,7 +373,7 @@ billing.get('/list/excel', async (req: Request, res: Response) => {
             year: Number(billingYear),
         }, req.user.tenantId);
 
-        const workbookTitle = `PRA billing ${billingYear}`;
+        const workbookTitle = `Billing ${billingYear}`;
         const workbook = startWorkbook(workbookTitle);
         const worksheet = workbook.getWorksheet(1);
         worksheet.columns = [

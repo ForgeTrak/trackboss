@@ -9,7 +9,7 @@ interface UserContextInterface {
     isInitializing: boolean,
 }
 
-const TOKEN_STORAGE_KEY = 'trackboss_auth_token';
+const TOKEN_STORAGE_KEY = 'forgetrak_auth_token';
 
 export const initialUserContext: UserContextInterface = {
     loggedIn: false,

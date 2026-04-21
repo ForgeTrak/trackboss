@@ -303,7 +303,7 @@ function ApplicationForm() {
                     </Box>
                     <Box m={2}>
                         <Text>Referred By</Text>
-                        <Text fontSize="xs">This can be an existing, or former member of PRA.</Text>
+                        <Text fontSize="xs">This can be an existing, or former member of the organization.</Text>
                         <Input
                             value={referredBy}
                             onChange={
@@ -446,7 +446,7 @@ function ApplicationForm() {
                         <Text fontSize="2xl" as="em">{`${fullName}`}</Text>
                         <Divider />
                         <Text fontSize="xs">
-                            By signing in this field you agree to have your application reviewed by the PRA board
+                            By signing in this field you agree to have your application reviewed by the board
                             (including background searches) as well as to recieve communications via email and
                             text message about your application.
                         </Text>
@@ -501,7 +501,7 @@ function ApplicationForm() {
                 </Button>
             </Box>
             <SimpleAlertModal
-                title="Existing PRA member or applicant"
+                title="Existing member or applicant"
                 message={alertMsg}
                 isOpen={isOpen}
                 onClose={onClose}
@@ -516,7 +516,7 @@ function ApplicationForm() {
                 onClose={
                     () => {
                         onConfirmClose();
-                        window.location.href = 'https://palmyramx.com';
+                        window.location.href = 'https://google.com';
                     }
                 }
             />

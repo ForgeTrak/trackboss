@@ -5,8 +5,6 @@ import { Link as DashboardLink } from '../../../../../src/typedefs/link';
 
 interface cardProps {
     dashboardLinks: DashboardLink[],
-    memberId: number,
-    jwt: string,
 }
 
 export default function ImportantLinksCard(props: cardProps) {
@@ -18,17 +16,6 @@ export default function ImportantLinksCard(props: cardProps) {
                 </Center>
                 <Divider />
                 <UnorderedList>
-                    <Link
-                        target="_blank"
-                        fontSize="2xl"
-                        // eslint-disable-next-line max-len
-                        href={`${import.meta.env.VITE_API_URL}/api/member/card/create/${props.memberId}?id=${props.jwt}`}
-                        color="orange"
-                    >
-                        <ListItem>
-                            Membership Card
-                        </ListItem>
-                    </Link>
                     {
                         // eslint-disable-next-line arrow-body-style
                         props.dashboardLinks.map((link: DashboardLink) => {

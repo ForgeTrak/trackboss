@@ -21,22 +21,6 @@ describe('ImportantLinksCard', () => {
         expect(screen.getByRole('heading', { name: /club info and links/i })).toBeInTheDocument();
     });
 
-    it('renders the membership card link with API URL, member id, and jwt', () => {
-        renderWithProviders(
-            <ImportantLinksCard
-                dashboardLinks={[]}
-                memberId={42}
-                jwt="my-jwt"
-            />,
-        );
-
-        const membershipLink = screen.getByRole('link', { name: /membership card/i });
-        expect(membershipLink).toHaveAttribute(
-            'href',
-            'http://vitest-api.test/api/member/card/create/42?id=my-jwt',
-        );
-    });
-
     it('renders dashboard links from props', () => {
         renderWithProviders(
             <ImportantLinksCard

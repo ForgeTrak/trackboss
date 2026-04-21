@@ -200,9 +200,9 @@ describe('MembershipApplicationModal', () => {
         fireEvent.click(notesTab);
 
         expect(screen.getByText('Notes to applicant (emailed to applicant)')).toBeInTheDocument();
-        expect(screen.getByText('Internal PRA Notes (not shared)')).toBeInTheDocument();
+        expect(screen.getByText('Internal Notes (not shared)')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Notes to applicant (sent in email)')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Internal PRA notes (not shared)')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Internal notes (not shared)')).toBeInTheDocument();
     });
 
     it('shows warning alert about emails', () => {
