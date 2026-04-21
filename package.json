@@ -15,7 +15,7 @@
         "new-migration": "cd database/migrations && npx knex migrate:make $npm_config_name",
         "run-migrations": "cd database/migrations && npx knex migrate:latest",
         "seed-db": "mysql -u $MYSQL_USER -p$MYSQL_PASS -h $MYSQL_HOST < seeddump.sql",
-        "test": "jest", 
+        "test": "jest",
         "test:coverage": "jest --coverage"
     },
     "repository": {
@@ -55,8 +55,6 @@
         "knex": "^3.1.0",
         "lodash": "^4.17.21",
         "mysql2": "^3.11.5",
-        "node-cron": "^3.0.3",
-        "pdfkit": "^0.14.0",
         "sanitize-html": "^2.13.1",
         "square": "^43.0.2",
         "uuid": "^9.0.1",

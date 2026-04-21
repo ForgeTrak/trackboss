@@ -96,24 +96,11 @@ function Dashboard() {
 
     useEffect(() => {
         async function getData() {
-            setEventCardProps(await getEventCardPropsLocal(state.token));
-            if (state.user) {
-                setPercent(await getWorkPointsPercentage(state.token, state.user.membershipId));
-            }
-            await loadTrackStatuses();
-            await loadLinks();
-            await loadBills();
-        }
-        getData();
-    }, []);
-
-    useEffect(() => {
-        async function getData() {
             const latestGateCode = await getGateCodeLatest(state.token, state.user?.membershipId) as GateCode;
             setGateCode(latestGateCode.gateCode || latestGateCode.message || '');
         }
         getData();
-    });
+    }, [state.user]);
 
     async function updateArea(updatedArea: RidingAreaStatus) {
         await updateRidingAreaStatus(state.token, (updatedArea.id || 0), updatedArea);
@@ -181,8 +168,6 @@ function Dashboard() {
                         }
                         <ImportantLinksCard
                             dashboardLinks={dashboardLinks}
-                            memberId={state.user?.memberId || 0}
-                            jwt={state.token}
                         />
                     </SimpleGrid>
                 </Center>

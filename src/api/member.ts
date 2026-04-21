@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express';
-import PDFDocument from 'pdfkit';
 
 import { checkHeader, validateAdminAccess, verify } from '../util/auth';
 import {

@@ -15,7 +15,6 @@ import { markMembershipFormer } from '../../database/membership';
 import { getBoardMemberList } from '../../database/boardMember';
 import { getDefaultSettingValue } from '../../database/defaultSettings';
 import member from '../../api/member';
-import PDFDocument from 'pdfkit';
 import { createJsonRouterApp } from './testUtils';
 
 /** Captures Express `res` passed to `doc.pipe(res)` so `doc.end()` can finish the HTTP response in tests. */
@@ -43,33 +42,7 @@ jest.mock('../../excel/workbookHelper', () => ({
         res.end();
     }),
 }));
-jest.mock('pdfkit', () =>
-    jest.fn().mockImplementation(() => {
-        const doc: Record<string, unknown> = {
-            page: { width: 612, height: 792 },
-        };
-        doc.pipe = jest.fn((r: { end?: () => void }) => {
-            mockPdfPipeTarget.res = r;
-            return doc;
-        });
-        doc.moveTo = jest.fn().mockReturnValue(doc);
-        doc.lineTo = jest.fn().mockReturnValue(doc);
-        doc.lineWidth = jest.fn().mockReturnValue(doc);
-        doc.stroke = jest.fn().mockReturnValue(doc);
-        doc.image = jest.fn().mockReturnValue(doc);
-        doc.font = jest.fn().mockReturnValue(doc);
-        doc.fontSize = jest.fn().mockReturnValue(doc);
-        doc.text = jest.fn().mockReturnValue(doc);
-        doc.on = jest.fn((ev: string, cb: () => void) => {
-            if (ev === 'end') setImmediate(cb);
-        });
-        doc.end = jest.fn(() => {
-            const r = mockPdfPipeTarget.res as { end?: () => void } | undefined;
-            if (r && typeof r.end === 'function') r.end();
-        });
-        return doc;
-    }),
-);
+
 jest.mock('../../database/auditLog', () => ({
     __esModule: true,
     default: jest.fn(),
