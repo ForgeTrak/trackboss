@@ -312,7 +312,7 @@ export class DeployStack extends Stack {
     });
 
     const forgeTrakApiLambda = new lambda.DockerImageFunction(this, 'forgeTrakApiLambda', {
-        code: lambda.DockerImageCode.fromEcr(ecr.Repository.fromRepositoryName(this, 'forgetrak-lambda-repo', 'pra/trackbossapi'), {
+        code: lambda.DockerImageCode.fromEcr(ecr.Repository.fromRepositoryName(this, 'forgetrak-lambda-repo', 'forgetrak/forgetrakapi'), {
             tagOrDigest: 'latest',
         }),
         memorySize: 1024,
