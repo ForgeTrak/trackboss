@@ -78,18 +78,27 @@ function Dashboard() {
 
     useEffect(() => {
         async function getData() {
-            try {
-                setEventCardProps(await getEventCardPropsLocal(state.token));
-            } catch (error) {
+            const eventCardPromise = getEventCardPropsLocal(state.token);
+            const workPointsPromise = state.user
+                ? getWorkPointsPercentage(state.token, state.user.membershipId)
+                : Promise.resolve(0);
+            const statusesPromise = loadTrackStatuses();
+            const linksPromise = loadLinks();
+            const billsPromise = loadBills();
+
+            const [eventCardResult, workPointsResult] = await Promise.allSettled([
+                eventCardPromise, workPointsPromise, statusesPromise, linksPromise, billsPromise,
+            ]);
+
+            if (eventCardResult.status === 'fulfilled') {
+                setEventCardProps(eventCardResult.value);
+            } else {
                 // eslint-disable-next-line no-console
-                console.error(error);
+                console.error(eventCardResult.reason);
             }
-            if (state.user) {
-                setPercent(await getWorkPointsPercentage(state.token, state.user.membershipId));
+            if (workPointsResult.status === 'fulfilled') {
+                setPercent(workPointsResult.value);
             }
-            await loadTrackStatuses();
-            await loadLinks();
-            await loadBills();
         }
         getData();
     }, [state.user]);
