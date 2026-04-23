@@ -26,7 +26,7 @@ const app = express();
 
 const port = process.env.PORT || 8080;
 
-createVerifier();
+const verifierReady = createVerifier();
 
 AWS.config.update({ region: 'us-east-1' });
 
@@ -59,10 +59,9 @@ app.use((err: any, req: any, res: any, next: () => void) => {
 });
 
 const server = (async () => {
-    await configReady;
+    await Promise.all([configReady, verifierReady]);
     return app.listen(port, async () => {
-        const envName = await getEnvironmentParameter('trackbossEnvironmentName');
-        logger.info(`Forgetrak API environment ${envName} listening on port ${port}`);
+        logger.info(`Forgetrak API environment listening on port ${port}`);
     });
 })();
 
