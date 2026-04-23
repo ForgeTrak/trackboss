@@ -65,7 +65,6 @@ const mockedMarkFormer = markMembershipFormer as jest.MockedFunction<typeof mark
 const mockedEligible = getEligibleVoters as jest.MockedFunction<typeof getEligibleVoters>;
 const mockedBoardList = getBoardMemberList as jest.MockedFunction<typeof getBoardMemberList>;
 const mockedDefaultPw = getDefaultSettingValue as jest.MockedFunction<typeof getDefaultSettingValue>;
-const mockedPdfCtor = PDFDocument as jest.MockedFunction<typeof PDFDocument>;
 
 describe('api/member', () => {
     const app = createJsonRouterApp('/m', member);
