@@ -11,4 +11,5 @@ export type MemberCommunication = {
     selectedTags: string[],
     sentDate?: Date,
     members?: any,
+    fromEmail?: string,
 };
