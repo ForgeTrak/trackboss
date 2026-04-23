@@ -8,8 +8,7 @@ import logger from '../logger';
 let verifier: CognitoJwtVerifierSingleUserPool<{ userPoolId: string; tokenUse: 'id'; clientId: string[]; }>;
 
 const createVerifier = async () => {
-    const poolId = await getCognitoPoolId();
-    const clientId = await getCognitoClientId();
+    const [poolId, clientId] = await Promise.all([getCognitoPoolId(), getCognitoClientId()]);
     if (!poolId) {
         logger.error('No Cognito User Pool ID specified in environment');
         throw new Error('Auth setup failed due to missing pool ID');

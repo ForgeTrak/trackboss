@@ -4,8 +4,6 @@
 // 2022-01-19 23:23:41 [Club Manager] info: PRA Club Manager API listening on port 8080
 
 import { createLogger, format, transports } from 'winston';
-import WinstonCloudWatch from 'winston-cloudwatch';
-import { hostname } from 'os';
 
 const { combine, timestamp: timestampFn, label: labelFn, printf } = format;
 const logFormat =
@@ -13,10 +11,6 @@ const logFormat =
 
 let logTransports = [
     new transports.Console(),
-    new WinstonCloudWatch({
-        logGroupName: 'trackboss-api-logs',
-        logStreamName: `${hostname()}-${new Date().toLocaleDateString('en-CA')}`,
-    }),
 ];
 if (process.env.CW_LOGS_OFF === 'true') {
     logTransports = [
