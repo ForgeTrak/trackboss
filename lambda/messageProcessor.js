@@ -11,7 +11,7 @@ const ses = new SESClient({ region });
 exports.handler = async function (event) {
   console.log(JSON.stringify(event));
   const notificationMessage = JSON.parse(event.Records[0].body);
-  const { members, mechanism, subject } = notificationMessage;
+  const { members, mechanism, subject, fromEmail } = notificationMessage;
   let { text } = notificationMessage;
 
   console.log(`there are ${members.length} recipients.`);
@@ -27,7 +27,6 @@ exports.handler = async function (event) {
             Message: text,
             MessageAttributes: {
               'AWS.SNS.SMS.SMSType': { DataType: 'String', StringValue: 'Promotional' },
-              'AWS.SNS.SMS.SenderID': { DataType: 'String', StringValue: 'PRA-Hogback' },
             },
           })
         );
@@ -52,9 +51,9 @@ exports.handler = async function (event) {
     console.log(`Trackboss messaging lambda - added ${memberRecipients.length}`);
 
     let template = fs.readFileSync('./emailtemplate.html', 'utf8');
-    template = template.replace(/PRA_NOTIFICATION_TITLE/g, subject);
-    template = template.replace('PRA_NOTIFICATION_BODY', text);
-    template = template.replace('PRA_NOTIFICATION_SEND_TIME', new Date().toISOString());
+    template = template.replace(/NOTIFICATION_TITLE/g, subject);
+    template = template.replace('NOTIFICATION_BODY', text);
+    template = template.replace('NOTIFICATION_SEND_TIME', new Date().toISOString());
 
     for (const recipient of memberRecipients) {
       const emailParams = {
@@ -70,7 +69,7 @@ exports.handler = async function (event) {
             },
           },
         },
-        ReplyToAddresses: ['hogbacksecretary@gmail.com'],
+        ReplyToAddresses: [fromEmail],
         Source: 'admin@palmyramx.com',
       };
 
