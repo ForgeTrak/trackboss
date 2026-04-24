@@ -12,6 +12,7 @@ import { MemberCommunication } from '../typedefs/memberCommunication';
 import { getEnvironmentParameter } from '../util/environmentWrapper';
 import { getBoardMemberList } from '../database/boardMember';
 import logAuditEvent from '../database/auditLog';
+import { getTenantById } from '../database/tenant';
 
 const memberCommunication = Router();
 
@@ -42,6 +43,8 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
     try {
         await validateAdminAccess(req, res);
         const communication : MemberCommunication = req.body;
+        const tenant = await getTenantById(req.user.tenantId);
+        communication.fromEmail = tenant.contactEmail;
         // I add this here because we figure out what they are in this upcomign code block.
         communication.members = [];
         // on texts remove paragraph breaks inserted by Quill.
