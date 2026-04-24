@@ -8,6 +8,7 @@ import {
 import { getMemberList, getMembersWithTag } from '../../database/member';
 import { getBoardMemberList } from '../../database/boardMember';
 import { getEnvironmentParameter } from '../../util/environmentWrapper';
+import { getTenantById } from '../../database/tenant';
 import memberCommunication from '../../api/memberCommunication';
 import { createJsonRouterApp } from './testUtils';
 
@@ -19,6 +20,7 @@ jest.mock('../../util/auth', () => ({
 jest.mock('../../database/memberCommunication');
 jest.mock('../../database/member');
 jest.mock('../../database/boardMember');
+jest.mock('../../database/tenant');
 jest.mock('../../util/environmentWrapper', () => ({
     getEnvironmentParameter: jest.fn(),
     getConnectionObject: jest.fn().mockResolvedValue({}),
@@ -47,6 +49,7 @@ const mockedMemberList = getMemberList as jest.MockedFunction<typeof getMemberLi
 const mockedWithTag = getMembersWithTag as jest.MockedFunction<typeof getMembersWithTag>;
 const mockedBoardList = getBoardMemberList as jest.MockedFunction<typeof getBoardMemberList>;
 const mockedEnv = getEnvironmentParameter as jest.MockedFunction<typeof getEnvironmentParameter>;
+const mockedGetTenant = getTenantById as jest.MockedFunction<typeof getTenantById>;
 
 describe('api/memberCommunication', () => {
     const app = createJsonRouterApp('/mc', memberCommunication);
@@ -54,6 +57,7 @@ describe('api/memberCommunication', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockedValidate.mockResolvedValue({} as any);
+        mockedGetTenant.mockResolvedValue({ contactEmail: 'noreply@test.com' } as any);
     });
 
     it('returns all communications for admin', async () => {
