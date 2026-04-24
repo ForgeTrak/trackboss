@@ -5,7 +5,7 @@ ENV TZ="America/New_York"
 
 ENV PORT=3000
 ENV AWS_LWA_PORT=3000
-ENV AWS_LWA_READINESS_CHECK_PATH=/api/health
+ENV AWS_LWA_READINESS_CHECK_PATH=/api/health/readiness
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -18,5 +18,6 @@ COPY . .
 
 RUN npm install
 RUN npm run build
+RUN npm prune --production
 EXPOSE ${PORT}
 CMD [ "npm", "run", "server-prod" ]

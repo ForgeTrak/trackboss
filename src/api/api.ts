@@ -37,6 +37,11 @@ api.use((req, res, next) => {
 });
 api.use(bodyParser.json());
 
+// Lightweight readiness probe for Lambda Web Adapter - no DB dependency
+api.get('/health/readiness', (req: Request, res: Response) => {
+    res.status(200).send({ ok: true });
+});
+
 api.get('/me', async (req: Request, res: Response) => {
     const { authorization } = req.headers;
     let response;
