@@ -111,6 +111,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
             });
         }
         const response = await insertMemberCommunication(communication, req.user.tenantId);
+        response.fromEmail = tenant.contactEmail;
         logAuditEvent(req, 'memberCommunication', response.memberCommunicationId, null, req.body);
         // now stick the message in the respective SQS queue for further processing.
         const outboundQueueName = `forgetrak-prod-queue-${communication.mechanism}`;
