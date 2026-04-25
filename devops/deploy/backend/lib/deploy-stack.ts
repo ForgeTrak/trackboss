@@ -5,14 +5,11 @@ import { aws_iam as iam } from 'aws-cdk-lib';
 import { aws_certificatemanager as acm } from 'aws-cdk-lib';
 import { aws_route53 as route53 } from 'aws-cdk-lib';
 import { aws_rds as rds } from 'aws-cdk-lib';
-import { aws_logs as logs } from 'aws-cdk-lib';
 import { aws_ssm as ssm } from 'aws-cdk-lib';
 import { aws_sqs as sqs } from 'aws-cdk-lib';
 import { aws_lambda as lambda } from 'aws-cdk-lib';
 import { aws_lambda_event_sources as lambdaEventSources } from 'aws-cdk-lib';
 import { DatabaseInstanceEngine, MysqlEngineVersion } from 'aws-cdk-lib/aws-rds';
-import { aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
-import { SecretValue } from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
@@ -138,11 +135,6 @@ export class DeployStack extends Stack {
         Tags.of(infraElement).add('Name', `${environmentName}-api`);  
     });
     */
-    const applicationLogsGroup = new logs.LogGroup(
-      this, 'LogGroup', {
-        logGroupName: `${environmentName}-api-logs`
-      }
-    );
 
     // create queue
     const emailQueue = new sqs.Queue(this, 'trackboss-email-queue', {
@@ -196,13 +188,6 @@ export class DeployStack extends Stack {
       tier: ssm.ParameterTier.STANDARD,
     });
 
-    const trackbossEnvironmentName = new ssm.StringParameter(this, 'trackbossEnvironmentName', {
-        allowedPattern: '.*',
-        parameterName: 'trackbossEnvironmentName',
-        stringValue: 'trackboss',
-        tier: ssm.ParameterTier.STANDARD,
-    });
-
     const accountParam = new ssm.StringParameter(this, 'account', {
         allowedPattern: '.*',
         parameterName: 'account',
@@ -219,7 +204,7 @@ export class DeployStack extends Stack {
     
     const appRunnerRole = new iam.Role(this, 'trackboss-api-role', {
         assumedBy: new iam.ServicePrincipal('tasks.apprunner.amazonaws.com'),
-        roleName: `${trackbossEnvironmentName.stringValue}-api-runner-role`
+        roleName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}-api-runner-role`
     });
 
     // role for apprunner
@@ -235,7 +220,7 @@ export class DeployStack extends Stack {
     appRunnerRole.addToPolicy(appRunnerSnsPolicy);
     
     const appRunnerParamStorePolicy = new iam.PolicyStatement();
-    [cognitoClientId, cognitoPoolId, trackbossEnvironmentName, accountParam, regionParam].forEach((ssmParam) => {
+    [cognitoClientId, cognitoPoolId, accountParam, regionParam].forEach((ssmParam) => {
         appRunnerParamStorePolicy.addActions('ssm:GetParameter');
         appRunnerParamStorePolicy.addResources(ssmParam.parameterArn);
     });
@@ -320,6 +305,7 @@ export class DeployStack extends Stack {
         vpc,
         vpcSubnets: { subnets: privateSubnets },        
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
+        functionName: 'forgetrak-api-backend',
     });
 
     const forgeTrakApiUrl = forgeTrakApiLambda.addFunctionUrl({
@@ -370,6 +356,7 @@ export class DeployStack extends Stack {
             API_BASE_URL: process.env.BILLING_API_BASE_URL || '',
         },
         timeout: Duration.minutes(10),
+        functionName: 'forgetrak-billing-job',
     });
 
     new events.Rule(this, 'billingRunnerSchedule', {
