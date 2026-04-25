@@ -113,7 +113,7 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
         const response = await insertMemberCommunication(communication, req.user.tenantId);
         logAuditEvent(req, 'memberCommunication', response.memberCommunicationId, null, req.body);
         // now stick the message in the respective SQS queue for further processing.
-        const outboundQueueName = `trackboss-queue-${communication.mechanism}`;
+        const outboundQueueName = `forgetrak-prod-queue-${communication.mechanism}`;
         AWS.config.update({ region: process.env.AWS_REGION });
         const sqs = new AWS.SQS();
 

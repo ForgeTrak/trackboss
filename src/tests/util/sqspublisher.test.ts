@@ -39,7 +39,7 @@ describe('util/sqspublisher', () => {
         expect(mockSendMessage).toHaveBeenCalledWith(
             expect.objectContaining({
                 MessageBody: JSON.stringify(comm),
-                QueueUrl: 'https://sqs.us-east-1.amazonaws.com/111122223333/trackboss-queue-email',
+                QueueUrl: 'https://sqs.us-east-1.amazonaws.com/111122223333/forgetrak-prod-queue-email',
             }),
             expect.any(Function),
         );

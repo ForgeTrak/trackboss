@@ -5,7 +5,7 @@ import { getEnvironmentParameter } from './environmentWrapper';
 
 export default async function publishCommunicationSqs(communication : MemberCommunication) {
     // now stick the message in the respective SQS queue for further processing.
-    const outboundQueueName = `trackboss-queue-${communication.mechanism}`;
+    const outboundQueueName = `forgetrak-prod-queue-${communication.mechanism}`;
     AWS.config.update({ region: process.env.AWS_REGION });
     const sqs = new AWS.SQS();
 
