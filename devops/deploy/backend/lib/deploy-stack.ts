@@ -28,6 +28,7 @@ export class DeployStack extends Stack {
     const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC',{isDefault: true});
 
     const environmentName = process.env.TRACKBOSS_ENVIRONMENT_NAME || 'trackboss';
+    const forgetrakEnvironment = process.env.FORGETRAK_ENVIRONMENT_NAME || 'forgetrak-prod';
 
     // fck-nat: cheap NAT instance in the default VPC for Lambda outbound internet
     const fckNatSg = new ec2.SecurityGroup(this, 'FckNatSg', {
@@ -136,14 +137,16 @@ export class DeployStack extends Stack {
     });
     */
 
+    const communicationQueue = `${forgetrakEnvironment}-queue`;
+
     // create queue
-    const emailQueue = new sqs.Queue(this, 'trackboss-email-queue', {
-        queueName: 'trackboss-queue-EMAIL',
+    const emailQueue = new sqs.Queue(this, 'forgetrak-email-queue', {
+        queueName: `${communicationQueue}-EMAIL`,
         visibilityTimeout: Duration.minutes(10),
     });
 
-    const textQueue = new sqs.Queue(this, 'trackboss-text-queue', {
-        queueName: 'trackboss-queue-TEXT',
+    const textQueue = new sqs.Queue(this, 'forgetrak-text-queue', {
+        queueName: `${communicationQueue}-TEXT`,
         visibilityTimeout: Duration.minutes(10),
     });
     
@@ -305,7 +308,10 @@ export class DeployStack extends Stack {
         vpc,
         vpcSubnets: { subnets: privateSubnets },        
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
-        functionName: 'forgetrak-api-backend',
+        environment: {
+            FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
+        },
+        functionName: `${forgetrakEnvironment}-api-backend`,
     });
 
     const forgeTrakApiUrl = forgeTrakApiLambda.addFunctionUrl({
@@ -354,9 +360,10 @@ export class DeployStack extends Stack {
             COGNITO_PASSWORD: process.env.BILLING_COGNITO_PASSWORD || '',
             COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID || '',
             API_BASE_URL: process.env.BILLING_API_BASE_URL || '',
+            FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
         },
         timeout: Duration.minutes(10),
-        functionName: 'forgetrak-billing-job',
+        functionName: `${forgetrakEnvironment}-billing-job`,
     });
 
     new events.Rule(this, 'billingRunnerSchedule', {
