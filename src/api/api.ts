@@ -26,6 +26,7 @@ import link from './link';
 import paidLabor from './paidLabor';
 import defaultSetting from './defaultSetting';
 import auditLog from './auditLog';
+import dashboard from './dashboard';
 
 const api = Router();
 
@@ -100,4 +101,5 @@ api.use('/link', link);
 api.use('/paidLabor', paidLabor);
 api.use('/defaultSettings', defaultSetting);
 api.use('/auditLog', auditLog);
+api.use('/dashboard', dashboard);
 export default api;

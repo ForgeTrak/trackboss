@@ -1,41 +1,21 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Center, SimpleGrid, VStack } from '@chakra-ui/react';
+import moment from 'moment';
 import { useAppToast } from '../hooks/useAppToast';
 import Header from '../components/Header';
 import WorkPointsCard from '../components/WorkPointsCard';
 import ImportantLinksCard from '../components/cards/dashboard/ImportantLinksCard';
 import EventCard from '../components/EventCard';
-import { getEventCardProps } from '../controller/event';
-import { getWorkPointsTotal } from '../controller/workPoints';
-import { getBillsForMembership, getYearlyThresholdValue } from '../controller/billing';
 import GreetingText from '../components/GreetingText';
-import { getTodaysDate } from '../controller/utils';
-import { getGateCodeLatest } from '../controller/gateCode';
-import { GateCode } from '../../../src/typedefs/gateCode';
+import { getEventMonthDay, getTimeOfDay } from '../controller/utils';
 import TrackStatusCard from '../components/cards/dashboard/TrackStatusCard';
-import { getRidingAreaStatuses, updateRidingAreaStatus } from '../controller/ridingAreaStatus';
+import { updateRidingAreaStatus, getRidingAreaStatuses } from '../controller/ridingAreaStatus';
 import { RidingAreaStatus } from '../../../src/typedefs/ridingAreaStatus';
 import { signupForOpenEventJob } from '../controller/job';
 import { Link } from '../../../src/typedefs/link';
-import { getLinks } from '../controller/links';
 import { Bill } from '../../../src/typedefs/bill';
 import { UserContext } from '../contexts/UserContext';
-
-async function getEventCardPropsLocal(token: string): Promise<any | undefined> {
-    const nowString = getTodaysDate();
-    const props = await getEventCardProps(token, `${nowString}-`);
-    return props;
-}
-
-async function getWorkPointsPercentage(token: string, membershipId: number) {
-    const workPoints = await getWorkPointsTotal(token, membershipId);
-    const threshold = await getYearlyThresholdValue(token);
-    if (workPoints && threshold) {
-        return Math.ceil((workPoints / threshold) * 100);
-    }
-    // else
-    return 0;
-}
+import getDashboardData from '../controller/dashboard';
 
 function Dashboard() {
     const { state } = useContext(UserContext);
@@ -58,55 +38,54 @@ function Dashboard() {
         setRidingAreaStatuses(statuses);
     }
 
-    async function loadLinks() {
-        const links = await getLinks(state.token);
-        setDashboardLinks(links as Link[]);
-    }
-
-    async function loadBills() {
-        const bills = await getBillsForMembership(state.token, state.user?.membershipId || 0) as Bill[];
-        const today = new Date();
-        let billYear = today.getFullYear() - 1;
-        const isAfterNovember = (today.getMonth() > 10);
-        const isAfterBillingStart = (today.getMonth() === 10) && (today.getDate() >= 24);
-        if (isAfterNovember || isAfterBillingStart) {
-            billYear = today.getFullYear();
-        }
-        const displayBill = bills.filter((bill) => bill.year === billYear);
-        setLastBill(displayBill[0]);
-    }
-
     useEffect(() => {
         async function getData() {
-            const eventCardPromise = getEventCardPropsLocal(state.token);
-            const workPointsPromise = state.user
-                ? getWorkPointsPercentage(state.token, state.user.membershipId)
-                : Promise.resolve(0);
-            const statusesPromise = loadTrackStatuses();
-            const linksPromise = loadLinks();
-            const billsPromise = loadBills();
+            if (!state.user) return;
+            const data = await getDashboardData(state.token, state.user.membershipId);
 
-            const [eventCardResult, workPointsResult] = await Promise.allSettled([
-                eventCardPromise, workPointsPromise, statusesPromise, linksPromise, billsPromise,
-            ]);
-
-            if (eventCardResult.status === 'fulfilled') {
-                setEventCardProps(eventCardResult.value);
-            } else {
-                // eslint-disable-next-line no-console
-                console.error(eventCardResult.reason);
+            // Event card props
+            if (data.eventList && data.eventList.length > 0) {
+                const event = data.eventList[0];
+                const startTime = event.start.toString();
+                setEventCardProps({
+                    title: event.title,
+                    start: getEventMonthDay(startTime),
+                    end: getEventMonthDay(event.end.toString()),
+                    time: getTimeOfDay(startTime),
+                    fullDate: moment(event.start).format('MM-DD-YYYY'),
+                    id: event.eventId,
+                    eventType: event.eventType.toLowerCase(),
+                    description: event.eventDescription,
+                });
             }
-            if (workPointsResult.status === 'fulfilled') {
-                setPercent(workPointsResult.value);
-            }
-        }
-        getData();
-    }, [state.user]);
 
-    useEffect(() => {
-        async function getData() {
-            const latestGateCode = await getGateCodeLatest(state.token, state.user?.membershipId) as GateCode;
-            setGateCode(latestGateCode.gateCode || latestGateCode.message || '');
+            // Work points percentage
+            const workPoints = data.workPoints?.total || 0;
+            const threshold = data.threshold?.threshold || 0;
+            if (threshold > 0) {
+                setPercent(Math.ceil((workPoints / threshold) * 100));
+            }
+
+            // Riding area statuses
+            setRidingAreaStatuses(data.ridingAreaStatuses || []);
+
+            // Links
+            setDashboardLinks(data.links || []);
+
+            // Bills
+            const bills = (data.bills || []) as Bill[];
+            const today = new Date();
+            let billYear = today.getFullYear() - 1;
+            const isAfterNovember = (today.getMonth() > 10);
+            const isAfterBillingStart = (today.getMonth() === 10) && (today.getDate() >= 24);
+            if (isAfterNovember || isAfterBillingStart) {
+                billYear = today.getFullYear();
+            }
+            const displayBill = bills.filter((bill) => bill.year === billYear);
+            setLastBill(displayBill[0]);
+
+            // Gate code
+            setGateCode(data.gateCode?.gateCode || data.gateCode?.message || '');
         }
         getData();
     }, [state.user]);
