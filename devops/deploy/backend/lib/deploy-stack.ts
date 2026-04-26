@@ -27,7 +27,6 @@ export class DeployStack extends Stack {
 
     const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC',{isDefault: true});
 
-    const environmentName = process.env.TRACKBOSS_ENVIRONMENT_NAME || 'trackboss';
     const forgetrakEnvironment = process.env.FORGETRAK_ENVIRONMENT_NAME || 'forgetrak-prod';
 
     // fck-nat: cheap NAT instance in the default VPC for Lambda outbound internet
@@ -53,7 +52,7 @@ export class DeployStack extends Stack {
     // Private subnets in the default VPC for Lambda placement
     const privateRouteTable = new ec2.CfnRouteTable(this, 'PrivateRouteTable', {
       vpcId: vpc.vpcId,
-      tags: [{ key: 'Name', value: `${environmentName}-private-rt` }],
+      tags: [{ key: 'Name', value: `${forgetrakEnvironment}-private-rt` }],
     });
     new ec2.CfnRoute(this, 'NatRoute', {
       routeTableId: privateRouteTable.ref,
@@ -66,7 +65,7 @@ export class DeployStack extends Stack {
         vpcId: vpc.vpcId,
         cidrBlock: `172.31.${128 + i}.0/24`,
         availabilityZone: az,
-        tags: [{ key: 'Name', value: `${environmentName}-private-${az}` }],
+        tags: [{ key: 'Name', value: `${forgetrakEnvironment}-private-${az}` }],
       });
       new ec2.CfnSubnetRouteTableAssociation(this, `PrivateRtAssoc${i}`, {
         subnetId: cfnSubnet.ref,
@@ -128,14 +127,6 @@ export class DeployStack extends Stack {
     vpc.selectSubnets({ availabilityZones }).subnets.forEach(subnet => {
         rdsInstance.connections.allowFrom(ec2.Peer.ipv4(subnet.ipv4CidrBlock), ec2.Port.tcp(3306), 'App runner MySQL');
     });
-
-    /*
-    const taggableInfra = [trackbossApiService];
-    taggableInfra.forEach(infraElement => {
-        Tags.of(infraElement).add('EnvironmentName', environmentName);
-        Tags.of(infraElement).add('Name', `${environmentName}-api`);  
-    });
-    */
 
     const communicationQueue = `${forgetrakEnvironment}-queue`;
 

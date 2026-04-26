@@ -9,6 +9,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SAC }}
   PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
   TRACKBOSS_ENVIRONMENT_NAME: trackboss
+  FORGETRAK_ENVIRONMENT_NAME: forgetrak-prod
   COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
   COGNITO_POOL_ID: ${{ secrets.COGNITO_POOL_ID }}
   CLUB_EMAIL: ${{ secrets.CLUB_EMAIL }}
