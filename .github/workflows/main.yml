@@ -14,23 +14,13 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_AKI }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SAC }}  
   TRACKBOSS_ENVIRONMENT_NAME: trackboss
+  FORGETRAK_ENVIRONMENT_NAME: forgetrak-prod
   COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
   COGNITO_POOL_ID: ${{ secrets.COGNITO_POOL_ID }}
   CLUB_EMAIL: ${{ secrets.CLUB_EMAIL }}
   SQUARE_TOKEN: ${{ secrets.SQUARE_TOKEN }}
   SQUARE_LOCATION: ${{ secrets.SQUARE_LOCATION }}
 jobs:
-#   backend-cdk-build:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v2
-#     - name: Specify Node version
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: ${{ env.NODE_VERSION }}
-#     - name: Run CDK backend deployment
-#       run: bash devops/deploy/backend/deployBackendInfra.sh $HOME/work/trackboss/trackboss
   backend-docker-build:
     runs-on: ubuntu-latest
     steps:
