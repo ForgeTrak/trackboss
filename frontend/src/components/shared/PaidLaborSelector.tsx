@@ -29,7 +29,7 @@ export default function PaidLaborSelector(props: PaidLaborSelectorProps) {
     const [refreshList, setRefreshList] = useState<boolean>();
     const [newEntry, setNewEntry] = useState<PaidLabor>();
 
-    const [selectedOption] = useState<any>();
+    const [selectedOption, setSelectedOption] = useState<any>();
 
     useEffect(() => {
         async function getData() {
@@ -75,6 +75,7 @@ export default function PaidLaborSelector(props: PaidLaborSelectorProps) {
                 isDisabled={props.disabled && !props.isAdmin}
                 onChange={
                     async (e) => {
+                        setSelectedOption(e);
                         props.setSelectedOption(e);
                     }
                 }

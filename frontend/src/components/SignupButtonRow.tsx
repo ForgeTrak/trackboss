@@ -47,18 +47,12 @@ export default function SignupButtonRow(props: any) {
 
     useEffect(() => {
         async function signupForJobDropdown() {
+            if (!selectedOption?.value) return;
             await signupForJob(state.token, props.data.jobId, selectedOption.value);
             props.refreshData();
         }
         signupForJobDropdown();
     }, [selectedOption]);
-
-    useEffect(() => {
-        async function signupLaborForJobDropdown() {
-            props.refreshData();
-        }
-        signupLaborForJobDropdown();
-    }, [selectedPaidLaborOption]);
 
     let signupButton;
     if (!props.data.member) {
@@ -112,11 +106,13 @@ export default function SignupButtonRow(props: any) {
                         <Button
                             backgroundColor="orange.300"
                             color="white"
+                            isDisabled={!selectedPaidLaborOption?.value}
                             onClick={
                                 async () => {
+                                    if (!selectedPaidLaborOption?.value) return;
                                     // eslint-disable-next-line max-len
                                     await signupForJob(state.token, props.data.jobId, selectedPaidLaborOption.value, true);
-                                    // await signupForJobFreeForm(state.token, props.data.jobId, paidLabor);
+                                    setSelectedPaidLaborOption(undefined);
                                     await props.refreshData();
                                     setMarkedPaid(true);
                                     onNonMemberClose();

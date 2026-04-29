@@ -970,13 +970,16 @@ exports.up = async function (knex) {
       IN _points_awarded FLOAT,
       IN _verified BIT,
       IN _paid BIT,
-      IN _modified_by INT
+      IN _modified_by INT,
+      IN _paid_labor VARCHAR(255),
+      IN _paid_labor_id INT
     )
     BEGIN
       SELECT member_id, event_id, job_type_id, job_start_date, job_end_date, points_awarded,
-        verified, paid
+        verified, paid, paid_labor, paid_labor_id
       INTO @cur_member_id, @cur_event_id, @cur_job_type_id, @cur_job_start_date,
-        @cur_job_end_date, @cur_points_awarded, @cur_verified, @cur_paid
+        @cur_job_end_date, @cur_points_awarded, @cur_verified, @cur_paid,
+        @cur_paid_labor, @cur_paid_labor_id
       FROM job
       WHERE job_id = _job_id AND tenant_id = _tenant_id;
 
@@ -999,6 +1002,8 @@ exports.up = async function (knex) {
         job_start_date = IFNULL(_job_start_date, @cur_job_start_date),
         job_end_date = IFNULL(_job_end_date, @cur_job_end_date),
         points_awarded = IFNULL(_points_awarded, @cur_points_awarded),
+        paid_labor = IFNULL(_paid_labor, @cur_paid_labor),
+        paid_labor_id = IFNULL(_paid_labor_id, @cur_paid_labor_id),
         last_modified_date = CURDATE(),
         last_modified_by = _modified_by
       WHERE job_id = _job_id AND tenant_id = _tenant_id;
