@@ -174,7 +174,7 @@ export class DeployStack extends Stack {
       credentials: rds.Credentials.fromGeneratedSecret('admin', {
         secretName: `${forgetrakEnvironment}-rds-credentials`,
       }),
-      databaseName: 'pradb',
+      databaseName: 'forgetrak',
       parameterGroup: newRdsParamGroup,
       securityGroups: [newRdsSg],
       backupRetention: Duration.days(7),
