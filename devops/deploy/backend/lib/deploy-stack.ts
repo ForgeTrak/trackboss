@@ -146,6 +146,49 @@ export class DeployStack extends Stack {
       description: 'RDS MySql parameter group to allow the use of triggers.', 
     });  
     rdsParamGroup.addParameter('log_bin_trust_function_creators','1');
+
+    // New CDK-managed RDS instance (replacement for the legacy clickops praclubmanager2-dev).
+    // Side-by-side with the imported instance above during migration.
+    const newRdsEngine = DatabaseInstanceEngine.mysql({ version: MysqlEngineVersion.VER_8_4_8 });
+
+    const newRdsParamGroup = new rds.ParameterGroup(this, 'forgetrakRdsParamGroup', {
+      engine: newRdsEngine,
+      description: 'RDS MySQL 8.4 parameter group (allow trigger creation).',
+    });
+    newRdsParamGroup.addParameter('log_bin_trust_function_creators', '1');
+
+    const newRdsSg = new ec2.SecurityGroup(this, 'forgetrakRdsSg', {
+      vpc,
+      allowAllOutbound: true,
+      description: 'Security group for forgetrak RDS instance',
+    });
+
+    const newRdsInstance = new rds.DatabaseInstance(this, 'forgetrakRds', {
+      engine: newRdsEngine,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      publiclyAccessible: true,
+      allocatedStorage: 20,
+      storageType: rds.StorageType.GP2,
+      credentials: rds.Credentials.fromGeneratedSecret('admin', {
+        secretName: `${forgetrakEnvironment}-rds-credentials`,
+      }),
+      databaseName: 'pradb',
+      parameterGroup: newRdsParamGroup,
+      securityGroups: [newRdsSg],
+      backupRetention: Duration.days(7),
+      deletionProtection: true,
+      removalPolicy: RemovalPolicy.RETAIN,
+      instanceIdentifier: `${forgetrakEnvironment}-rds`,
+    });
+
+    new CfnOutput(this, 'forgetrakRdsEndpoint', {
+      value: newRdsInstance.dbInstanceEndpointAddress,
+    });
+    new CfnOutput(this, 'forgetrakRdsSecretArn', {
+      value: newRdsInstance.secret?.secretArn ?? '',
+    });
     
     // inbound handling for text messages
     const inboundMemberCommLambda = new lambda.Function(this, 'inboundMemberCommHandler', {
@@ -275,6 +318,9 @@ export class DeployStack extends Stack {
     databackupBucket.grantWrite(dataBackupLambda);
     databackupBucket.grantReadWrite(dataBackupLambda);
 
+    newRdsInstance.connections.allowDefaultPortFrom(dataBackupLambda, 'Data backup lambda to new RDS');
+    newRdsInstance.secret?.grantRead(dataBackupLambda);
+
     const cognitoTenantIdsInjection = new lambda.Function(this, 'cognitoTenantIdsInjection', {
         runtime: lambda.Runtime.NODEJS_22_X,
         tracing: lambda.Tracing.ACTIVE,
@@ -304,6 +350,9 @@ export class DeployStack extends Stack {
         },
         functionName: `${forgetrakEnvironment}-api-backend`,
     });
+
+    newRdsInstance.connections.allowDefaultPortFrom(forgeTrakApiLambda, 'forgeTrak API lambda to new RDS');
+    newRdsInstance.secret?.grantRead(forgeTrakApiLambda);
 
     const forgeTrakApiUrl = forgeTrakApiLambda.addFunctionUrl({
         authType: lambda.FunctionUrlAuthType.NONE,
