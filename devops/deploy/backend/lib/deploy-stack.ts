@@ -347,6 +347,7 @@ export class DeployStack extends Stack {
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
         environment: {
             FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
+            RDS_CONNECTION_ID: '/trackboss/app/rds', // newRdsInstance.secret?.secretName || '',
         },
         functionName: `${forgetrakEnvironment}-api-backend`,
     });
