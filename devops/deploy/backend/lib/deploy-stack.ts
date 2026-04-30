@@ -180,7 +180,7 @@ export class DeployStack extends Stack {
       backupRetention: Duration.days(7),
       deletionProtection: true,
       removalPolicy: RemovalPolicy.RETAIN,
-      instanceIdentifier: `${forgetrakEnvironment}-rds`,
+      instanceIdentifier: `${forgetrakEnvironment}-db`,
     });
 
     new CfnOutput(this, 'forgetrakRdsEndpoint', {
