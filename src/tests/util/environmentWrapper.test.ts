@@ -60,6 +60,7 @@ describe('util/environmentWrapper', () => {
     });
 
     it('getConnectionObject parses RDS secret', async () => {
+        process.env.RDS_CONNECTION_ID = 'rds_fake_one';
         mockSecretString = '{"user":"u"}';
         const obj = await getConnectionObject();
         expect(obj).toEqual({ user: 'u' });
