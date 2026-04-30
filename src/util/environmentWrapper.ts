@@ -44,9 +44,13 @@ export async function getCognitoClientId() {
 }
 
 export async function getConnectionObject() {
-    const secretValue = await secretsClient.getSecretValue({
-        SecretId: '/trackboss/app/rds',
-    }).promise();
-    logger.info(`environmentWrapper - Pulled database connection info from ${secretValue.Name}`);
-    return JSON.parse(secretValue.SecretString || '');
+    const secretId = process.env.RDS_CONNECTION_ID || '';
+    if (secretId) {
+        const secretValue = await secretsClient.getSecretValue({
+            SecretId: secretId,
+        }).promise();
+        logger.info(`environmentWrapper - Pulled database connection info from ${secretValue.Name}`);
+        return JSON.parse(secretValue.SecretString || '');
+    }
+    return '';
 }

@@ -20,7 +20,11 @@ export async function initConfig() {
     const { host, username, password, dbname } = connectionObject;
     const { MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
     if (MYSQL_USER && MYSQL_PASS) {
-        logger.warn('pool - database connection info found in both env vars and secrets manager. Environment variables will take precedence.');
+        if (connectionObject) {
+            logger.warn('pool - database connection info found in both env vars and secrets manager. Environment variables will take precedence.');
+        } else {
+            logger.info('pool - db connection pulled from env vars.');
+        }
     } else if (connectionObject) {
         logger.info('pool - database connection info pulled from secrets manager');
     }
