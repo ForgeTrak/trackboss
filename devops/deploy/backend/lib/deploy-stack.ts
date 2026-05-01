@@ -114,20 +114,6 @@ export class DeployStack extends Stack {
         description: 'inbound rules for database',
     });
 
-    const rdsInstance = rds.DatabaseInstance.fromDatabaseInstanceAttributes(this, 'trackBossAppDb', {
-      instanceIdentifier: 'praclubmanager2-dev',
-      instanceEndpointAddress: `arn:aws:rds:${region}:${account}:db:praclubmanager2-dev`,
-      port: 3306,
-      securityGroups: [appRunnerRdsInbound],
-    });
-    rdsInstance.connections.addSecurityGroup(appRunnerRdsInbound);
-
-    const availabilityZones = [`${region}b`, `${region}c`];
-
-    vpc.selectSubnets({ availabilityZones }).subnets.forEach(subnet => {
-        rdsInstance.connections.allowFrom(ec2.Peer.ipv4(subnet.ipv4CidrBlock), ec2.Port.tcp(3306), 'App runner MySQL');
-    });
-
     const communicationQueue = `${forgetrakEnvironment}-queue`;
 
     // create queue
@@ -163,7 +149,7 @@ export class DeployStack extends Stack {
       description: 'Security group for forgetrak RDS instance',
     });
 
-    const newRdsInstance = new rds.DatabaseInstance(this, 'forgetrakRds', {
+    const forgeTrakRdsInstance = new rds.DatabaseInstance(this, 'forgetrakRds', {
       engine: newRdsEngine,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
       vpc,
@@ -184,10 +170,10 @@ export class DeployStack extends Stack {
     });
 
     new CfnOutput(this, 'forgetrakRdsEndpoint', {
-      value: newRdsInstance.dbInstanceEndpointAddress,
+      value: forgeTrakRdsInstance.dbInstanceEndpointAddress,
     });
     new CfnOutput(this, 'forgetrakRdsSecretArn', {
-      value: newRdsInstance.secret?.secretArn ?? '',
+      value: forgeTrakRdsInstance.secret?.secretArn ?? '',
     });
     
     // inbound handling for text messages
@@ -306,7 +292,7 @@ export class DeployStack extends Stack {
         vpc,
         vpcSubnets: { subnets: privateSubnets },
         environment: {
-            DB_HOST: rdsInstance.instanceEndpoint.hostname,
+            DB_HOST: forgeTrakRdsInstance.instanceEndpoint.hostname,
             DB_NAME: 'pradb',
             DB_USER: '',
             DB_PASS: '',
@@ -318,8 +304,8 @@ export class DeployStack extends Stack {
     databackupBucket.grantWrite(dataBackupLambda);
     databackupBucket.grantReadWrite(dataBackupLambda);
 
-    newRdsInstance.connections.allowDefaultPortFrom(dataBackupLambda, 'Data backup lambda to new RDS');
-    newRdsInstance.secret?.grantRead(dataBackupLambda);
+    forgeTrakRdsInstance.connections.allowDefaultPortFrom(dataBackupLambda, 'Data backup lambda to new RDS');
+    forgeTrakRdsInstance.secret?.grantRead(dataBackupLambda);
 
     const cognitoTenantIdsInjection = new lambda.Function(this, 'cognitoTenantIdsInjection', {
         runtime: lambda.Runtime.NODEJS_22_X,
@@ -347,13 +333,13 @@ export class DeployStack extends Stack {
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
         environment: {
             FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
-            RDS_CONNECTION_ID: '/trackboss/app/rds', // newRdsInstance.secret?.secretName || '',
+            RDS_CONNECTION_ID: forgeTrakRdsInstance.secret?.secretName || '',
         },
         functionName: `${forgetrakEnvironment}-api-backend`,
     });
 
-    newRdsInstance.connections.allowDefaultPortFrom(forgeTrakApiLambda, 'forgeTrak API lambda to new RDS');
-    newRdsInstance.secret?.grantRead(forgeTrakApiLambda);
+    forgeTrakRdsInstance.connections.allowDefaultPortFrom(forgeTrakApiLambda, 'forgeTrak API lambda to new RDS');
+    forgeTrakRdsInstance.secret?.grantRead(forgeTrakApiLambda);
 
     const forgeTrakApiUrl = forgeTrakApiLambda.addFunctionUrl({
         authType: lambda.FunctionUrlAuthType.NONE,
