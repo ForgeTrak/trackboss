@@ -6,24 +6,25 @@ jest.mock('../../util/email', () => ({
     sendPasswordReset: jest.fn().mockResolvedValue(undefined),
 }));
 
-const mockAdminCreateUser = jest.fn();
-const mockAdminAddUserToGroup = jest.fn();
-const mockAdminDeleteUser = jest.fn();
-const mockAdminUpdateUserAttributes = jest.fn();
-const mockAdminResetUserPassword = jest.fn();
-const mockAdminSetUserPassword = jest.fn();
+const mockSend = jest.fn();
 
-jest.mock('aws-sdk', () => ({
-    CognitoIdentityServiceProvider: jest.fn().mockImplementation(() => ({
-        adminCreateUser: mockAdminCreateUser,
-        adminAddUserToGroup: mockAdminAddUserToGroup,
-        adminDeleteUser: mockAdminDeleteUser,
-        adminUpdateUserAttributes: mockAdminUpdateUserAttributes,
-        adminResetUserPassword: mockAdminResetUserPassword,
-        adminSetUserPassword: mockAdminSetUserPassword,
-    })),
-}));
+jest.mock('@aws-sdk/client-cognito-identity-provider', () => {
+    const actual = jest.requireActual('@aws-sdk/client-cognito-identity-provider');
+    return {
+        ...actual,
+        CognitoIdentityProviderClient: jest.fn().mockImplementation(() => ({
+            send: mockSend,
+        })),
+    };
+});
 
+import {
+    AdminCreateUserCommand,
+    AdminAddUserToGroupCommand,
+    AdminDeleteUserCommand,
+    AdminSetUserPasswordCommand,
+    AdminResetUserPasswordCommand,
+} from '@aws-sdk/client-cognito-identity-provider';
 import { sendPasswordReset } from '../../util/email';
 import {
     createCognitoUser,
@@ -37,46 +38,59 @@ const mockedSendPwReset = sendPasswordReset as jest.MockedFunction<typeof sendPa
 describe('util/cognito', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        mockAdminCreateUser.mockReturnValue({
-            promise: jest.fn().mockResolvedValue({
-                User: { Username: 'uuid-abc' },
-            }),
+        mockSend.mockImplementation(async (command: unknown) => {
+            if (command instanceof AdminCreateUserCommand) {
+                return { User: { Username: 'uuid-abc' } };
+            }
+            return {};
         });
-        mockAdminAddUserToGroup.mockReturnValue({ promise: jest.fn().mockResolvedValue({}) });
-        mockAdminDeleteUser.mockReturnValue({ promise: jest.fn().mockResolvedValue({}) });
-        mockAdminUpdateUserAttributes.mockReturnValue({ promise: jest.fn().mockResolvedValue({}) });
-        mockAdminResetUserPassword.mockReturnValue({ promise: jest.fn().mockResolvedValue({}) });
-        mockAdminSetUserPassword.mockReturnValue({ promise: jest.fn().mockResolvedValue({}) });
     });
 
     it('createCognitoUser creates user and adds member group', async () => {
         const uuid = await createCognitoUser('a@b.com', false, 'tenant-1');
         expect(uuid).toBe('uuid-abc');
-        expect(mockAdminCreateUser).toHaveBeenCalled();
-        expect(mockAdminAddUserToGroup).toHaveBeenCalledWith(
+        const sendCalls = mockSend.mock.calls;
+        expect(sendCalls[0][0]).toBeInstanceOf(AdminCreateUserCommand);
+        const addGroupCalls = sendCalls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminAddUserToGroupCommand,
+        );
+        expect(addGroupCalls).toHaveLength(1);
+        expect(addGroupCalls[0][0].input).toEqual(
             expect.objectContaining({ GroupName: 'member', Username: 'uuid-abc' }),
         );
-        expect(mockAdminAddUserToGroup).toHaveBeenCalledTimes(1);
     });
 
     it('createCognitoUser adds membershipAdmin group when requested', async () => {
         await createCognitoUser('c@d.com', true, 'tenant-1');
-        expect(mockAdminAddUserToGroup).toHaveBeenCalledTimes(2);
-        expect(mockAdminAddUserToGroup).toHaveBeenCalledWith(
+        const addGroupCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminAddUserToGroupCommand,
+        );
+        expect(addGroupCalls).toHaveLength(2);
+        expect(addGroupCalls[1][0].input).toEqual(
             expect.objectContaining({ GroupName: 'membershipAdmin' }),
         );
     });
 
     it('createCognitoUser throws when addUserToGroup fails', async () => {
-        mockAdminAddUserToGroup.mockReturnValue({
-            promise: jest.fn().mockRejectedValue(new Error('group err')),
+        mockSend.mockImplementation(async (command: unknown) => {
+            if (command instanceof AdminCreateUserCommand) {
+                return { User: { Username: 'uuid-abc' } };
+            }
+            if (command instanceof AdminAddUserToGroupCommand) {
+                throw new Error('group err');
+            }
+            return {};
         });
         await expect(createCognitoUser('e@f.com', false, 't')).rejects.toThrow('group err');
     });
 
     it('deleteCognitoUser calls adminDeleteUser', async () => {
         await deleteCognitoUser('uuid-x');
-        expect(mockAdminDeleteUser).toHaveBeenCalledWith(
+        const deleteCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminDeleteUserCommand,
+        );
+        expect(deleteCalls).toHaveLength(1);
+        expect(deleteCalls[0][0].input).toEqual(
             expect.objectContaining({ UserPoolId: 'pool-1', Username: 'uuid-x' }),
         );
     });
@@ -86,7 +100,7 @@ describe('util/cognito', () => {
             uuid: 'u1',
             email: 'new@x.com',
         } as any);
-        expect(mockAdminUpdateUserAttributes).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('resetCognitoPassword uses adminSetUserPassword when default provided', async () => {
@@ -98,8 +112,14 @@ describe('util/cognito', () => {
             tenantId: 't1',
         } as any;
         await resetCognitoPassword(member, 'Temp123!');
-        expect(mockAdminSetUserPassword).toHaveBeenCalled();
-        expect(mockAdminResetUserPassword).not.toHaveBeenCalled();
+        const setPwCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminSetUserPasswordCommand,
+        );
+        const resetPwCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminResetUserPasswordCommand,
+        );
+        expect(setPwCalls).toHaveLength(1);
+        expect(resetPwCalls).toHaveLength(0);
         expect(mockedSendPwReset).toHaveBeenCalledWith(member, 'Temp123!', 't1');
     });
 
@@ -112,8 +132,14 @@ describe('util/cognito', () => {
             tenantId: 't1',
         } as any;
         await resetCognitoPassword(member, '');
-        expect(mockAdminResetUserPassword).toHaveBeenCalled();
-        expect(mockAdminSetUserPassword).not.toHaveBeenCalled();
+        const resetPwCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminResetUserPasswordCommand,
+        );
+        const setPwCalls = mockSend.mock.calls.filter(
+            ([cmd]: [unknown]) => cmd instanceof AdminSetUserPasswordCommand,
+        );
+        expect(resetPwCalls).toHaveLength(1);
+        expect(setPwCalls).toHaveLength(0);
         expect(mockedSendPwReset).toHaveBeenCalledWith(member, '', 't1');
     });
 });

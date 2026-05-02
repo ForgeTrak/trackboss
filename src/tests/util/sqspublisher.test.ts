@@ -2,14 +2,17 @@ jest.mock('../../util/environmentWrapper', () => ({
     getEnvironmentParameter: jest.fn(),
 }));
 
-const mockSendMessage = jest.fn();
+const mockSend = jest.fn();
 
-jest.mock('aws-sdk', () => ({
-    config: { update: jest.fn() },
-    SQS: jest.fn().mockImplementation(() => ({
-        sendMessage: mockSendMessage,
-    })),
-}));
+jest.mock('@aws-sdk/client-sqs', () => {
+    const actual = jest.requireActual('@aws-sdk/client-sqs');
+    return {
+        ...actual,
+        SQSClient: jest.fn().mockImplementation(() => ({
+            send: mockSend,
+        })),
+    };
+});
 
 import { getEnvironmentParameter } from '../../util/environmentWrapper';
 import publishCommunicationSqs from '../../util/sqspublisher';
@@ -24,9 +27,7 @@ describe('util/sqspublisher', () => {
             if (name === 'account') return '111122223333';
             return '';
         });
-        mockSendMessage.mockImplementation((_params: unknown, cb: (e: Error | null, r?: unknown) => void) => {
-            cb(null, { MessageId: 'msg-1' });
-        });
+        mockSend.mockResolvedValue({ MessageId: 'msg-1' });
     });
 
     it('invokes sendMessage with queue URL and JSON body', async () => {
@@ -36,19 +37,16 @@ describe('util/sqspublisher', () => {
             subject: 'Hi',
         } as any;
         await publishCommunicationSqs(comm);
-        expect(mockSendMessage).toHaveBeenCalledWith(
-            expect.objectContaining({
-                MessageBody: JSON.stringify(comm),
-                QueueUrl: 'https://sqs.us-east-1.amazonaws.com/111122223333/forgetrak-prod-queue-email',
-            }),
-            expect.any(Function),
-        );
+        expect(mockSend).toHaveBeenCalledTimes(1);
+        const command = mockSend.mock.calls[0][0];
+        expect(command.input).toEqual(expect.objectContaining({
+            MessageBody: JSON.stringify(comm),
+            QueueUrl: 'https://sqs.us-east-1.amazonaws.com/111122223333/forgetrak-prod-queue-email',
+        }));
     });
 
-    it('still resolves when sendMessage reports error (callback logs only)', async () => {
-        mockSendMessage.mockImplementation((_p: unknown, cb: (e: Error | null) => void) => {
-            cb(new Error('sqs failed'));
-        });
+    it('still resolves when sendMessage reports error (logs only)', async () => {
+        mockSend.mockRejectedValue(new Error('sqs failed'));
         const result = await publishCommunicationSqs({
             memberCommunicationId: 1,
             mechanism: 'sms',

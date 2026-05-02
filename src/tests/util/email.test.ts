@@ -14,16 +14,17 @@ jest.mock('../../util/dateHelper', () => ({
     calculateApplicationYear: jest.fn().mockReturnValue(2027),
 }));
 
-const mockSendEmailPromise = jest.fn().mockResolvedValue({});
+const mockSend = jest.fn().mockResolvedValue({});
 
-jest.mock('aws-sdk', () => ({
-    config: { update: jest.fn() },
-    SES: jest.fn().mockImplementation(() => ({
-        sendEmail: jest.fn().mockImplementation(() => ({
-            promise: mockSendEmailPromise,
+jest.mock('@aws-sdk/client-ses', () => {
+    const actual = jest.requireActual('@aws-sdk/client-ses');
+    return {
+        ...actual,
+        SESClient: jest.fn().mockImplementation(() => ({
+            send: mockSend,
         })),
-    })),
-}));
+    };
+});
 
 import { getPool } from '../../database/pool';
 import {
@@ -61,11 +62,11 @@ describe('util/email', () => {
             text: 'Body',
             bcc: [],
         });
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('sendTextEmail logs when SES throws', async () => {
-        mockSendEmailPromise.mockRejectedValueOnce(new Error('ses down'));
+        mockSend.mockRejectedValueOnce(new Error('ses down'));
         await sendTextEmail({ to: 'a@b.com', subject: 's', text: 't', bcc: [] });
     });
 
@@ -74,7 +75,7 @@ describe('util/email', () => {
             { id: 9, firstName: 'F', lastName: 'L', email: 'e@x.com' },
             'tenant-1',
         );
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('sendNewMemberEmail replaces names and optional notes', async () => {
@@ -93,7 +94,7 @@ describe('util/email', () => {
             },
             't',
         );
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('sendAppRejectedEmail replaces names', async () => {
@@ -106,7 +107,7 @@ describe('util/email', () => {
             { id: 2, firstName: 'C', lastName: 'D', email: 'r@x.com' },
             't',
         );
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('sendAppRejectedEmail replaces applicationNotesShared when present', async () => {
@@ -131,7 +132,7 @@ describe('util/email', () => {
             },
             't',
         );
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('sendPaymentConfirmationEmail and sendInsuranceConfirmEmail use PAYMENT_CONFIRMED and INSURANCE_CONFIRMED', async () => {
@@ -152,7 +153,7 @@ describe('util/email', () => {
         } as any;
         await sendPaymentConfirmationEmail(bill, 't');
         await sendInsuranceConfirmEmail(bill, 't');
-        expect(mockSendEmailPromise).toHaveBeenCalledTimes(2);
+        expect(mockSend).toHaveBeenCalledTimes(2);
     });
 
     it('sendPasswordReset replaces tokens', async () => {
@@ -166,7 +167,7 @@ describe('util/email', () => {
             'new-secret',
             't',
         );
-        expect(mockSendEmailPromise).toHaveBeenCalled();
+        expect(mockSend).toHaveBeenCalled();
     });
 
     it('getEmailById swallows DB errors and send flows handle missing row via undefined access', async () => {

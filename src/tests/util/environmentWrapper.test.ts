@@ -5,25 +5,28 @@ var mockSsmResult: unknown = { Parameter: { Value: 'param-value' } };
 var mockSsmReject: unknown;
 var mockSecretString = '{"accessToken":"t"}';
 
-jest.mock('aws-sdk', () => ({
-    SSM: jest.fn().mockImplementation(() => ({
-        getParameter: jest.fn().mockImplementation(() => ({
-            promise: jest.fn().mockImplementation(() => {
-                if (mockSsmReject) {
-                    return Promise.reject(mockSsmReject);
-                }
-                return Promise.resolve(mockSsmResult);
-            }),
+var mockSsmSend = jest.fn();
+var mockSecretsSend = jest.fn();
+
+jest.mock('@aws-sdk/client-ssm', () => {
+    const actual = jest.requireActual('@aws-sdk/client-ssm');
+    return {
+        ...actual,
+        SSMClient: jest.fn().mockImplementation(() => ({
+            send: (...args: any[]) => mockSsmSend(...args),
         })),
-    })),
-    SecretsManager: jest.fn().mockImplementation(() => ({
-        getSecretValue: jest.fn().mockImplementation(() => ({
-            promise: jest.fn().mockImplementation(() =>
-                Promise.resolve({ SecretString: mockSecretString }),
-            ),
+    };
+});
+
+jest.mock('@aws-sdk/client-secrets-manager', () => {
+    const actual = jest.requireActual('@aws-sdk/client-secrets-manager');
+    return {
+        ...actual,
+        SecretsManagerClient: jest.fn().mockImplementation(() => ({
+            send: (...args: any[]) => mockSecretsSend(...args),
         })),
-    })),
-}));
+    };
+});
 
 import {
     getCognitoClientId,
@@ -39,6 +42,14 @@ describe('util/environmentWrapper', () => {
         mockSsmResult = { Parameter: { Value: 'param-value' } };
         mockSecretString = '{"accessToken":"t"}';
         jest.clearAllMocks();
+        mockSsmSend.mockImplementation(async () => {
+            if (mockSsmReject) throw mockSsmReject;
+            return mockSsmResult;
+        });
+        mockSecretsSend.mockImplementation(async () => ({
+            SecretString: mockSecretString,
+            Name: 'test-secret',
+        }));
     });
 
     it('getEnvironmentParameter returns SSM value', async () => {

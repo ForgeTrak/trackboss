@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import AWS from 'aws-sdk';
 import api from './api/api';
 import logger from './logger';
 import { checkHeader, createVerifier, verify } from './util/auth';
@@ -27,8 +26,6 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const verifierReady = createVerifier();
-
-AWS.config.update({ region: 'us-east-1' });
 
 const addTenantToRequest = async (req : any, res : any, next : () => void) => {
     const headerCheck = checkHeader(req.headers.authorization);

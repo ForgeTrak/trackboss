@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Request, Response, Router } from 'express';
-import AWS from 'aws-sdk';
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import sanitizeHtml from 'sanitize-html';
 import {
     getMemberCommunicationById, getMemberCommunications, insertMemberCommunication,
@@ -115,25 +115,23 @@ memberCommunication.post('/', async (req: Request, res: Response) => {
         logAuditEvent(req, 'memberCommunication', response.memberCommunicationId, null, req.body);
         // now stick the message in the respective SQS queue for further processing.
         const outboundQueueName = `forgetrak-prod-queue-${communication.mechanism}`;
-        AWS.config.update({ region: process.env.AWS_REGION });
-        const sqs = new AWS.SQS();
+        const sqs = new SQSClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
         // eslint-disable-next-line max-len
         logger.info(`memberCommunication - Sending communication id ${response.memberCommunicationId} to outbound queue`);
         const region = await getEnvironmentParameter('region');
         const account = await getEnvironmentParameter('account');
         const sqsUrl = `https://sqs.${region}.amazonaws.com/${account}/${outboundQueueName}`;
-        sqs.sendMessage({
-            MessageBody: JSON.stringify(response),
-            QueueUrl: sqsUrl,
-        }, (error, messageResult) => {
-            if (error) {
-                logger.error(`memberCommunication - Queue send failed for communication ${response.memberCommunicationId} due to `, error);
-                logger.error(`memberCommunication - The message with subject ${response.subject} will not be delivered.`);
-                return;
-            }
+        try {
+            const messageResult = await sqs.send(new SendMessageCommand({
+                MessageBody: JSON.stringify(response),
+                QueueUrl: sqsUrl,
+            }));
             logger.info(`memberCommunication - Communication is ${response.memberCommunicationId} enqueued as ${messageResult.MessageId}`);
-        });
+        } catch (error) {
+            logger.error(`memberCommunication - Queue send failed for communication ${response.memberCommunicationId} due to `, error);
+            logger.error(`memberCommunication - The message with subject ${response.subject} will not be delivered.`);
+        }
 
         res.json(response);
     } catch (error: any) {

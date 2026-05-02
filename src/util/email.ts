@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { RowDataPacket } from 'mysql2';
 import logger from '../logger';
 import { getPool } from '../database/pool';
@@ -31,10 +31,9 @@ async function getEmailById(purpose: string, tenantId: string) {
 }
 
 export async function sendTextEmail(email: any) {
-    AWS.config.update({ region: process.env.AWS_REGION });
     const tenant = await getTenantById(email.tenantId);
     const clubEmail = tenant.contactEmail;
-    const ses = new AWS.SES();
+    const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
     const emailParams = {
         Destination: {
             ToAddresses: [email.to],
@@ -58,7 +57,7 @@ export async function sendTextEmail(email: any) {
         // intercepting the process at the last possible point but keeps us from messing up and sending emails to
         // members from dev which we never want to do.
         // if (process.env.ENVIRONMENT_NAME === 'trackboss') {
-        await ses.sendEmail(emailParams).promise();
+        await ses.send(new SendEmailCommand(emailParams));
         // } else {
         logger.info(`This is environment ${process.env.ENVIRONMENT_NAME} so I'm logging this email`);
         logger.info(JSON.stringify(emailParams));

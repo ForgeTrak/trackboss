@@ -31,15 +31,17 @@ jest.mock('../../database/auditLog', () => ({
     getAuditLogById: jest.fn(),
     getAuditLogByTenant: jest.fn(),
 }));
-const mockSqsSendMessage = jest.fn((_p: unknown, cb: (e: Error | null, r?: { MessageId: string }) => void) => {
-    cb(null, { MessageId: 'mid' });
+const mockSqsSend = jest.fn().mockResolvedValue({ MessageId: 'mid' });
+
+jest.mock('@aws-sdk/client-sqs', () => {
+    const actual = jest.requireActual('@aws-sdk/client-sqs');
+    return {
+        ...actual,
+        SQSClient: jest.fn().mockImplementation(() => ({
+            send: mockSqsSend,
+        })),
+    };
 });
-jest.mock('aws-sdk', () => ({
-    config: { update: jest.fn() },
-    SQS: jest.fn().mockImplementation(() => ({
-        sendMessage: (...args: unknown[]) => (mockSqsSendMessage as any)(...args),
-    })),
-}));
 
 const mockedValidate = validateAdminAccess as jest.MockedFunction<typeof validateAdminAccess>;
 const mockedGetAll = getMemberCommunications as jest.MockedFunction<typeof getMemberCommunications>;
@@ -102,9 +104,7 @@ describe('api/memberCommunication', () => {
     });
 
     it('POST / logs when SQS sendMessage fails', async () => {
-        mockSqsSendMessage.mockImplementationOnce((_p: unknown, cb: (e: Error | null) => void) => {
-            cb(new Error('queue down'));
-        });
+        mockSqsSend.mockRejectedValueOnce(new Error('queue down'));
         mockedMemberList.mockResolvedValue([
             {
                 memberId: 1,
@@ -128,9 +128,6 @@ describe('api/memberCommunication', () => {
             .set('Authorization', 'Bearer t')
             .send({ mechanism: 'EMAIL', subject: 'S', text: 'x', selectedTags: [] });
         expect(res.status).toBe(200);
-        mockSqsSendMessage.mockImplementation((_p: unknown, cb: (e: null, r: { MessageId: string }) => void) => {
-            cb(null, { MessageId: 'mid' });
-        });
     });
 
     it('POST / expands recipients from selected tags', async () => {
