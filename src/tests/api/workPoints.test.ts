@@ -16,8 +16,8 @@ jest.mock('../../util/auth', () => ({
 jest.mock('../../database/workPoints');
 jest.mock('../../excel/workbookHelper', () => ({
     startWorkbook: jest.fn(() => ({
-        getWorksheet: () => ({ columns: [], addRow: jest.fn() }),
-        xlsx: { writeBuffer: jest.fn().mockResolvedValue(Buffer.from('')) },
+        workbook: { xlsx: { writeBuffer: jest.fn().mockResolvedValue(Buffer.from('')) } },
+        worksheet: { columns: [], addRow: jest.fn() },
     })),
     formatWorkbook: jest.fn(),
     httpOutputWorkbook: jest.fn((_wb: unknown, res: any) => {

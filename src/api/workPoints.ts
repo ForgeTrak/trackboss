@@ -110,8 +110,7 @@ workPoints.get('/list/excel', async (req: Request, res: Response) => {
         const rightNow = new Date();
         const workPointsByMember = await getWorkPointsList(rightNow.getFullYear(), req.user.tenantId) as WorkPoints[];
         const workbookTitle = `PRA members ${new Date().toLocaleDateString().replace(/\//gi, '-')}`;
-        const workbook = startWorkbook(workbookTitle);
-        const worksheet = workbook.getWorksheet(1);
+        const { workbook, worksheet } = startWorkbook(workbookTitle);
         worksheet.columns = [
             { header: 'Last Name', key: 'lastName', width: 10 },
             { header: 'First Name', key: 'firstName', width: 15 },

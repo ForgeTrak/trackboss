@@ -37,7 +37,7 @@ export function startWorkbook(title: string) {
     const workbook = new Workbook();
     workbook.creator = 'Palmyra Racing Association - Track Boss';
     workbook.created = new Date();
-    workbook.addWorksheet(
+    const worksheet = workbook.addWorksheet(
         title,
         {
             pageSetup: {
@@ -53,7 +53,7 @@ export function startWorkbook(title: string) {
             },
         },
     );
-    return workbook;
+    return { workbook, worksheet };
 }
 
 export async function httpOutputWorkbook(workbook: Workbook, res: Response, filename: string) {

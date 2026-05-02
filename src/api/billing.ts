@@ -374,8 +374,7 @@ billing.get('/list/excel', async (req: Request, res: Response) => {
         }, req.user.tenantId);
 
         const workbookTitle = `Billing ${billingYear}`;
-        const workbook = startWorkbook(workbookTitle);
-        const worksheet = workbook.getWorksheet(1);
+        const { workbook, worksheet } = startWorkbook(workbookTitle);
         worksheet.columns = [
             { header: 'Last Name', key: 'lastName', width: 10 },
             { header: 'First Name', key: 'firstName', width: 15 },

@@ -35,7 +35,7 @@ jest.mock('../../database/membership');
 jest.mock('../../database/boardMember');
 jest.mock('../../database/defaultSettings');
 jest.mock('../../excel/workbookHelper', () => ({
-    startWorkbook: jest.fn(() => ({ getWorksheet: () => ({ columns: [], addRow: jest.fn() }) })),
+    startWorkbook: jest.fn(() => ({ workbook: {}, worksheet: { columns: [], addRow: jest.fn() } })),
     formatWorkbook: jest.fn(),
     httpOutputWorkbook: jest.fn((_wb: unknown, res: any) => {
         res.status(200);

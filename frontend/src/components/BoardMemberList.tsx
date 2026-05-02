@@ -25,6 +25,10 @@ const columns: any = [
         sortable: true,
     },
     {
+        name: 'Phone',
+        selector: (row: BoardMember) => row.phone,
+    },
+    {
         name: 'Email',
         selector: (row: BoardMember) => row.email,
         sortable: true,

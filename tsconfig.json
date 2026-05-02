@@ -1,13 +1,18 @@
 {
-    "extends": "@tsconfig/node16/tsconfig.json",
     "ts-node": {
         "files": true
     },
     "compilerOptions": {
+        "target": "es2023",
+        "lib": ["es2023"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "noFallthroughCasesInSwitch": true,
-        "moduleResolution": "node",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "outDir": "build",

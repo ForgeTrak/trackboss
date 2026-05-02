@@ -32,7 +32,8 @@ jest.mock('../../database/auditLog', () => ({
 jest.mock('../../util/billing', () => ({ runBillingComplete: jest.fn() }));
 jest.mock('../../excel/workbookHelper', () => ({
     startWorkbook: jest.fn(() => ({
-        getWorksheet: () => ({ columns: [], addRow: jest.fn() }),
+        workbook: {},
+        worksheet: { columns: [], addRow: jest.fn() },
     })),
     formatWorkbook: jest.fn(),
     httpOutputWorkbook: jest.fn((_wb: unknown, res: any) => {

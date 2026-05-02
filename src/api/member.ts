@@ -330,8 +330,7 @@ member.get('/list/voterEligibility/excel', async (req: Request, res: Response) =
         const rightNow = new Date();
         const eligibleVoters = await getEligibleVoters(rightNow.getFullYear());
         const workbookTitle = `Eligible Voters ${new Date().toLocaleDateString().replace(/\//gi, '-')}`;
-        const workbook = startWorkbook(workbookTitle);
-        const worksheet = workbook.getWorksheet(1);
+        const { workbook, worksheet } = startWorkbook(workbookTitle);
         worksheet.columns = [
             { header: 'Last Name', key: 'lastName', width: 10 },
             { header: 'First Name', key: 'firstName', width: 15 },

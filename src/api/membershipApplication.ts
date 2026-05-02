@@ -274,8 +274,7 @@ membershipApplication.get('/list/excel', async (req: Request, res: Response) => 
             await getMembershipApplications(parseInt(year as string, 10), req.user.tenantId);
         applications = applications.filter((app) => app.status !== 'Accepted');
         const workbookTitle = 'PRA applications';
-        const workbook = startWorkbook(workbookTitle);
-        const worksheet = workbook.getWorksheet(1);
+        const { workbook, worksheet } = startWorkbook(workbookTitle);
         worksheet.columns = [
             { header: 'ID', key: 'id', width: 6 },
             { header: 'Last Name', key: 'lastName', width: 10 },

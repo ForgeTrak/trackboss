@@ -234,8 +234,7 @@ job.get('/list/excel', async (req: Request, res: Response) => {
         // get the jobs list with the given parameters.
         const jobsList = await GetJobList(req, res) as Job[];
         // Create workbook and some meta datars about it.
-        const workbook = startWorkbook(`Signups for ${jobsList[0].event}`);
-        const worksheet = workbook.getWorksheet(1);
+        const { workbook, worksheet } = startWorkbook(`Signups for ${jobsList[0].event}`);
         worksheet.columns = [
             { header: 'Name', key: 'name', width: 13 },
             { header: 'Job', key: 'job', width: 23 },
