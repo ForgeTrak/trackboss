@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const AWS = require('aws-sdk');
+const AWS = {}; // require('aws-sdk');
 const mysql = require('mysql2');
 
 // Configure AWS SDK
