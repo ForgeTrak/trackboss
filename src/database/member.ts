@@ -22,8 +22,8 @@ export const INSERT_MEMBER_SQL = 'INSERT INTO member (membership_id, uuid, membe
     'phone_number, occupation, email, birthdate, date_joined, last_modified_date, last_modified_by, active, subscribed, dependent_status, tenant_id)' +
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, 1, ?, ?, ?)';
 export const PATCH_MEMBER_SQL = 'CALL sp_patch_member(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-export const GET_VALID_ACTORS_SQL = 'select member_id from pradb.member m where member_id=? or (m.member_type_id=2 ' +
-    'and m.member_id=(select ms.membership_admin_id from pradb.member m left join pradb.membership ms on ' +
+export const GET_VALID_ACTORS_SQL = 'select member_id from member m where member_id=? or (m.member_type_id=2 ' +
+    'and m.member_id=(select ms.membership_admin_id from member m left join membership ms on ' +
     'm.membership_id=ms.membership_id where member_id=?)) or m.member_type_id=1 and m.tenant_id = ?';
 
 async function mapMemberFromResult(results: any) {
@@ -216,7 +216,7 @@ export async function getMember(searchParam: string, tenantId: string): Promise<
 export async function getMemberByPhone(phone: string, tenantId: string): Promise<Member> {
     let results;
     try {
-        const sql = 'SELECT * FROM pradb.v_member where phone_number = ? and tenant_id = ?';
+        const sql = 'SELECT * FROM v_member where phone_number = ? and tenant_id = ?';
         [results] = await getPool().query<RowDataPacket[]>(sql, [phone, tenantId]);
     } catch (e) {
         logger.error(e);
@@ -258,7 +258,7 @@ export async function getMemberByPhone(phone: string, tenantId: string): Promise
 export async function getMemberByEmail(email: string, tenantId?: string): Promise<any> {
     let results;
     try {
-        let sql = 'SELECT * FROM pradb.v_member where email like ?';
+        let sql = 'SELECT * FROM v_member where email like ?';
         const params: any[] = [`%${email}%`];
         if (tenantId) {
             sql += ' and tenant_id = ?';
