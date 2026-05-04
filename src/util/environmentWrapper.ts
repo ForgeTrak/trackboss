@@ -34,11 +34,11 @@ export async function getEnvironmentParameter(name: string) {
 }
 
 export async function getCognitoPoolId() {
-    return getEnvironmentParameter('cognitoPoolId');
+    return process.env.COGNITO_POOL_ID || getEnvironmentParameter('cognitoPoolId');
 }
 
 export async function getCognitoClientId() {
-    return getEnvironmentParameter('cognitoClientId');
+    return process.env.COGNITO_CLIENT_ID || getEnvironmentParameter('cognitoClientId');
 }
 
 export async function getConnectionObject() {

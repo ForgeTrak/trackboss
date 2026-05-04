@@ -2,7 +2,7 @@ import mysql, { Pool } from 'mysql2/promise';
 import logger from '../logger';
 import { getConnectionObject } from '../util/environmentWrapper';
 
-const DEFAULT_CONN_LIMIT = 10;
+const DEFAULT_CONN_LIMIT = 1;
 const DEFAULT_QUEUE_LIMIT = 0;
 
 // Singleton database connection pool

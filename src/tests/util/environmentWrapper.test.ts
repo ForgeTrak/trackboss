@@ -38,6 +38,8 @@ import {
 
 describe('util/environmentWrapper', () => {
     beforeEach(() => {
+        delete process.env.COGNITO_POOL_ID;
+        delete process.env.COGNITO_CLIENT_ID;
         mockSsmReject = undefined;
         mockSsmResult = { Parameter: { Value: 'param-value' } };
         mockSecretString = '{"accessToken":"t"}';
