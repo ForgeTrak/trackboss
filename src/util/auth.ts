@@ -23,6 +23,9 @@ const createVerifier = async () => {
         tokenUse: 'id',
         clientId: clientIds,
     });
+    // Pre-fetch JWKS keys so the first request doesn't pay the download penalty
+    await verifier.hydrate();
+    logger.info('auth - JWKS keys pre-hydrated');
 };
 
 const verify = async (token: string, permissionLevel?: string, targetActingAs?: number) => {

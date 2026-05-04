@@ -326,6 +326,7 @@ export class DeployStack extends Stack {
         code: lambda.DockerImageCode.fromEcr(ecr.Repository.fromRepositoryName(this, 'forgetrak-lambda-repo', 'forgetrak/forgetrakapi'), {
             tagOrDigest: 'latest',
         }),
+        architecture: lambda.Architecture.ARM_64,
         memorySize: 1024,
         timeout: Duration.minutes(10),
         vpc,
