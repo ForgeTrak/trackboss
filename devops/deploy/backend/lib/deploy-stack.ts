@@ -333,7 +333,12 @@ export class DeployStack extends Stack {
         role: iam.Role.fromRoleName(this, 'forgetrak-lambda-role', 'ec2_aws_access'),
         environment: {
             FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
-            RDS_CONNECTION_ID: forgeTrakRdsInstance.secret?.secretName || '',
+            COGNITO_POOL_ID: cognitoPoolId.stringValue,
+            COGNITO_CLIENT_ID: cognitoClientId.stringValue,
+            MYSQL_HOST: forgeTrakRdsInstance.dbInstanceEndpointAddress,
+            MYSQL_USER: forgeTrakRdsInstance.secret?.secretValueFromJson('username').unsafeUnwrap() || '',
+            MYSQL_PASS: forgeTrakRdsInstance.secret?.secretValueFromJson('password').unsafeUnwrap() || '',
+            MYSQL_DB: 'forgetrak',
         },
         functionName: `${forgetrakEnvironment}-api-backend`,
     });
