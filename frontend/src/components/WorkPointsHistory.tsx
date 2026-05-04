@@ -120,6 +120,9 @@ export default function WorkPointsHistory() {
 
     useEffect(() => {
         setCells(_.filter(allJobs, (job) => new Date(job.start).getFullYear() === year));
+    }, [year, allJobs]);
+
+    useEffect(() => {
         async function getData() {
             const workPoints = await getWorkPointsByMembership(state.token, state.user!.membershipId, year);
             const threshold = await getYearlyThreshold(state.token, year);
@@ -135,7 +138,7 @@ export default function WorkPointsHistory() {
             }
         }
         getData();
-    }, [year, allJobs]);
+    }, [year]);
 
     const userActive = state.user?.active || false;
     const adminOrActingAsAdmin = (

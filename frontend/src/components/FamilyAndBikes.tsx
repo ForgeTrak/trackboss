@@ -23,8 +23,6 @@ import { createBike, deleteBike, getBikeList, updateBike } from '../controller/b
 import EditMemberModal from './modals/EditMemberModal';
 
 interface cardProps {
-    memberFamily: GetMemberListResponse,
-    memberBikes: GetBikeListResponse,
     admin: boolean
 }
 
@@ -94,12 +92,9 @@ export default function GeneralInfo(props: cardProps) {
     }
 
     useEffect(() => {
-        async function setMemberData() {
-            setMemberFamily(props.memberFamily);
-            setMemberBikes(props.memberBikes);
-        }
-        setMemberData();
-    }, [props.memberFamily, props.memberBikes]);
+        refreshFamilyList();
+        refreshBikeList();
+    }, []);
 
     return (
         <SimpleGrid columns={1}>
