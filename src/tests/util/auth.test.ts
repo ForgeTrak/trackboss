@@ -9,6 +9,7 @@ jest.mock('aws-jwt-verify', () => ({
     CognitoJwtVerifier: {
         create: jest.fn(() => ({
             verify: (...args: unknown[]) => mockJwtVerify(...args),
+            hydrate: jest.fn().mockResolvedValue(undefined),
         })),
     },
 }));
