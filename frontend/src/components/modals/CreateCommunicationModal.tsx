@@ -63,6 +63,15 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
         );
         return tagCheckBox;
     });
+
+    const resetPopupState = () => {
+        setCharacterCount(0);
+        setSelectedTags([]);
+        setTotalCount(0);
+        setMechanism('EMAIL');
+        setSubject('');
+    };
+
     const toast = useAppToast();
 
     return (
@@ -162,9 +171,7 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                     size="lg"
                     onClick={
                         () => {
-                            setCharacterCount(0);
-                            setTotalCount(0);
-                            setSelectedTags([]);
+                            resetPopupState();
                             props.onClose();
                         }
                     }
@@ -185,9 +192,7 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                                 selectedTags: Object.keys(selectedTags),
                             };
                             await createCommunication(token, communication);
-                            setCharacterCount(0);
-                            setSelectedTags([]);
-                            setTotalCount(0);
+                            resetPopupState();
                             props.addAction();
                             toast.success({
                                 title: 'Member communication queued for sending.',
