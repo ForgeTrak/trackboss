@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import CustomTabPanel from '../../../components/shared/CustomTabPanel';
 import TabData from '../../../components/shared/TabData';
@@ -30,9 +30,21 @@ describe('CustomTabPanel', () => {
     it('renders panels correctly', () => {
         render(<CustomTabPanel tabs={mockTabs} panels={mockPanels} />);
 
+        // With isLazy, only the active panel is rendered initially
+        expect(screen.getByText('Panel 1 Content')).toBeInTheDocument();
+        expect(screen.queryByText('Panel 2 Content')).not.toBeInTheDocument();
+
+        // Click Tab 2 to render its panel
+        fireEvent.click(screen.getByText('Tab 2'));
+        expect(screen.getByText('Panel 2 Content')).toBeInTheDocument();
+
+        // Click Tab 3 to render its panel
+        fireEvent.click(screen.getByText('Tab 3'));
+        expect(screen.getByText('Panel 3 Content')).toBeInTheDocument();
+
+        // With lazyBehavior="keepMounted", previously rendered panels stay in the DOM
         expect(screen.getByText('Panel 1 Content')).toBeInTheDocument();
         expect(screen.getByText('Panel 2 Content')).toBeInTheDocument();
-        expect(screen.getByText('Panel 3 Content')).toBeInTheDocument();
     });
 
     it('renders tabs without icons', () => {
