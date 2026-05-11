@@ -76,31 +76,33 @@ export class DeployStack extends Stack {
         domainNames: [domain],
         certificate: certificate,
       });
-
-      const dnsARecord = new route53.ARecord(this, 'TrackBossApiAliasRecord', {
-        zone,
-        recordName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}.hogbackmx.com`,
-        target: route53.RecordTarget.fromAlias({
-          bind() {
-            return {
-              dnsName: distribution.domainName,
-              hostedZoneId: 'Z2FDTNDATAQYW2',
-            }
-          }
-        })
-      });
-      const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
-        zone: forgetrakZone,
-        recordName: `app.forgetrak.com`,
-        target: route53.RecordTarget.fromAlias({
-          bind() {
-            return {
-              dnsName: distribution.domainName,
-              hostedZoneId: 'Z2FDTNDATAQYW2',
-            }
-          }
-        })
-      });
+        if (index === 0) {
+            const dnsARecord = new route53.ARecord(this, 'TrackBossApiAliasRecord', {
+                zone,
+                recordName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}.hogbackmx.com`,
+                target: route53.RecordTarget.fromAlias({
+                    bind() {
+                        return {
+                            dnsName: distribution.domainName,
+                            hostedZoneId: 'Z2FDTNDATAQYW2',
+                        }
+                    }
+                })
+            });
+        } else {
+            const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
+                zone: forgetrakZone,
+                recordName: `app.forgetrak.com`,
+                target: route53.RecordTarget.fromAlias({
+                    bind() {
+                        return {
+                            dnsName: distribution.domainName,
+                            hostedZoneId: 'Z2FDTNDATAQYW2',
+                        }
+                    }
+                })
+            });
+        }
 
 
       const cloudfrontOutput = new CfnOutput(this, 'bucketName', {
