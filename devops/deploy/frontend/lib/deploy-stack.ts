@@ -11,9 +11,26 @@ export class DeployStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
     const environmentName = process.env.TRACKBOSS_ENVIRONMENT_NAME || 'trackboss';
-    const domains = [`${environmentName}.hogbackmx.com`];
+    const domains = [`${environmentName}.hogbackmx.com`, 'app.forgetrak.com'];
     const bucketName = `${environmentName}-frontend-deploy-bucket`;
-    const certArns = ['arn:aws:acm:us-east-1:425610073499:certificate/6bdd2367-df28-4226-866d-8d057ce0f496'];
+    const certArns = [
+        'arn:aws:acm:us-east-1:425610073499:certificate/6bdd2367-df28-4226-866d-8d057ce0f496',
+        'arn:aws:acm:us-east-1:425610073499:certificate/30c14c8a-e6fb-4bf7-b8ac-c933c89065ac'
+    ];
+    const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'trackbossZone',
+        {
+            hostedZoneId: 'Z01677201PBLHEH8PE24N',
+            zoneName: 'hogbackmx.com'
+        },
+    );
+
+    const forgetrakZone = route53.HostedZone.fromHostedZoneAttributes(this, 'forgeTrakZone',
+        {
+            hostedZoneId: 'Z08084702HFW0EXZKUGNQ',
+            zoneName: 'forgetrak.com'
+        },
+    );
+
     for (let index = 0; index < domains.length; index++) {
       let domain = domains[index];
       const deploymentBucket = new s3.Bucket(this, bucketName+domain, {
@@ -59,27 +76,36 @@ export class DeployStack extends Stack {
         domainNames: [domain],
         certificate: certificate,
       });
+        if (index === 0) {
+            const dnsARecord = new route53.ARecord(this, 'TrackBossApiAliasRecord', {
+                zone,
+                recordName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}.hogbackmx.com`,
+                target: route53.RecordTarget.fromAlias({
+                    bind() {
+                        return {
+                            dnsName: distribution.domainName,
+                            hostedZoneId: 'Z2FDTNDATAQYW2',
+                        }
+                    }
+                })
+            });
+        } else {
+            const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
+                zone: forgetrakZone,
+                recordName: `app.forgetrak.com`,
+                target: route53.RecordTarget.fromAlias({
+                    bind() {
+                        return {
+                            dnsName: distribution.domainName,
+                            hostedZoneId: 'Z2FDTNDATAQYW2',
+                        }
+                    }
+                })
+            });
+        }
 
-      const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'trackbossZone',
-        {
-          hostedZoneId: 'Z01677201PBLHEH8PE24N',
-          zoneName: 'hogbackmx.com'
-        },
-      );
-      const dnsARecord = new route53.ARecord(this, 'TrackBossApiAliasRecord', {
-        zone,
-        recordName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}.hogbackmx.com`,
-        target: route53.RecordTarget.fromAlias({
-          bind() {
-            return {
-              dnsName: distribution.domainName,
-              hostedZoneId: 'Z2FDTNDATAQYW2',
-            }
-          }
-        })
-      });
 
-      const cloudfrontOutput = new CfnOutput(this, 'bucketName', {
+      const cloudfrontOutput = new CfnOutput(this, `cfdist-${domain}`, {
         value: distribution.domainName,
         description: 'Distribution domain name',
         exportName: `distributionDomainName-${process.env.TRACKBOSS_ENVIRONMENT_NAME}`,
