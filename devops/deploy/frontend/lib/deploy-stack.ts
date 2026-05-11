@@ -69,6 +69,14 @@ export class DeployStack extends Stack {
           zoneName: 'hogbackmx.com'
         },
       );
+
+      const forgetrakZone =  route53.HostedZone.fromHostedZoneAttributes(this, 'forgeTrakZone',
+        {
+          hostedZoneId: 'Z08084702HFW0EXZKUGNQ',
+          zoneName: 'forgetrak.com'
+        },
+      );
+
       const dnsARecord = new route53.ARecord(this, 'TrackBossApiAliasRecord', {
         zone,
         recordName: `${process.env.TRACKBOSS_ENVIRONMENT_NAME}.hogbackmx.com`,
@@ -82,13 +90,13 @@ export class DeployStack extends Stack {
         })
       });
       const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
-        zone,
+        zone: forgetrakZone,
         recordName: `app.forgetrak.com`,
         target: route53.RecordTarget.fromAlias({
           bind() {
             return {
               dnsName: distribution.domainName,
-              hostedZoneId: 'Z08084702HFW0EXZKUGNQ',
+              hostedZoneId: 'Z2FDTNDATAQYW2',
             }
           }
         })
