@@ -104,12 +104,6 @@ export class DeployStack extends Stack {
             });
         }
 
-
-      const cloudfrontOutput = new CfnOutput(this, `cfdist-${domain}`, {
-        value: distribution.domainName,
-        description: 'Distribution domain name',
-        exportName: `distributionDomainName-${process.env.TRACKBOSS_ENVIRONMENT_NAME}`,
-      });
     }
   }
 }
