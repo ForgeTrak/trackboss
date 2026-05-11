@@ -178,7 +178,7 @@ export class DeployStack extends Stack {
     
     // inbound handling for text messages
     const inboundMemberCommLambda = new lambda.Function(this, 'inboundMemberCommHandler', {
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         tracing: lambda.Tracing.ACTIVE,
         code: lambda.Code.fromAsset('../../../lambda'),
         handler: 'messageProcessor.handler',
@@ -308,7 +308,7 @@ export class DeployStack extends Stack {
     forgeTrakRdsInstance.secret?.grantRead(dataBackupLambda);
 
     const cognitoTenantIdsInjection = new lambda.Function(this, 'cognitoTenantIdsInjection', {
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         tracing: lambda.Tracing.ACTIVE,
         code: lambda.Code.fromAsset('../../../lambda/cognitoTokenInjection'),
         handler: 'injectCognitoToken.handler',

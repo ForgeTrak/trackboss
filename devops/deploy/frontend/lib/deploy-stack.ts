@@ -11,9 +11,12 @@ export class DeployStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
     const environmentName = process.env.TRACKBOSS_ENVIRONMENT_NAME || 'trackboss';
-    const domains = [`${environmentName}.hogbackmx.com`];
+    const domains = [`${environmentName}.hogbackmx.com`, 'app.forgetrak.com'];
     const bucketName = `${environmentName}-frontend-deploy-bucket`;
-    const certArns = ['arn:aws:acm:us-east-1:425610073499:certificate/6bdd2367-df28-4226-866d-8d057ce0f496'];
+    const certArns = [
+        'arn:aws:acm:us-east-1:425610073499:certificate/6bdd2367-df28-4226-866d-8d057ce0f496',
+        'arn:aws:acm:us-east-1:425610073499:certificate/30c14c8a-e6fb-4bf7-b8ac-c933c89065ac'
+    ];
     for (let index = 0; index < domains.length; index++) {
       let domain = domains[index];
       const deploymentBucket = new s3.Bucket(this, bucketName+domain, {
@@ -78,6 +81,19 @@ export class DeployStack extends Stack {
           }
         })
       });
+      const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
+        zone,
+        recordName: `app.forgetrak.com`,
+        target: route53.RecordTarget.fromAlias({
+          bind() {
+            return {
+              dnsName: distribution.domainName,
+              hostedZoneId: 'Z08084702HFW0EXZKUGNQ',
+            }
+          }
+        })
+      });
+
 
       const cloudfrontOutput = new CfnOutput(this, 'bucketName', {
         value: distribution.domainName,
