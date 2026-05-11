@@ -61,8 +61,8 @@ export class DeployStack extends Stack {
       );
 
       const cachePolicy = new cloudfront.CachePolicy(this, 'cachePolicy'+domain, {
-        cachePolicyName: `${environmentName}-frontEndCachePolicy`,
-        comment: 'A default policy for a Track Boss environment',
+        cachePolicyName: `${domain}-frontEndCachePolicy`,
+        comment: 'A default policy for a ForgeTrak environment',
         defaultTtl: Duration.minutes(10),
       });
 
