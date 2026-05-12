@@ -92,7 +92,7 @@ export class DeployStack extends Stack {
         } else {
             const dnsARecordForgeTrak = new route53.ARecord(this, 'forgeTrakAppAliasRecord', {
                 zone: forgetrakZone,
-                recordName: `app.forgetrak.com`,
+                recordName: `*.forgetrak.com`,
                 target: route53.RecordTarget.fromAlias({
                     bind() {
                         return {

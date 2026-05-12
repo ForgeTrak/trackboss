@@ -16,6 +16,7 @@ export async function getTenants(): Promise<Tenant[]> {
     return results.map((result) => ({
         tenantId: result.tenant_id,
         name: result.name,
+        slug: result.slug,
         contactName: result.tenant_contact_name,
         contactEmail: result.tenant_email,
         contactPhone: result.tenant_phone,
@@ -40,6 +41,32 @@ export async function getTenantById(tenantId: string): Promise<Tenant> {
     return {
         tenantId: result.tenant_id,
         name: result.name,
+        slug: result.slug,
+        contactName: result.tenant_contact_name,
+        contactEmail: result.tenant_email,
+        contactPhone: result.tenant_phone,
+        createdAt: result.created_at,
+        updatedAt: result.updated_at,
+    };
+}
+
+export async function getTenantBySlug(slug: string): Promise<Tenant> {
+    const sql = 'select * from tenants where slug = ?';
+    let results;
+    try {
+        [results] = await getPool().query<RowDataPacket[]>(sql, [slug]);
+    } catch (e) {
+        logger.error(`DB error getting tenant with ID ${slug}: ${e}`);
+        throw new Error('internal server error');
+    }
+    if (results.length === 0) {
+        throw new Error('tenant not found');
+    }
+    const result = results[0];
+    return {
+        tenantId: result.tenant_id,
+        name: result.name,
+        slug: result.slug,
         contactName: result.tenant_contact_name,
         contactEmail: result.tenant_email,
         contactPhone: result.tenant_phone,

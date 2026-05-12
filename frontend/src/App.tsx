@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import getTenantBySlug from './controller/tenant';
 import { UserContext, UserContextProvider } from './contexts/UserContext';
 import AppProvider from './components/AppProvider';
 import Dashboard from './pages/Dashboard';
@@ -18,12 +19,14 @@ export function App() {
     const location = useLocation();
 
     // Helper function to redirect to login
-    const redirectToLogin = useCallback(() => {
+    const redirectToLogin = useCallback(async () => {
         localStorage.removeItem('trackboss_auth_token');
         update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
+        const tenant = await getTenantBySlug(window.location.hostname);
+        const stateTenant = btoa(JSON.stringify(tenant));
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
-        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
+        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${stateTenant}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
         window.location.href = authTarget;
     }, [update]);
 
