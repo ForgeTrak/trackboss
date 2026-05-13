@@ -22,7 +22,8 @@ export function App() {
     const redirectToLogin = useCallback(async () => {
         localStorage.removeItem('trackboss_auth_token');
         update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
-        const tenant = await getTenantBySlug(window.location.hostname);
+        const hostFirstPart = window.location.hostname.split('.')[0];
+        const tenant = await getTenantBySlug(hostFirstPart);
         const stateTenant = btoa(JSON.stringify(tenant));
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
