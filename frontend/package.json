@@ -70,7 +70,7 @@
     "scripts": {
         "start": "VITE_API_URL=\"http://localhost:8080\" VITE_AUTH_URL=\"https://auth.forgetrak.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in VITE_CALLBACK_URL=\"http://localhost:3000/callback\" vite",
         "build-trackbosstest": "VITE_API_URL=\"https://trackbosstestapi.hogbackmx.com:4443\" VITE_AUTH_URL=\"https://auth.forgetrak.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in VITE_CALLBACK_URL=\"https://callback.forgetrak.com/callback\" vite build",
-        "build-trackboss": "VITE_API_URL=\"https://api.forgetrak.com\" VITE_AUTH_URL=\"https://auth.forgetrak.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in VITE_CALLBACK_URL=\"https://callback.forgetrak.com/callback\" vite build",
+        "build-trackboss": "VITE_API_URL=\"https://api.forgetrak.com\" VITE_AUTH_URL=\"https://auth.forgetrak.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in VITE_CALLBACK_URL=\"https://trackboss.hogbackmx.com/callback\" vite build",
         "preview": "vite preview",
         "test": "vitest run --coverage",
         "test:watch": "vitest"
