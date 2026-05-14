@@ -13,7 +13,7 @@ import MemberCommunicationsPage from './pages/MemberCommunicationsPage';
 import ApplicationForm from './pages/ApplicationForm';
 import RaceAdministration from './pages/RaceAdministration';
 import EarlySeasonPage from './pages/EarlySeasonPage';
-import { buildOAuthState, verifyOAuthState } from './util/oauthState';
+import { buildOAuthState } from './util/oauthState';
 import CallbackPage from './pages/CallbackPage';
 
 export function App() {
@@ -64,19 +64,6 @@ export function App() {
             const hashStr = location.hash.split('#id_token=')[1];
             if (hashStr) {
                 const token = hashStr.split('&')[0];
-                // Verify CSRF nonce — the nonce was set on this origin before redirect
-                const hashParams = new URLSearchParams(location.hash.substring(1));
-                const stateRaw = hashParams.get('state');
-                if (stateRaw) {
-                    try {
-                        verifyOAuthState(stateRaw);
-                    } catch (e) {
-                        // eslint-disable-next-line no-console
-                        console.error('OAuth state verification failed', e);
-                        redirectToLogin();
-                        return;
-                    }
-                }
                 updateState(token);
             } else if (state.token) {
                 // If no hash but we have a stored token, try to verify it
