@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import { UserContext } from '../contexts/UserContext';
+import { buildOAuthState } from '../util/oauthState';
 
 interface pageProps {
     title: string;
@@ -52,9 +53,11 @@ export default function Header(props:pageProps) {
                         () => {
                             localStorage.removeItem('trackboss_auth_token');
                             update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
-                            const { VITE_AUTH_URL, VITE_CLIENT_ID } = import.meta.env;
+                            const { VITE_AUTH_URL, VITE_CLIENT_ID, VITE_CALLBACK_URL } = import.meta.env;
                             const { origin } = window.location;
-                            const authTarget = `${VITE_AUTH_URL}/login?client_id=${VITE_CLIENT_ID}&response_type=token&scope=email+openid+phone&redirect_uri=${origin}`;
+                            const encodedState = buildOAuthState({ origin });
+                            // eslint-disable-next-line max-len
+                            const authTarget = `${VITE_AUTH_URL}/login?client_id=${VITE_CLIENT_ID}&state=${encodedState}&response_type=token&scope=email+openid+phone&redirect_uri=${VITE_CALLBACK_URL}`;
                             window.location.href = authTarget;
                         }
                     }

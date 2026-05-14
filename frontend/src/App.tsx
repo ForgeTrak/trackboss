@@ -13,6 +13,8 @@ import MemberCommunicationsPage from './pages/MemberCommunicationsPage';
 import ApplicationForm from './pages/ApplicationForm';
 import RaceAdministration from './pages/RaceAdministration';
 import EarlySeasonPage from './pages/EarlySeasonPage';
+import { buildOAuthState, verifyOAuthState } from './util/oauthState';
+import CallbackPage from './pages/CallbackPage';
 
 export function App() {
     const { state, update } = useContext(UserContext);
@@ -24,10 +26,10 @@ export function App() {
         update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
         const hostFirstPart = window.location.hostname.split('.')[0];
         const tenant = await getTenantBySlug(hostFirstPart);
-        const stateTenant = btoa(JSON.stringify(tenant));
+        const encodedState = buildOAuthState({ tenant, origin: window.location.origin });
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
-        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${stateTenant}&response_type=token&scope=email+openid+phone&redirect_uri=${window.location.origin}`;
+        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${encodedState}&response_type=token&scope=email+openid+phone&redirect_uri=${import.meta.env.VITE_CALLBACK_URL}`;
         window.location.href = authTarget;
     }, [update]);
 
@@ -56,11 +58,25 @@ export function App() {
 
     // Effect to handle initial authentication and token validation
     useEffect(() => {
-        if (!state.loggedIn && state.isInitializing && !location.pathname.includes('apply')) {
+        const isPublicPage = location.pathname.includes('apply') || location.pathname.includes('callback');
+        if (!state.loggedIn && state.isInitializing && !isPublicPage) {
             // First check if there's a token in the URL hash (from Cognito redirect)
-            const hash = location.hash.split('#id_token=')[1];
-            if (hash) {
-                const token = hash.split('&')[0];
+            const hashStr = location.hash.split('#id_token=')[1];
+            if (hashStr) {
+                const token = hashStr.split('&')[0];
+                // Verify CSRF nonce — the nonce was set on this origin before redirect
+                const hashParams = new URLSearchParams(location.hash.substring(1));
+                const stateRaw = hashParams.get('state');
+                if (stateRaw) {
+                    try {
+                        verifyOAuthState(stateRaw);
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.error('OAuth state verification failed', e);
+                        redirectToLogin();
+                        return;
+                    }
+                }
                 updateState(token);
             } else if (state.token) {
                 // If no hash but we have a stored token, try to verify it
@@ -83,7 +99,8 @@ export function App() {
     // Effect to periodically validate token when user is logged in
     // eslint-disable-next-line consistent-return
     useEffect(() => {
-        if (state.loggedIn && state.token && !location.pathname.includes('apply')) {
+        const isPublicPath = location.pathname.includes('apply') || location.pathname.includes('callback');
+        if (state.loggedIn && state.token && !isPublicPath) {
             // Validate token every 5 minutes to catch expiration
             const validationInterval = setInterval(async () => {
                 try {
@@ -102,7 +119,8 @@ export function App() {
 
     // Don't render routes until authentication is complete (either logged in or redirected)
     // This prevents components from making API calls with invalid/empty tokens
-    if (state.isInitializing && !location.pathname.includes('apply')) {
+    const isPublicRoute = location.pathname.includes('apply') || location.pathname.includes('callback');
+    if (state.isInitializing && !isPublicRoute) {
         return null; // or a loading spinner if desired
     }
 
@@ -117,6 +135,7 @@ export function App() {
             <Route path="early" element={<EarlySeasonPage />} />
             <Route path="communicate" element={<MemberCommunicationsPage />} />
             <Route path="apply" element={<ApplicationForm />} />
+            <Route path="callback" element={<CallbackPage />} />
         </Routes>
     );
 }
