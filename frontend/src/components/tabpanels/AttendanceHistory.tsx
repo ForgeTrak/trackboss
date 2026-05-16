@@ -6,7 +6,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import DataTable from 'react-data-table-component';
 import { Attendance } from '../../../../src/typedefs/attendance';
 import { UserContext } from '../../contexts/UserContext';
@@ -80,13 +80,13 @@ export default function AttendanceHistory() {
     const columns: any = [
         {
             name: 'Date',
-            selector: (row: Attendance) => `${moment(row.checkInTime).utc().format('dddd, MMMM D YYYY')}`,
+            selector: (row: Attendance) => `${moment(row.checkInTime).tz('America/New_York').format('dddd, MMMM D YYYY')}`,
             sortable: true,
             wrap: true,
         },
         {
             name: 'Time',
-            selector: (row: Attendance) => `${moment(row.checkInTime).utc().format('h:mm A')}`,
+            selector: (row: Attendance) => `${moment(row.checkInTime).tz('America/New_York').format('h:mm A')}`,
             sortable: false,
         },
     ];
