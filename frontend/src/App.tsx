@@ -13,6 +13,7 @@ import MemberCommunicationsPage from './pages/MemberCommunicationsPage';
 import ApplicationForm from './pages/ApplicationForm';
 import RaceAdministration from './pages/RaceAdministration';
 import EarlySeasonPage from './pages/EarlySeasonPage';
+import AttendancePage from './pages/AttendancePage';
 import { buildOAuthState } from './util/oauthState';
 import CallbackPage from './pages/CallbackPage';
 
@@ -121,6 +122,7 @@ export function App() {
             <Route path="administration" element={<RaceAdministration />} />
             <Route path="early" element={<EarlySeasonPage />} />
             <Route path="communicate" element={<MemberCommunicationsPage />} />
+            <Route path="attendance" element={<AttendancePage />} />
             <Route path="apply" element={<ApplicationForm />} />
             <Route path="callback" element={<CallbackPage />} />
         </Routes>
