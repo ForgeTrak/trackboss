@@ -16,6 +16,7 @@ import {
     AiOutlineNotification,
 } from 'react-icons/ai';
 import { HiUsers, HiCog } from 'react-icons/hi';
+import { BsCalendarCheck } from 'react-icons/bs';
 import { IoIosArrowBack } from 'react-icons/io';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -192,6 +193,23 @@ export default function HamburgerMenu(props: pageProps) {
                                     isActive={props.activeButtonId === 4}
                                 >
                                     <Link to="/settings">My Account</Link>
+                                </Button>
+                                <Button
+                                    justifyContent="flex-start"
+                                    height="80px"
+                                    fontFamily="heading"
+                                    fontSize="xl"
+                                    leftIcon={<BsCalendarCheck />}
+                                    width="100%"
+                                    bg="white"
+                                    color="black"
+                                    borderRadius="0"
+                                    _hover={{ bg: 'gray.100' }}
+                                    _active={activeButtonStyle}
+                                    id="8"
+                                    isActive={props.activeButtonId === 8}
+                                >
+                                    <Link to="/attendance">My Visits</Link>
                                 </Button>
                             </VStack>
                             { (props.admin) && (adminButtons) }

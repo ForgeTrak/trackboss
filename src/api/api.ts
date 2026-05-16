@@ -28,6 +28,7 @@ import defaultSetting from './defaultSetting';
 import auditLog from './auditLog';
 import dashboard from './dashboard';
 import tenant from './tenant';
+import attendance from './attendance';
 
 const api = Router();
 
@@ -104,4 +105,5 @@ api.use('/defaultSettings', defaultSetting);
 api.use('/auditLog', auditLog);
 api.use('/dashboard', dashboard);
 api.use('/tenant', tenant);
+api.use('/attendance', attendance);
 export default api;
