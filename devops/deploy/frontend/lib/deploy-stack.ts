@@ -70,7 +70,7 @@ export class DeployStack extends Stack {
       const distribution = new cloudfront.Distribution(this, 'applyToCdnDistribution'+domain, {
         defaultBehavior: {
           cachePolicy,
-          origin: new origins.S3Origin(deploymentBucket),
+          origin: new origins.S3StaticWebsiteOrigin(deploymentBucket),
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         },
         domainNames: [domain],
