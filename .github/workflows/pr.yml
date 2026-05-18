@@ -27,8 +27,8 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: Install modules
       run: |
-        npm ci
-        (cd frontend && npm ci)
+        npm install
+        (cd frontend && npm install)
     - name: Run ESLint
       run: npx eslint .
     - name: Run tests
@@ -110,6 +110,6 @@ jobs:
     - name: Frontend build
       run: cd frontend && npm install && npm run build-$TRACKBOSS_ENVIRONMENT_NAME
     - name: CDK diff - front end
-      run: cd devops/deploy/frontend && npm ci && npx cdk diff
+      run: cd devops/deploy/frontend && npm install && npx cdk diff
     - name: CDK diff - back end
-      run: cd devops/deploy/backend && npm ci && npx cdk diff $TRACKBOSS_ENVIRONMENT_NAME-backendhost-stack
+      run: cd devops/deploy/backend && npm install && npx cdk diff $TRACKBOSS_ENVIRONMENT_NAME-backendhost-stack
