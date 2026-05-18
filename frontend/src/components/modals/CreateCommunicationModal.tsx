@@ -3,7 +3,7 @@ import {
     Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Button, Checkbox, CheckboxGroup, Divider,
     Grid, GridItem, Heading, Input, Select, Text,
 } from '@chakra-ui/react';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 import 'react-quill/dist/quill.snow.css';
 import { useAppToast } from '../../hooks/useAppToast';
