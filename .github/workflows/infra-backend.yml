@@ -7,7 +7,7 @@ on:
         - devops/deploy/backend/**
   workflow_dispatch:
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "26"
   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_AKI }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SAC }}  

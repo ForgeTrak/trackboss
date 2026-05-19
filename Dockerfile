@@ -1,5 +1,5 @@
 # ---------- build stage ----------
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -12,7 +12,7 @@ RUN npm run build
 RUN npm prune --production
 
 # ---------- runtime stage ----------
-FROM node:22-alpine
+FROM node:24-alpine
 
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0 /lambda-adapter /opt/extensions/lambda-adapter
 
