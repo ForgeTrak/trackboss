@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, Portal } from '@chakra-ui/react';
+import { Dialog, IconButton, Portal } from '@chakra-ui/react';
+import { LuX } from 'react-icons/lu';
 
 /**
  * Centralized modal component that wraps Chakra UI's Modal, ModalOverlay,
@@ -19,6 +20,23 @@ import { Dialog, Portal } from '@chakra-ui/react';
  *       <AppModalFooter>Footer buttons</AppModalFooter>
  *   </AppModal>
  */
+
+// Map Chakra v2 Modal size tokens to their original max-width values.
+// v3 Dialog uses wider defaults (e.g. xl went from 640px to 780px),
+// so we constrain Dialog.Content to preserve the v2 visual sizing.
+const v2SizeMaxWidth: Record<string, string> = {
+    xs: '384px',
+    sm: '448px',
+    md: '512px',
+    lg: '576px',
+    xl: '640px',
+    '2xl': '768px',
+    '3xl': '896px',
+    '4xl': '1024px',
+    '5xl': '1152px',
+    '6xl': '1280px',
+    full: '100vw',
+};
 
 type SpaceValue = string | number | undefined;
 
@@ -56,7 +74,6 @@ export default function AppModal({
     return (
         <Dialog.Root
             open={isOpen}
-            size={size}
             placement="center"
             closeOnInteractOutside={closeOnOverlayClick}
             onOpenChange={
@@ -72,6 +89,7 @@ export default function AppModal({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
+                        maxW={size ? v2SizeMaxWidth[size] : v2SizeMaxWidth.md}
                         padding={contentProps?.padding}
                         p={contentProps?.p}
                         pb={contentProps?.pb}
@@ -104,4 +122,12 @@ AppModal.defaultProps = {
 export const AppModalHeader = Dialog.Header;
 export const AppModalBody = Dialog.Body;
 export const AppModalFooter = Dialog.Footer;
-export const AppModalCloseButton = Dialog.CloseTrigger;
+export function AppModalCloseButton() {
+    return (
+        <Dialog.CloseTrigger asChild position="absolute" top="2" right="2">
+            <IconButton aria-label="Close dialog" variant="ghost" size="sm">
+                <LuX />
+            </IconButton>
+        </Dialog.CloseTrigger>
+    );
+}

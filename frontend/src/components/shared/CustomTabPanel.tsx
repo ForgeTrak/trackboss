@@ -16,7 +16,7 @@ export default function MemberSelector(props: CustomTabsProps) {
                     tabs.map((tab) => (
                         // eslint-disable-next-line react/no-array-index-key
                         (
-                            <Tabs.Trigger value={tab.label.toLowerCase()} key={tab.label.toLowerCase()}>
+                            <Tabs.Trigger rounded="md" value={tab.label.toLowerCase()} key={tab.label.toLowerCase()}>
                                 {tab.label}
                                 {tab.icon}
                             </Tabs.Trigger>

@@ -16,19 +16,19 @@ export default function AccountPageTabs() {
     return (
         <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue="general">
             <Tabs.List>
-                <Tabs.Trigger value="general">
+                <Tabs.Trigger rounded="md" value="general">
                     General Info &nbsp;
                     <BsWrench />
                 </Tabs.Trigger>
-                <Tabs.Trigger value="family">
+                <Tabs.Trigger rounded="md" value="family">
                     Family & Bikes &nbsp;
                     <BsFillPeopleFill />
                 </Tabs.Trigger>
-                <Tabs.Trigger value="workpoints">
+                <Tabs.Trigger rounded="md" value="workpoints">
                     Work Point History &nbsp;
                     <IoMdBriefcase />
                 </Tabs.Trigger>
-                <Tabs.Trigger value="dues">
+                <Tabs.Trigger rounded="md" value="dues">
                     Dues & Waivers &nbsp;
                     <FaMoneyBillAlt />
                 </Tabs.Trigger>

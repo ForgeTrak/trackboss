@@ -54,9 +54,9 @@ export default function MembershipApplicationModal(props: appModalProps) {
             <SimpleGrid columns={[1, 1, 1]} gap={0.5} m={3}>
                 <Tabs.Root variant="subtle" bg="white" colorPalette="orange" defaultValue="info">
                     <Tabs.List>
-                        <Tabs.Trigger value="info">Application Info</Tabs.Trigger>
-                        <Tabs.Trigger value="family">Family Members</Tabs.Trigger>
-                        <Tabs.Trigger value="notes">Notes</Tabs.Trigger>
+                        <Tabs.Trigger rounded="md" value="info">Application Info</Tabs.Trigger>
+                        <Tabs.Trigger rounded="md" value="family">Family Members</Tabs.Trigger>
+                        <Tabs.Trigger rounded="md" value="notes">Notes</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="info">
                         <NameAddressDisplay

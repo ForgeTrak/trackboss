@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Heading, Text, VStack, Input, Separator } from '@chakra-ui/react';
-import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
+import { Button, Heading, Text, VStack, Input } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 import { Bike } from '../../../src/typedefs/bike';
 
 interface modalProps {
@@ -31,43 +31,40 @@ export default function EditBikesModal(props: modalProps) {
 
     return (
         <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
-            <Heading pl={2} pr={2} textAlign="center">
-                Edit this bike
-            </Heading>
-            <Text fontSize="2xl" textAlign="center">
-                Current Bike Info:
-                {' '}
-                {`${bike?.year}, ${bike?.make} ${bike?.model}`}
-            </Text>
-            <Separator mb={5} />
+            <AppModalHeader>
+                <Heading textAlign="center">Edit this bike</Heading>
+            </AppModalHeader>
             <AppModalCloseButton />
-            <VStack
-                align="left"
-                mr={5}
-                ml={5}
-            >
-                <Input
-                    variant="outline"
-                    placeholder="Bike year"
-                    value={bikeYear}
-                    onChange={handleEditedBikeYear}
-                    size="md"
-                />
-                <Input
-                    variant="outline"
-                    placeholder="Bike Make"
-                    value={bikeMake}
-                    onChange={handleEditedBikeMake}
-                    size="md"
-                />
-                <Input
-                    variant="outline"
-                    placeholder="Bike Model"
-                    value={bikeModel}
-                    onChange={handleEditedBikeModel}
-                    size="md"
-                />
-            </VStack>
+            <AppModalBody>
+                <Text fontSize="2xl" textAlign="center">
+                    Current Bike Info:
+                    {' '}
+                    {`${bike?.year}, ${bike?.make} ${bike?.model}`}
+                </Text>
+                <VStack align="left">
+                    <Input
+                        variant="outline"
+                        placeholder="Bike year"
+                        value={bikeYear}
+                        onChange={handleEditedBikeYear}
+                        size="md"
+                    />
+                    <Input
+                        variant="outline"
+                        placeholder="Bike Make"
+                        value={bikeMake}
+                        onChange={handleEditedBikeMake}
+                        size="md"
+                    />
+                    <Input
+                        variant="outline"
+                        placeholder="Bike Model"
+                        value={bikeModel}
+                        onChange={handleEditedBikeModel}
+                        size="md"
+                    />
+                </VStack>
+            </AppModalBody>
             <AppModalFooter>
                 <Button
                     variant="ghost"

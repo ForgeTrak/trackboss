@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { createSystem, defaultConfig } from '@chakra-ui/react';
+import { createSystem, defaultConfig, defineSlotRecipe } from '@chakra-ui/react';
 
 export default createSystem(defaultConfig, {
     globalCss: {
@@ -77,6 +77,35 @@ export default createSystem(defaultConfig, {
                     value: 'Roboto, sans-serif',
                 },
             },
+        },
+
+        slotRecipes: {
+            toast: defineSlotRecipe({
+                className: 'chakra-toast',
+                slots: ['root', 'title', 'description', 'indicator', 'closeTrigger', 'actionTrigger'],
+                base: {
+                    root: {
+                        bg: '#e56e03',
+                        color: '#ffffff',
+                        '&[data-type=success]': {
+                            bg: '#e56e03',
+                            color: '#ffffff',
+                        },
+                        '&[data-type=error]': {
+                            bg: '#e56e03',
+                            color: '#ffffff',
+                        },
+                        '&[data-type=warning]': {
+                            bg: '#e56e03',
+                            color: '#ffffff',
+                        },
+                        '&[data-type=info]': {
+                            bg: '#e56e03',
+                            color: '#ffffff',
+                        },
+                    },
+                },
+            }),
         },
     },
 
