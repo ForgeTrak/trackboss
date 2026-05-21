@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider, Heading, HStack, SimpleGrid, Switch, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, SimpleGrid, Switch, Text, VStack, Separator } from '@chakra-ui/react';
 import { RidingAreaStatus } from '../../../../../src/typedefs/ridingAreaStatus';
 
 interface cardProps {
@@ -27,17 +27,22 @@ export default function TrackStatusCard(props: cardProps) {
                 </Text>
                 {
                     isAdmin && (
-                        <Switch
-                            colorScheme="orange"
+                        <Switch.Root
+                            colorPalette="orange"
                             size="lg"
                             defaultChecked={area.isOpen}
-                            onChange={
+                            onCheckedChange={
                                 async () => {
                                     area.isOpen = !area.isOpen;
                                     await props.updateArea(area);
                                 }
                             }
-                        />
+                        >
+                            <Switch.HiddenInput />
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch.Root>
                     )
                 }
             </Box>
@@ -54,11 +59,11 @@ export default function TrackStatusCard(props: cardProps) {
             p={2}
             m={2}
         >
-            <VStack align="left" spacing="2em">
+            <VStack align="left" gap="2em">
                 <Heading alignContent="left" size="lg">Track Status</Heading>
-                <Divider />
+                <Separator />
                 <HStack>
-                    <SimpleGrid w="100%" columns={[1, null, 3]} spacing="20px">
+                    <SimpleGrid w="100%" columns={[1, null, 3]} gap="20px">
                         {ridingAreaDisplay}
                     </SimpleGrid>
                 </HStack>

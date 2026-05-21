@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    Button, Grid, GridItem, Input, Text,
-} from '@chakra-ui/react';
+import { Button, Grid, GridItem, Input, Text } from '@chakra-ui/react';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
 import DatePicker from 'react-date-picker';
@@ -75,7 +73,7 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                 textDecoration="underline"
                 color="orange"
                 variant="ghost"
-                isDisabled={!selectedMember.active}
+                disabled={!selectedMember.active}
                 onClick={onOpen}
             >
                 Edit
@@ -291,7 +289,7 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                     <Button
                         mr={4}
                         backgroundColor="orange"
-                        isDisabled={!dirty}
+                        disabled={!dirty}
                         color="white"
                         onClick={
                             async () => {

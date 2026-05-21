@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Center, Input, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react';
+import { Box, Center, Group, Input, IconButton } from '@chakra-ui/react';
 import { BsBackspace, BsSearch } from 'react-icons/bs';
 
 interface dataSearchBoxProps {
@@ -12,10 +12,10 @@ export default function DataSearchBox(props: dataSearchBoxProps) {
     return (
         <Center>
             <Box maxWidth={500} padding={5}>
-                <InputGroup>
-                    <InputLeftElement pointerEvents="none">
-                        <BsSearch color="gray.300" />
-                    </InputLeftElement>
+                <Group attached>
+                    <Box pointerEvents="none" display="flex" alignItems="center" pl={3}>
+                        <BsSearch color="gray" />
+                    </Box>
                     <Input
                         size="lg"
                         placeholder="Search..."
@@ -26,12 +26,14 @@ export default function DataSearchBox(props: dataSearchBoxProps) {
                             }
                         }
                     />
-                    <InputRightElement
+                    <IconButton
+                        aria-label="Clear search"
+                        variant="ghost"
                         onClick={() => props.onTextChange('')}
                     >
-                        <BsBackspace color="gray.300" />
-                    </InputRightElement>
-                </InputGroup>
+                        <BsBackspace color="gray" />
+                    </IconButton>
+                </Group>
             </Box>
         </Center>
     );

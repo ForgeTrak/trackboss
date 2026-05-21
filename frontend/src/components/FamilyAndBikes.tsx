@@ -1,13 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    Heading,
-    VStack,
-    HStack,
-    SimpleGrid,
-    Button,
-    UnorderedList,
-    ListItem,
-} from '@chakra-ui/react';
+import { Heading, VStack, HStack, SimpleGrid, Button, List } from '@chakra-ui/react';
 import moment from 'moment';
 import _ from 'lodash';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
@@ -122,11 +114,11 @@ export default function GeneralInfo(props: cardProps) {
                 </HStack>
                 {
                     memberFamily && (
-                        <UnorderedList pt={10} spacing={2}>
+                        <List.Root as="ul" pt={10} gap={2}>
                             {
                                 (memberFamily as Member[]).map((member) => (
                                     <HStack>
-                                        <ListItem
+                                        <List.Item
                                             fontSize="xl"
                                         >
                                             {
@@ -134,7 +126,7 @@ export default function GeneralInfo(props: cardProps) {
                                                 ${member.lastName} (${member.dependentStatus})
                                                 (Age: ${moment().diff(member.birthdate, 'years')})`
                                             }
-                                        </ListItem>
+                                        </List.Item>
                                         {
                                             (props.admin && (member.memberType === 'Member')) && (
                                                 <>
@@ -168,7 +160,7 @@ export default function GeneralInfo(props: cardProps) {
                                     </HStack>
                                 ))
                             }
-                        </UnorderedList>
+                        </List.Root>
                     )
                 }
             </VStack>
@@ -195,15 +187,15 @@ export default function GeneralInfo(props: cardProps) {
                 </HStack>
                 {
                     memberBikes && (
-                        <UnorderedList pt={10} spacing={2}>
+                        <List.Root as="ul" pt={10} gap={2}>
                             {
                                 (memberBikes as Bike[]).map((bike) => (
                                     <HStack>
-                                        <ListItem
+                                        <List.Item
                                             fontSize="xl"
                                         >
                                             {` ${bike.year} ${bike.make} ${bike.model}`}
-                                        </ListItem>
+                                        </List.Item>
                                         {
                                             props.admin && (
                                                 <Button
@@ -243,7 +235,7 @@ export default function GeneralInfo(props: cardProps) {
                                     </HStack>
                                 ))
                             }
-                        </UnorderedList>
+                        </List.Root>
                     )
                 }
             </VStack>

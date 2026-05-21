@@ -19,13 +19,13 @@ export default function WrappedSwitchInput(props: wrappedSwitchProps) {
     return (
         <Box maxWidth={maxWidth}>
             <Text fontSize="sm">{wrapperText}</Text>
-            <Switch
-                colorScheme="orange"
+            <Switch.Root
+                colorPalette="orange"
                 defaultChecked={defaultChecked}
                 size="lg"
-                onChange={
-                    (event) => {
-                        onSwitchChange(event.currentTarget.checked);
+                onCheckedChange={
+                    (e) => {
+                        onSwitchChange(e.checked);
                         if (props.toastMessage) {
                             toast.success({
                                 description: props.toastMessage,
@@ -34,8 +34,13 @@ export default function WrappedSwitchInput(props: wrappedSwitchProps) {
                         }
                     }
                 }
-                isDisabled={locked}
-            />
+                disabled={locked}
+            >
+                <Switch.HiddenInput />
+                <Switch.Control>
+                    <Switch.Thumb />
+                </Switch.Control>
+            </Switch.Root>
         </Box>
     );
 }

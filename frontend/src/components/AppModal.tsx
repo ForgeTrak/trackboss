@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader as ChakraModalHeader,
-    ModalBody as ChakraModalBody,
-    ModalFooter as ChakraModalFooter,
-    ModalCloseButton as ChakraModalCloseButton,
-    ModalProps,
-    ResponsiveValue,
-} from '@chakra-ui/react';
+import { Dialog, Portal } from '@chakra-ui/react';
 
 /**
  * Centralized modal component that wraps Chakra UI's Modal, ModalOverlay,
@@ -22,7 +12,7 @@ import {
  * Wrapping them here means we only update this one file during migration.
  *
  * Usage:
- *   <AppModal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
+ *   <AppModal isOpen={isOpen} onClose={onClose} size="lg">
  *       <AppModalHeader>Title</AppModalHeader>
  *       <AppModalCloseButton />
  *       <AppModalBody>Content here</AppModalBody>
@@ -30,7 +20,7 @@ import {
  *   </AppModal>
  */
 
-type SpaceValue = ResponsiveValue<string | number>;
+type SpaceValue = string | number | undefined;
 
 interface ContentStyleProps {
     padding?: SpaceValue;
@@ -50,8 +40,7 @@ interface AppModalProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
-    size?: ModalProps['size'];
-    isCentered?: boolean;
+    size?: string;
     closeOnOverlayClick?: boolean;
     contentProps?: ContentStyleProps;
 }
@@ -61,48 +50,58 @@ export default function AppModal({
     onClose,
     children,
     size,
-    isCentered,
     closeOnOverlayClick,
     contentProps,
 }: AppModalProps) {
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
+        <Dialog.Root
+            open={isOpen}
             size={size}
-            isCentered={isCentered}
-            closeOnOverlayClick={closeOnOverlayClick}
+            placement="center"
+            closeOnInteractOutside={closeOnOverlayClick}
+            onOpenChange={
+                (e) => {
+                    if (!e.open) {
+                        onClose();
+                    }
+                }
+            }
         >
-            <ModalOverlay />
-            <ModalContent
-                padding={contentProps?.padding}
-                p={contentProps?.p}
-                pb={contentProps?.pb}
-                pt={contentProps?.pt}
-                pl={contentProps?.pl}
-                pr={contentProps?.pr}
-                m={contentProps?.m}
-                mb={contentProps?.mb}
-                mt={contentProps?.mt}
-                ml={contentProps?.ml}
-                mr={contentProps?.mr}
-            >
-                {children}
-            </ModalContent>
-        </Modal>
+            <Portal>
+
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        padding={contentProps?.padding}
+                        p={contentProps?.p}
+                        pb={contentProps?.pb}
+                        pt={contentProps?.pt}
+                        pl={contentProps?.pl}
+                        pr={contentProps?.pr}
+                        m={contentProps?.m}
+                        mb={contentProps?.mb}
+                        mt={contentProps?.mt}
+                        ml={contentProps?.ml}
+                        mr={contentProps?.mr}
+                    >
+                        {children}
+                    </Dialog.Content>
+                </Dialog.Positioner>
+
+            </Portal>
+        </Dialog.Root>
     );
 }
 
 AppModal.defaultProps = {
     size: undefined,
-    isCentered: undefined,
     closeOnOverlayClick: undefined,
     contentProps: undefined,
 };
 
 // Re-export sub-components so consumers import everything from one place.
 // During Chakra v3 migration, only the mappings below need to change.
-export const AppModalHeader = ChakraModalHeader;
-export const AppModalBody = ChakraModalBody;
-export const AppModalFooter = ChakraModalFooter;
-export const AppModalCloseButton = ChakraModalCloseButton;
+export const AppModalHeader = Dialog.Header;
+export const AppModalBody = Dialog.Body;
+export const AppModalFooter = Dialog.Footer;
+export const AppModalCloseButton = Dialog.CloseTrigger;

@@ -31,11 +31,21 @@ describe('BillingStatsDisplay', () => {
         render(<BillingStatsDisplay bill={mockBill} />);
 
         expect(screen.getByText('Full Member')).toBeInTheDocument();
-        expect(screen.getByText((content, element) => content.includes('Points Earned in') && element?.tagName.toLowerCase() === 'dt')).toBeInTheDocument();
-        expect(screen.getByText((content, element) => content.includes('2024') && element?.tagName.toLowerCase() === 'dt')).toBeInTheDocument();
+        const isDt = (el: Element | null) => el?.tagName.toLowerCase() === 'dt';
+        const isDd = (el: Element | null) => el?.tagName.toLowerCase() === 'dd';
+        expect(screen.getByText(
+            (content, element) => content.includes('Points Earned in') && isDt(element),
+        )).toBeInTheDocument();
+        expect(screen.getByText(
+            (content, element) => content.includes('2024') && isDt(element),
+        )).toBeInTheDocument();
         expect(screen.getByText('85')).toBeInTheDocument();
-        expect(screen.getByText((content, element) => content.includes('of') && element?.tagName.toLowerCase() === 'dd')).toBeInTheDocument();
-        expect(screen.getByText((content, element) => content.includes('100') && element?.tagName.toLowerCase() === 'dd')).toBeInTheDocument();
+        expect(screen.getByText(
+            (content, element) => content.includes('of') && isDd(element),
+        )).toBeInTheDocument();
+        expect(screen.getByText(
+            (content, element) => content.includes('100') && isDd(element),
+        )).toBeInTheDocument();
         expect(screen.getByText('Amount Due')).toBeInTheDocument();
         expect(screen.getByText('$250')).toBeInTheDocument();
         expect(screen.getByText('$258.5 w/ Square')).toBeInTheDocument();
@@ -76,7 +86,9 @@ describe('BillingStatsDisplay', () => {
         };
         render(<BillingStatsDisplay bill={emptyBill} />);
 
-        expect(screen.getByText((content, element) => content.includes('Points Earned in') && element?.tagName.toLowerCase() === 'dt')).toBeInTheDocument();
+        expect(screen.getByText(
+            (content, element) => content.includes('Points Earned in') && element?.tagName.toLowerCase() === 'dt',
+        )).toBeInTheDocument();
         expect(screen.getByText('Amount Due')).toBeInTheDocument();
         expect(screen.getByText('Bill generated on')).toBeInTheDocument();
     });

@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import {
     Button,
-    Divider,
     Heading,
     VStack,
     Input,
-    Select,
+    NativeSelect,
     NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
+    Separator,
 } from '@chakra-ui/react';
 import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 
@@ -34,48 +30,51 @@ export default function EditBikesModal(props: modalProps) {
     const maxModelYear = thisYear + 1;
 
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading pl={2} pr={2} textAlign="center">
                 Add New Bike
             </Heading>
-            <Divider mb={5} />
+            <Separator mb={5} />
             <AppModalCloseButton />
             <VStack
                 align="left"
                 mr={5}
                 ml={5}
             >
-                <NumberInput
+                <NumberInput.Root
                     variant="outline"
-                    defaultValue={maxModelYear}
+                    defaultValue={String(maxModelYear)}
                     min={minModelYear}
                     max={maxModelYear}
                 >
-                    <NumberInputField onChange={handleEditedBikeYear} />
-                    <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                    </NumberInputStepper>
-                </NumberInput>
-                <Select
-                    variant="outline"
-                    placeholder="Bike Make"
-                    onChange={handleEditedBikeMake}
-                    size="md"
-                >
-                    <option value="Beta">Beta</option>
-                    <option value="Cobra">Cobra</option>
-                    <option value="Gas Gas">Gas Gas</option>
-                    <option value="GPX">GPX</option>
-                    <option value="Honda">Honda</option>
-                    <option value="Husqvarna">Husqvarna</option>
-                    <option value="Kawasaki">Kawasaki</option>
-                    <option value="KTM">KTM</option>
-                    <option value="Other">Other</option>
-                    <option value="Pitster Pro">Pitster Pro</option>
-                    <option value="Suzuki">Suzuki</option>
-                    <option value="Yamaha">Yamaha</option>
-                </Select>
+                    <NumberInput.Input onChange={handleEditedBikeYear} />
+                    <NumberInput.Control>
+                        <NumberInput.IncrementTrigger />
+                        <NumberInput.DecrementTrigger />
+                    </NumberInput.Control>
+                </NumberInput.Root>
+                <NativeSelect.Root>
+                    <NativeSelect.Field
+                        variant="outline"
+                        placeholder="Bike Make"
+                        onChange={handleEditedBikeMake}
+                        size="md"
+                    >
+                        <option value="Beta">Beta</option>
+                        <option value="Cobra">Cobra</option>
+                        <option value="Gas Gas">Gas Gas</option>
+                        <option value="GPX">GPX</option>
+                        <option value="Honda">Honda</option>
+                        <option value="Husqvarna">Husqvarna</option>
+                        <option value="Kawasaki">Kawasaki</option>
+                        <option value="KTM">KTM</option>
+                        <option value="Other">Other</option>
+                        <option value="Pitster Pro">Pitster Pro</option>
+                        <option value="Suzuki">Suzuki</option>
+                        <option value="Yamaha">Yamaha</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                </NativeSelect.Root>
                 <Input
                     variant="outline"
                     placeholder="Bike Model"

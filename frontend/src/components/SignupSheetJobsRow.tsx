@@ -1,6 +1,4 @@
-import {
-    Box, Button, Input, NumberInput, NumberInputField, SimpleGrid, Text,
-} from '@chakra-ui/react';
+import { Box, Button, Input, NumberInput, SimpleGrid, Text } from '@chakra-ui/react';
 import React, { useContext, useState } from 'react';
 import { BsTrashFill } from 'react-icons/bs';
 import { useAppToast } from '../hooks/useAppToast';
@@ -48,7 +46,7 @@ function SignupSheetJobsRow(props: any) {
 
     return (
         <Box ml={10} maxWidth="50%">
-            <SimpleGrid columns={[1, 2, 3]} spacing={2}>
+            <SimpleGrid columns={[1, 2, 3]} gap={2}>
                 <Box maxWidth={250}>
                     <Text fontSize="sm">Description</Text>
                     <Input
@@ -64,8 +62,8 @@ function SignupSheetJobsRow(props: any) {
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Point Value</Text>
-                    <NumberInput min={0} max={30} step={0.25}>
-                        <NumberInputField
+                    <NumberInput.Root min={0} max={30} step={0.25}>
+                        <NumberInput.Input
                             placeholder={`${data.pointValue}`}
                             onChange={
                                 (event) => {
@@ -74,12 +72,12 @@ function SignupSheetJobsRow(props: any) {
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Cash Payout</Text>
-                    <NumberInput min={0} max={750} step={10}>
-                        <NumberInputField
+                    <NumberInput.Root min={0} max={750} step={10}>
+                        <NumberInput.Input
                             placeholder={`${data.cashValue}`}
                             onChange={
                                 (event) => {
@@ -88,7 +86,7 @@ function SignupSheetJobsRow(props: any) {
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={250}>
                     <Text fontSize="sm">Job Day</Text>
@@ -115,8 +113,8 @@ function SignupSheetJobsRow(props: any) {
                 />
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Positions</Text>
-                    <NumberInput min={1} max={300} step={1}>
-                        <NumberInputField
+                    <NumberInput.Root min={1} max={300} step={1}>
+                        <NumberInput.Input
                             placeholder={`${data.count}`}
                             onChange={
                                 (event) => {
@@ -127,12 +125,12 @@ function SignupSheetJobsRow(props: any) {
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Display Order</Text>
-                    <NumberInput min={1} max={300} step={1}>
-                        <NumberInputField
+                    <NumberInput.Root min={1} max={300} step={1}>
+                        <NumberInput.Input
                             placeholder={`${data.sortOrder}`}
                             onChange={
                                 (event) => {
@@ -141,7 +139,7 @@ function SignupSheetJobsRow(props: any) {
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
             </SimpleGrid>
             <Button
@@ -183,7 +181,6 @@ function SignupSheetJobsRow(props: any) {
             </Button>
             <Button
                 hidden={disableInputs}
-                leftIcon={<BsTrashFill />}
                 mt={2}
                 ml={2}
                 backgroundColor="red"
@@ -194,6 +191,7 @@ function SignupSheetJobsRow(props: any) {
                     }
                 }
             >
+                <BsTrashFill />
                 Delete
             </Button>
             <DeleteAlert

@@ -1,14 +1,12 @@
 import React from 'react';
 import {
     Drawer,
-    DrawerBody,
-    DrawerOverlay,
-    DrawerContent,
     Button,
     IconButton,
     VStack,
-    StackDivider,
     HStack,
+    Portal,
+    Separator,
 } from '@chakra-ui/react';
 
 import {
@@ -23,6 +21,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 
 interface pageProps {
+    // eslint-disable-next-line react/no-unused-prop-types
     activeButtonId: number,
     admin: boolean,
     boardMember: boolean,
@@ -32,18 +31,17 @@ export default function HamburgerMenu(props: pageProps) {
     const { isOpen, onOpen, onClose } = useAppDisclosure();
     const history = useNavigate();
     const activeButtonStyle = {
-        bg: 'orange',
-        color: 'white',
+        bg: 'white',
+        color: 'black',
     };
     const adminButtons = (
-        <VStack width="100%" divider={<StackDivider borderColor="gray.300" />} spacing="0">
-            <StackDivider borderColor="gray.300" />
+        <VStack width="100%" gap="0">
+            <Separator borderColor="gray.300" />
             <Button
                 justifyContent="flex-start"
                 height="80px"
                 fontFamily="heading"
                 fontSize="xl"
-                leftIcon={<AiOutlineNotification />}
                 width="100%"
                 bg="white"
                 color="black"
@@ -51,16 +49,17 @@ export default function HamburgerMenu(props: pageProps) {
                 _hover={{ bg: 'gray.100' }}
                 _active={activeButtonStyle}
                 id="5"
-                isActive={props.activeButtonId === 5}
+                data-active
             >
+                <AiOutlineNotification />
                 <Link to="/communicate">Communicate</Link>
             </Button>
+            <Separator borderColor="gray.300" />
             <Button
                 justifyContent="flex-start"
                 height="80px"
                 fontFamily="heading"
                 fontSize="xl"
-                leftIcon={<AiFillBank />}
                 width="100%"
                 bg="white"
                 color="black"
@@ -68,21 +67,21 @@ export default function HamburgerMenu(props: pageProps) {
                 _hover={{ bg: 'gray.100' }}
                 _active={activeButtonStyle}
                 id="6"
-                isActive={props.activeButtonId === 6}
+                data-active
             >
+                <AiFillBank />
                 <Link to="/administration">Club Administration</Link>
             </Button>
-            <StackDivider borderColor="gray.300" />
+            <Separator borderColor="gray.300" />
         </VStack>
     );
     const boardMemberButtons = (
-        <VStack width="100%" divider={<StackDivider borderColor="gray.300" />} spacing="0">
+        <VStack width="100%" gap="0">
             <Button
                 justifyContent="flex-start"
                 height="80px"
                 fontFamily="heading"
                 fontSize="xl"
-                leftIcon={<AiFillFolderOpen />}
                 width="100%"
                 bg="white"
                 color="black"
@@ -90,8 +89,9 @@ export default function HamburgerMenu(props: pageProps) {
                 _hover={{ bg: 'gray.100' }}
                 _active={activeButtonStyle}
                 id="6"
-                isActive={props.activeButtonId === 7}
+                data-active
             >
+                <AiFillFolderOpen />
                 <Link to="/early">Billing + Applications</Link>
             </Button>
         </VStack>
@@ -100,123 +100,141 @@ export default function HamburgerMenu(props: pageProps) {
         <HStack>
             <IconButton
                 aria-label="Back"
-                icon={<IoIosArrowBack size="lg" />}
                 color="orange"
                 bg="white"
                 size="lg"
                 onClick={() => history(-1)}
-            />
+            >
+                <IoIosArrowBack size="lg" />
+            </IconButton>
             <div>
                 <IconButton
                     aria-label="Menu"
-                    icon={<AiOutlineMenu />}
                     onClick={onOpen}
-                    background="orange"
-                    color="white"
-                    isRound
+                    background="white"
+                    color="orange"
+                    borderRadius="full"
                     size="lg"
-                />
-                <Drawer
-                    isOpen={isOpen}
-                    placement="left"
-                    onClose={onClose}
-                    size="sm"
                 >
-                    <DrawerOverlay />
-                    <DrawerContent>
-                        <DrawerBody padding="0">
-                            <VStack width="100%" divider={<StackDivider borderColor="gray.300" />} spacing="0">
-                                <Button
-                                    justifyContent="flex-start"
-                                    height="80px"
-                                    fontFamily="heading"
-                                    fontSize="xl"
-                                    leftIcon={<AiFillHome />}
-                                    width="100%"
-                                    bg="white"
-                                    color="black"
-                                    borderRadius="0"
-                                    _hover={{ bg: 'gray.100' }}
-                                    _active={activeButtonStyle}
-                                    id="1"
-                                    isActive={props.activeButtonId === 1}
-                                >
-                                    <Link to="/">Dashboard</Link>
-                                </Button>
-                                <Button
-                                    justifyContent="flex-start"
-                                    height="80px"
-                                    fontFamily="heading"
-                                    fontSize="xl"
-                                    leftIcon={<AiFillCalendar />}
-                                    width="100%"
-                                    bg="white"
-                                    color="black"
-                                    _hover={{ bg: 'gray.100' }}
-                                    _active={activeButtonStyle}
-                                    borderRadius="0"
-                                    id="2"
-                                    isActive={props.activeButtonId === 2}
-                                >
-                                    <Link to="/calendar">Calendar and Job Signup</Link>
-                                </Button>
-                                <Button
-                                    justifyContent="flex-start"
-                                    height="80px"
-                                    fontFamily="heading"
-                                    fontSize="xl"
-                                    leftIcon={<HiUsers />}
-                                    width="100%"
-                                    bg="white"
-                                    color="black"
-                                    borderRadius="0"
-                                    _hover={{ bg: 'gray.100' }}
-                                    _active={activeButtonStyle}
-                                    id="3"
-                                    isActive={props.activeButtonId === 3}
-                                >
-                                    <Link to="/members">Members</Link>
-                                </Button>
-                                <Button
-                                    justifyContent="flex-start"
-                                    height="80px"
-                                    fontFamily="heading"
-                                    fontSize="xl"
-                                    leftIcon={<HiCog />}
-                                    width="100%"
-                                    bg="white"
-                                    color="black"
-                                    borderRadius="0"
-                                    _hover={{ bg: 'gray.100' }}
-                                    _active={activeButtonStyle}
-                                    id="4"
-                                    isActive={props.activeButtonId === 4}
-                                >
-                                    <Link to="/settings">My Account</Link>
-                                </Button>
-                                <Button
-                                    justifyContent="flex-start"
-                                    height="80px"
-                                    fontFamily="heading"
-                                    fontSize="xl"
-                                    leftIcon={<BsCalendarCheck />}
-                                    width="100%"
-                                    bg="white"
-                                    color="black"
-                                    borderRadius="0"
-                                    _hover={{ bg: 'gray.100' }}
-                                    _active={activeButtonStyle}
-                                    id="8"
-                                    isActive={props.activeButtonId === 8}
-                                >
-                                    <Link to="/attendance">My Visits</Link>
-                                </Button>
-                            </VStack>
-                            { (props.admin) && (adminButtons) }
-                            { (props.boardMember || props.admin) && (boardMemberButtons)}
-                        </DrawerBody>
-                    </DrawerContent>
-                </Drawer>
+                    <AiOutlineMenu />
+                </IconButton>
+                <Drawer.Root
+                    open={isOpen}
+                    placement="start"
+                    size="sm"
+                    onOpenChange={
+                        (e) => {
+                            if (!e.open) {
+                                onClose();
+                            }
+                        }
+                    }
+                >
+                    <Portal>
+
+                        <Drawer.Backdrop />
+                        <Drawer.Positioner>
+                            <Drawer.Content>
+                                <Drawer.Body padding="0">
+                                    <VStack width="100%" gap="0">
+                                        <Button
+                                            justifyContent="flex-start"
+                                            height="80px"
+                                            fontFamily="heading"
+                                            fontSize="xl"
+                                            width="100%"
+                                            bg="white"
+                                            color="black"
+                                            borderRadius="0"
+                                            _hover={{ bg: 'gray.100' }}
+                                            _active={activeButtonStyle}
+                                            id="1"
+                                            data-active
+                                        >
+                                            <AiFillHome />
+                                            <Link to="/">Dashboard</Link>
+                                        </Button>
+                                        <Separator borderColor="gray.300" />
+                                        <Button
+                                            justifyContent="flex-start"
+                                            height="80px"
+                                            fontFamily="heading"
+                                            fontSize="xl"
+                                            width="100%"
+                                            bg="white"
+                                            color="black"
+                                            _hover={{ bg: 'gray.100' }}
+                                            _active={activeButtonStyle}
+                                            borderRadius="0"
+                                            id="2"
+                                            data-active
+                                        >
+                                            <AiFillCalendar />
+                                            <Link to="/calendar">Calendar and Job Signup</Link>
+                                        </Button>
+                                        <Separator borderColor="gray.300" />
+                                        <Button
+                                            justifyContent="flex-start"
+                                            height="80px"
+                                            fontFamily="heading"
+                                            fontSize="xl"
+                                            width="100%"
+                                            bg="white"
+                                            color="black"
+                                            borderRadius="0"
+                                            _hover={{ bg: 'gray.100' }}
+                                            _active={activeButtonStyle}
+                                            id="3"
+                                            data-active
+                                        >
+                                            <HiUsers />
+                                            <Link to="/members">Members</Link>
+                                        </Button>
+                                        <Separator borderColor="gray.300" />
+                                        <Button
+                                            justifyContent="flex-start"
+                                            height="80px"
+                                            fontFamily="heading"
+                                            fontSize="xl"
+                                            width="100%"
+                                            bg="white"
+                                            color="black"
+                                            borderRadius="0"
+                                            _hover={{ bg: 'gray.100' }}
+                                            _active={activeButtonStyle}
+                                            id="4"
+                                            data-active
+                                        >
+                                            <HiCog />
+                                            <Link to="/settings">My Account</Link>
+                                        </Button>
+                                        <Separator borderColor="gray.300" />
+                                        <Button
+                                            justifyContent="flex-start"
+                                            height="80px"
+                                            fontFamily="heading"
+                                            fontSize="xl"
+                                            width="100%"
+                                            bg="white"
+                                            color="black"
+                                            borderRadius="0"
+                                            _hover={{ bg: 'gray.100' }}
+                                            _active={activeButtonStyle}
+                                            id="8"
+                                            data-active
+                                        >
+                                            <BsCalendarCheck />
+                                            <Link to="/attendance">My Visits</Link>
+                                        </Button>
+                                    </VStack>
+                                    { (props.admin) && (adminButtons) }
+                                    { (props.boardMember || props.admin) && (boardMemberButtons)}
+                                </Drawer.Body>
+                            </Drawer.Content>
+                        </Drawer.Positioner>
+
+                    </Portal>
+                </Drawer.Root>
             </div>
         </HStack>
     );

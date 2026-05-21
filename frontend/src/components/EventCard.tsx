@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Center, Text, Heading, VStack, HStack, IconButton, Divider, Button } from '@chakra-ui/react';
+import {
+    Box,
+    Center,
+    Text,
+    Heading,
+    VStack,
+    HStack,
+    IconButton,
+    Button,
+    Separator,
+} from '@chakra-ui/react';
 import { GoCalendar } from 'react-icons/go';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,16 +44,17 @@ export default function EventCard(props: cardProps) {
             cursor="pointer"
             bg="white"
             boxShadow="md"
-            border="1px"
+            borderWidth="1px"
+            borderStyle="solid"
             borderColor="gray.200"
             p={3}
             m={2}
-            h="375"
+            h="375px"
         >
             <Center>
                 <VStack
                     p={0}
-                    boxSize="md"
+                    w="full"
                     onClick={navigateToCalendar}
                 >
                     <HStack>
@@ -55,11 +66,12 @@ export default function EventCard(props: cardProps) {
                             m="0"
                             fontSize="24px"
                             color="gray.200"
-                            icon={<GoCalendar />}
-                        />
+                        >
+                            <GoCalendar />
+                        </IconButton>
                         <Heading pr={5} size="lg">Next Event</Heading>
                     </HStack>
-                    <Divider />
+                    <Separator w="full" borderColor="gray.200" />
                     <Text pt={10} color="orange" fontSize="2xl">
                         {eventDates}
                     </Text>
@@ -69,7 +81,7 @@ export default function EventCard(props: cardProps) {
                     <Button
                         backgroundColor="orange.300"
                         color="white"
-                        isDisabled={disableSignInButton}
+                        disabled={disableSignInButton}
                         hidden={!props.allowsSignIn}
                         onClick={
                             (e) => {

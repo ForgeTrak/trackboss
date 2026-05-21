@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import {
-    Box, Button, Divider, Heading, Input,
-    NumberInput, NumberInputField, SimpleGrid, Text,
+    Box,
+    Button,
+    Heading,
+    Input,
+    NumberInput,
+    SimpleGrid,
+    Text,
+    Separator,
 } from '@chakra-ui/react';
 import AppModal, { AppModalFooter } from '../AppModal';
 import { useAppToast } from '../../hooks/useAppToast';
@@ -32,7 +38,7 @@ export default function AddJobTypeModal(props: alertProps) {
     const [sortOrder, setSortOrder] = useState<number>(99);
     const toast = useAppToast();
     return (
-        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
             >
@@ -40,8 +46,8 @@ export default function AddJobTypeModal(props: alertProps) {
                 {props.eventType}
                     &nbsp; job
             </Heading>
-            <Divider />
-            <SimpleGrid columns={[2, 3, 3]} spacing={2} m={3}>
+            <Separator />
+            <SimpleGrid columns={[2, 3, 3]} gap={2} m={3}>
                 <Box maxWidth={250}>
                     <Text fontSize="sm">Description</Text>
                     <Input
@@ -54,27 +60,27 @@ export default function AddJobTypeModal(props: alertProps) {
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Point Value</Text>
-                    <NumberInput min={0} max={30} step={0.25}>
-                        <NumberInputField
+                    <NumberInput.Root min={0} max={30} step={0.25}>
+                        <NumberInput.Input
                             onChange={
                                 (event) => {
                                     setPointValue(parseFloat(event.target.value));
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Cash Payout</Text>
-                    <NumberInput min={0} max={750} step={10} defaultValue={cashValue}>
-                        <NumberInputField
+                    <NumberInput.Root min={0} max={750} step={10} defaultValue={String(cashValue)}>
+                        <NumberInput.Input
                             onChange={
                                 (event) => {
                                     setCashValue(parseFloat(event.target.value));
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={140}>
                     <Text fontSize="sm">Job Day</Text>
@@ -91,27 +97,27 @@ export default function AddJobTypeModal(props: alertProps) {
                 />
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Positions</Text>
-                    <NumberInput min={1} max={300} step={1} defaultValue={count}>
-                        <NumberInputField
+                    <NumberInput.Root min={1} max={300} step={1} defaultValue={String(count)}>
+                        <NumberInput.Input
                             onChange={
                                 (event) => {
                                     setCount(parseInt(event.target.value, 10));
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                 </Box>
                 <Box maxWidth={100}>
                     <Text fontSize="sm">Display Order</Text>
-                    <NumberInput min={1} max={300} step={1} defaultValue={sortOrder}>
-                        <NumberInputField
+                    <NumberInput.Root min={1} max={300} step={1} defaultValue={String(sortOrder)}>
+                        <NumberInput.Input
                             onChange={
                                 (event) => {
                                     setSortOrder(parseInt(event.target.value, 10));
                                 }
                             }
                         />
-                    </NumberInput>
+                    </NumberInput.Root>
                     <Text fontSize="xs">(default is 99, bottom of the list for the day)</Text>
                 </Box>
             </SimpleGrid>

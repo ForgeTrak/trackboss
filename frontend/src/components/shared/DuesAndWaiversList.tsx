@@ -3,9 +3,14 @@ import {
     Box,
     Button,
     Center,
-    Heading, HStack, IconButton, Link,
-    Select, Stat, StatGroup, StatHelpText, StatLabel,
-    StatNumber, Text, VStack,
+    Heading,
+    HStack,
+    IconButton,
+    Link,
+    NativeSelect,
+    Stat,
+    Text,
+    VStack,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -173,30 +178,30 @@ export default function DuesAndWaiversList() {
                     setYear={setSelectedYear}
                 />
             </Center>
-            <StatGroup>
-                <Stat>
-                    <StatLabel>Paid or Owes $0</StatLabel>
-                    <StatNumber>{markedPaid}</StatNumber>
-                    <StatHelpText>{`${owesZero} owe $0`}</StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel>
+            <Stat.Root>
+                <Stat.Root>
+                    <Stat.Label>Paid or Owes $0</Stat.Label>
+                    <Stat.ValueText>{markedPaid}</Stat.ValueText>
+                    <Stat.HelpText>{`${owesZero} owe $0`}</Stat.HelpText>
+                </Stat.Root>
+                <Stat.Root>
+                    <Stat.Label>
                         {`${allBillsData.length - owesZero} members owe`}
-                    </StatLabel>
-                    <StatNumber>{`${markedPaid - owesZero}`}</StatNumber>
-                    <StatHelpText>are paid</StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel>Rules and Insurance</StatLabel>
-                    <StatNumber>{markedAttested}</StatNumber>
-                    <StatHelpText>{`Of ${allBillsData.length}`}</StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel>Completed all</StatLabel>
-                    <StatNumber>{`${((allDone / allBillsData.length) * 100).toFixed(2)}%`}</StatNumber>
-                    <StatHelpText>{allDone}</StatHelpText>
-                </Stat>
-            </StatGroup>
+                    </Stat.Label>
+                    <Stat.ValueText>{`${markedPaid - owesZero}`}</Stat.ValueText>
+                    <Stat.HelpText>are paid</Stat.HelpText>
+                </Stat.Root>
+                <Stat.Root>
+                    <Stat.Label>Rules and Insurance</Stat.Label>
+                    <Stat.ValueText>{markedAttested}</Stat.ValueText>
+                    <Stat.HelpText>{`Of ${allBillsData.length}`}</Stat.HelpText>
+                </Stat.Root>
+                <Stat.Root>
+                    <Stat.Label>Completed all</Stat.Label>
+                    <Stat.ValueText>{`${((allDone / allBillsData.length) * 100).toFixed(2)}%`}</Stat.ValueText>
+                    <Stat.HelpText>{allDone}</Stat.HelpText>
+                </Stat.Root>
+            </Stat.Root>
             <HStack>
                 <DataSearchBox
                     onTextChange={setSearchTerm}
@@ -215,8 +220,9 @@ export default function DuesAndWaiversList() {
                             window.location.href = objectUrl;
                         }
                     }
-                    icon={<BsPrinter />}
-                />
+                >
+                    <BsPrinter />
+                </IconButton>
             </HStack>
             <HStack>
                 <WrappedSwitchInput
@@ -270,7 +276,7 @@ export default function DuesAndWaiversList() {
                 subHeaderWrap
                 defaultSortFieldId={1}
             />
-            <AppModal isCentered size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ padding: 3 }}>
+            <AppModal size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ padding: 3 }}>
                 <Heading>
                     {`Billing detail for ${selectedBill?.membershipAdmin} - ${selectedBill?.year}`}
                 </Heading>
@@ -317,20 +323,23 @@ export default function DuesAndWaiversList() {
                 {
                     !selectedBill?.curYearPaid && (
                         <Box maxWidth={175}>
-                            <Select
-                                placeholder="Payment Method"
-                                size="sm"
-                                onChange={
-                                    (event) => {
-                                        setPaymentMethod(event.target.value);
+                            <NativeSelect.Root>
+                                <NativeSelect.Field
+                                    placeholder="Payment Method"
+                                    size="sm"
+                                    onChange={
+                                        (event) => {
+                                            setPaymentMethod(event.target.value);
+                                        }
                                     }
-                                }
-                            >
-                                <option value="Cash">Cash</option>
-                                <option value="Check">Check</option>
-                                <option value="PayPal">PayPal</option>
-                                <option value="Square">Square</option>
-                            </Select>
+                                >
+                                    <option value="Cash">Cash</option>
+                                    <option value="Check">Check</option>
+                                    <option value="PayPal">PayPal</option>
+                                    <option value="Square">Square</option>
+                                </NativeSelect.Field>
+                                <NativeSelect.Indicator />
+                            </NativeSelect.Root>
                         </Box>
                     )
                 }
@@ -354,9 +363,8 @@ export default function DuesAndWaiversList() {
                 />
                 <HStack mt={2} mr={3}>
                     <Button
-                        rightIcon={<BsCashCoin />}
-                        colorScheme="orange"
-                        isDisabled={selectedBill?.curYearPaid}
+                        colorPalette="orange"
+                        disabled={selectedBill?.curYearPaid}
                         onClick={
                             async () => {
                                 await payBill(state.token, selectedBill?.billId || 0, 'Discounted');
@@ -366,11 +374,11 @@ export default function DuesAndWaiversList() {
                         }
                     >
                         Discount 100%
+                        <BsCashCoin />
                     </Button>
                     <Button
-                        rightIcon={<BsCashCoin />}
-                        colorScheme="orange"
-                        isDisabled={selectedBill?.curYearPaid}
+                        colorPalette="orange"
+                        disabled={selectedBill?.curYearPaid}
                         onClick={
                             async () => {
                                 await discountBill(state.token, selectedBill?.billId || 0);
@@ -380,6 +388,7 @@ export default function DuesAndWaiversList() {
                         }
                     >
                         Discount 50%
+                        <BsCashCoin />
                     </Button>
                 </HStack>
                 <Text
@@ -387,17 +396,32 @@ export default function DuesAndWaiversList() {
                 >
                     Once insurance is attested, this checkbox locks so contact support if you need to undo it.
                 </Text>
-                <Alert status="warning">
-                    <Link fontSize="sm" href={`sms:${selectedBill?.phone}`} isExternal>
+                <Alert.Root status="warning">
+                    <Link
+                        fontSize="sm"
+                        href={`sms:${selectedBill?.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         {`Text at ${selectedBill?.phone}`}
                     </Link>
-                    <Link fontSize="sm" href={`mailto:${selectedBill?.membershipAdminEmail}`} isExternal>
+                    <Link
+                        fontSize="sm"
+                        href={`mailto:${selectedBill?.membershipAdminEmail}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         {`Email at ${selectedBill?.membershipAdminEmail}`}
                     </Link>
-                    <Link fontSize="sm" href={`tel:${selectedBill?.phone}`} isExternal>
+                    <Link
+                        fontSize="sm"
+                        href={`tel:${selectedBill?.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         {`Call at ${selectedBill?.phone}`}
                     </Link>
-                </Alert>
+                </Alert.Root>
                 <Button
                     mt={10}
                     variant="outline"

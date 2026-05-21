@@ -1,7 +1,4 @@
-import {
-    Center,
-    VStack,
-} from '@chakra-ui/react';
+import { Center, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { AttendanceCount } from '../../../../src/typedefs/attendance';

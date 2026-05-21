@@ -1,4 +1,4 @@
-import { Box, HStack, Link, Stat, StatHelpText, StatLabel, StatNumber } from '@chakra-ui/react';
+import { Box, HStack, Link, Stat } from '@chakra-ui/react';
 import React from 'react';
 import { Bill } from '../../../../src/typedefs/bill';
 
@@ -11,44 +11,44 @@ export default function BillingStatsDisplay(props: billStatsProps) {
     return (
         <Box>
             <HStack>
-                <Stat>
-                    <StatNumber>
+                <Stat.Root>
+                    <Stat.ValueText>
                         {bill?.membershipType}
-                    </StatNumber>
-                    <StatLabel>
+                    </Stat.ValueText>
+                    <Stat.Label>
                         Points Earned in &nbsp;
                         {bill?.year}
-                    </StatLabel>
-                    <StatNumber>
+                    </Stat.Label>
+                    <Stat.ValueText>
                         {bill?.pointsEarned}
                         &nbsp;
-                    </StatNumber>
-                    <StatHelpText>
+                    </Stat.ValueText>
+                    <Stat.HelpText>
                         of
                         &nbsp;
                         {bill?.pointsThreshold}
-                    </StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel>
+                    </Stat.HelpText>
+                </Stat.Root>
+                <Stat.Root>
+                    <Stat.Label>
                         Amount Due
-                    </StatLabel>
-                    <StatNumber>
+                    </Stat.Label>
+                    <Stat.ValueText>
                         {`$${bill?.amount}`}
-                    </StatNumber>
-                    <StatHelpText>
+                    </Stat.ValueText>
+                    <Stat.HelpText>
                         {`$${bill?.amountWithFee} w/ Square`}
-                    </StatHelpText>
-                </Stat>
+                    </Stat.HelpText>
+                </Stat.Root>
             </HStack>
-            <Stat>
-                <StatLabel>
+            <Stat.Root>
+                <Stat.Label>
                     Bill generated on
-                </StatLabel>
-                <StatHelpText>
+                </Stat.Label>
+                <Stat.HelpText>
                     {`${bill?.generatedDate}`}
-                </StatHelpText>
-            </Stat>
+                </Stat.HelpText>
+            </Stat.Root>
             <Link
                 href={bill?.squareLink}
                 target="_blank"

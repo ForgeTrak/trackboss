@@ -1,4 +1,4 @@
-import { Box, Button, Center, Input, InputGroup, InputLeftElement, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, Group, Input, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsSearch } from 'react-icons/bs';
@@ -115,16 +115,16 @@ export default function PaidLaborList() {
             <Center>
                 <VStack>
                     <Box maxWidth={300}>
-                        <InputGroup>
-                            <InputLeftElement pointerEvents="none">
-                                <BsSearch color="gray.300" />
-                            </InputLeftElement>
+                        <Group attached>
+                            <Box pointerEvents="none" display="flex" alignItems="center" pl={3}>
+                                <BsSearch color="gray" />
+                            </Box>
                             <Input
                                 size="lg"
                                 placeholder="Search..."
                                 onChange={(e) => setSearchTerm(e.target.value?.toLowerCase())}
                             />
-                        </InputGroup>
+                        </Group>
                     </Box>
                     <Button
                         backgroundColor="orange.300"

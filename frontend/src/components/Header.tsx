@@ -1,12 +1,5 @@
 import React, { useContext } from 'react';
-import {
-    Heading,
-    Flex,
-    Spacer,
-    Box,
-    Text,
-    Button,
-} from '@chakra-ui/react';
+import { Heading, Flex, Spacer, Box, Text, Button } from '@chakra-ui/react';
 
 import { useNavigate } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';

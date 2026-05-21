@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 
 import {
-    Button, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
-    NumberInputStepper, SimpleGrid,
+    Button,
+    NumberInput,
+    SimpleGrid,
 } from '@chakra-ui/react';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
 import { useAppToast } from '../../hooks/useAppToast';
@@ -29,34 +30,33 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
             <AppModalCloseButton />
             <AppModalBody pb={6}>
                 <SimpleGrid columns={2}>
-                    <NumberInput
+                    <NumberInput.Root
                         min={0}
                         max={30}
-                        defaultValue={props.selectedJob.pointsAwarded}
+                        defaultValue={String(props.selectedJob.pointsAwarded)}
                         step={0.25}
-                        onChange={
-                            async (changeValue) => {
+                        onValueChange={
+                            async (details) => {
                                 // eslint-disable-next-line max-len
-                                await modifyJobPoints(state.token, selectedJob.jobId, parseFloat(changeValue) || 0);
+                                await modifyJobPoints(state.token, selectedJob.jobId, details.valueAsNumber || 0);
                                 props.refreshPoints();
                                 toast.success({
                                     title: 'Points updated!',
-                                    description: `${selectedJob.member} ${selectedJob.title}, ${changeValue}`,
+                                    description: `${selectedJob.member} ${selectedJob.title}, ${details.value}`,
                                 });
                             }
                         }
                     >
-                        <NumberInputField
+                        <NumberInput.Input
                             placeholder="Points earned"
                         />
-                        <NumberInputStepper>
-                            <NumberIncrementStepper />
-                            <NumberDecrementStepper />
-                        </NumberInputStepper>
-                    </NumberInput>
+                        <NumberInput.Control>
+                            <NumberInput.IncrementTrigger />
+                            <NumberInput.DecrementTrigger />
+                        </NumberInput.Control>
+                    </NumberInput.Root>
                 </SimpleGrid>
             </AppModalBody>
-
             <AppModalFooter>
                 <Button
                     onClick={props.onClose}

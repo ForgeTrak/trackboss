@@ -3,18 +3,14 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Button,
-    Divider,
     Heading,
     SimpleGrid,
     VStack,
     Text,
     Switch,
     Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionIcon,
     Box,
-    AccordionPanel,
+    Separator,
 } from '@chakra-ui/react';
 import moment from 'moment';
 import { BsTrash2 } from 'react-icons/bs';
@@ -71,7 +67,7 @@ export default function SelectedEventModal(props: modalProps) {
     const [restrictSignups] = useState<boolean>(props.selectedEvent.restrictSignups);
 
     return (
-        <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="lg" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
                 pl={2}
@@ -97,74 +93,76 @@ export default function SelectedEventModal(props: modalProps) {
                 </Text>
                 {
                     ((props.admin) && (
-                        <Accordion allowToggle>
-                            <AccordionItem>
+                        <Accordion.Root collapsible>
+                            <Accordion.Item value="item-0">
                                 <h2>
-                                    <AccordionButton>
+                                    <Accordion.ItemTrigger>
                                         <Box as="span">
                                             Edit Dates
                                         </Box>
-                                        <AccordionIcon />
-                                    </AccordionButton>
+                                        <Accordion.ItemIndicator />
+                                    </Accordion.ItemTrigger>
                                 </h2>
-                                <AccordionPanel>
-                                    <SimpleGrid>
-                                        <VStack align="left">
-                                            <Text>Start Date/Time:</Text>
-                                            <DateTimePicker
-                                                disableClock
-                                                disableCalendar
-                                                value={startDateTime}
-                                                onChange={
-                                                    (date: any) => {
-                                                        setStartDateTime(date);
-                                                        setDatesDirty(true);
+                                <Accordion.ItemContent>
+                                    <Accordion.ItemBody>
+                                        <SimpleGrid>
+                                            <VStack align="left">
+                                                <Text>Start Date/Time:</Text>
+                                                <DateTimePicker
+                                                    disableClock
+                                                    disableCalendar
+                                                    value={startDateTime}
+                                                    onChange={
+                                                        (date: any) => {
+                                                            setStartDateTime(date);
+                                                            setDatesDirty(true);
+                                                        }
                                                     }
-                                                }
-                                            />
-                                        </VStack>
-                                        <VStack align="left">
-                                            <Text>End Date/Time:</Text>
-                                            <DateTimePicker
-                                                disableClock
-                                                disableCalendar
-                                                value={endDateTime}
-                                                minDate={startDateTime}
-                                                onChange={
-                                                    (date: any) => {
-                                                        setEndDateTime(date);
-                                                        setDatesDirty(true);
+                                                />
+                                            </VStack>
+                                            <VStack align="left">
+                                                <Text>End Date/Time:</Text>
+                                                <DateTimePicker
+                                                    disableClock
+                                                    disableCalendar
+                                                    value={endDateTime}
+                                                    minDate={startDateTime}
+                                                    onChange={
+                                                        (date: any) => {
+                                                            setEndDateTime(date);
+                                                            setDatesDirty(true);
+                                                        }
                                                     }
-                                                }
-                                            />
-                                        </VStack>
-                                        <VStack align="left">
-                                            <Button
-                                                width={50}
-                                                backgroundColor="orange.300"
-                                                color="white"
-                                                isDisabled={!datesDirty}
-                                                onClick={
-                                                    async () => {
-                                                        const patchEvent : PatchEventRequest = { restrictSignups: props.selectedEvent.restrictSignups };
-                                                        patchEvent.startDate = moment(startDateTime).toISOString(true).slice(0, -10);
-                                                        patchEvent.endDate = moment(endDateTime).toISOString(true).slice(0, -10);
-                                                        patchEvent.eventDescription = props.selectedEvent.description;
-                                                        patchEvent.eventName = props.selectedEvent.title;
-                                                        patchEvent.restrictSignups = props.selectedEvent.restrictSignups;
-                                                        await updateEvent(state.token, props.selectedEvent.eventId, patchEvent);
-                                                        props.eventsRefresh();
-                                                        props.onClose();
+                                                />
+                                            </VStack>
+                                            <VStack align="left">
+                                                <Button
+                                                    width={50}
+                                                    backgroundColor="orange.300"
+                                                    color="white"
+                                                    disabled={!datesDirty}
+                                                    onClick={
+                                                        async () => {
+                                                            const patchEvent : PatchEventRequest = { restrictSignups: props.selectedEvent.restrictSignups };
+                                                            patchEvent.startDate = moment(startDateTime).toISOString(true).slice(0, -10);
+                                                            patchEvent.endDate = moment(endDateTime).toISOString(true).slice(0, -10);
+                                                            patchEvent.eventDescription = props.selectedEvent.description;
+                                                            patchEvent.eventName = props.selectedEvent.title;
+                                                            patchEvent.restrictSignups = props.selectedEvent.restrictSignups;
+                                                            await updateEvent(state.token, props.selectedEvent.eventId, patchEvent);
+                                                            props.eventsRefresh();
+                                                            props.onClose();
+                                                        }
                                                     }
-                                                }
-                                            >
-                                                Save
-                                            </Button>
-                                        </VStack>
-                                    </SimpleGrid>
-                                </AccordionPanel>
-                            </AccordionItem>
-                        </Accordion>
+                                                >
+                                                    Save
+                                                </Button>
+                                            </VStack>
+                                        </SimpleGrid>
+                                    </Accordion.ItemBody>
+                                </Accordion.ItemContent>
+                            </Accordion.Item>
+                        </Accordion.Root>
                     ))
                 }
                 <WrappedSwitchInput
@@ -189,7 +187,7 @@ export default function SelectedEventModal(props: modalProps) {
                     {`Event ID: ${props.selectedEvent.eventId}`}
                 </Text>
             </AppModalBody>
-            <Divider />
+            <Separator />
             <AppModalCloseButton />
             <AppModalFooter>
                 <Link
@@ -206,8 +204,7 @@ export default function SelectedEventModal(props: modalProps) {
                                 mr={3}
                                 backgroundColor="red"
                                 color="white"
-                                isDisabled={!enableDelete}
-                                rightIcon={<BsTrash2 />}
+                                disabled={!enableDelete}
                                 onClick={
                                     () => {
                                         props.deleteEvent();
@@ -216,16 +213,22 @@ export default function SelectedEventModal(props: modalProps) {
                                 }
                             >
                                 Delete
+                                <BsTrash2 />
                             </Button>
-                            <Switch
+                            <Switch.Root
                                 size="sm"
-                                colorScheme="orange"
-                                onChange={
-                                    (event) => {
-                                        setEnableDelete(event.currentTarget.checked);
+                                colorPalette="orange"
+                                onCheckedChange={
+                                    (e) => {
+                                        setEnableDelete(e.checked);
                                     }
                                 }
-                            />
+                            >
+                                <Switch.HiddenInput />
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Root>
                         </>
                     )
                 }

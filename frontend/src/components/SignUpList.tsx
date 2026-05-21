@@ -1,6 +1,11 @@
 import {
     Alert,
-    Box, Center, Flex, IconButton, Input, InputGroup, InputLeftElement,
+    Box,
+    Center,
+    Flex,
+    Group,
+    IconButton,
+    Input,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -154,16 +159,16 @@ export default function SignUpList(props: SignupListProps) {
             <Center>
                 <Flex mt={5}>
                     <Box>
-                        <InputGroup>
-                            <InputLeftElement pointerEvents="none">
-                                <BsSearch color="gray.300" />
-                            </InputLeftElement>
+                        <Group attached>
+                            <Box pointerEvents="none" display="flex" alignItems="center" pl={3}>
+                                <BsSearch color="gray" />
+                            </Box>
                             <Input
                                 size="lg"
                                 placeholder="Search..."
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                        </InputGroup>
+                        </Group>
                     </Box>
                     <Box pl={5}>
                         <IconButton
@@ -185,17 +190,18 @@ export default function SignUpList(props: SignupListProps) {
                                     window.location.href = objectUrl;
                                 }
                             }
-                            icon={<BsPrinter />}
-                        />
+                        >
+                            <BsPrinter />
+                        </IconButton>
                     </Box>
                 </Flex>
             </Center>
             <Box>
-                <Alert status="warning">
+                <Alert.Root status="warning">
                     To choose a job expands its row, and click the signup button.  If you are an admin you can also
                     choose a name from the drop down, or type it in the dropdown to narrow the list.  Admins can also
                     assign a non member to a job.
-                </Alert>
+                </Alert.Root>
                 <Box mt={1} mb={1}>
                     {
                         `${signupsCount} of ${allJobsCount} 

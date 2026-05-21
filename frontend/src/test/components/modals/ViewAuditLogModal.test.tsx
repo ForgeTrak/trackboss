@@ -87,7 +87,10 @@ describe('ViewAuditLogModal', () => {
             />,
         );
 
-        const changeDetailsElement = screen.getByText((content) => content.includes('"name": "John Doe"') && content.includes('"email": "john@example.com"'));
+        const matcher = (content: string) => (
+            content.includes('"name": "John Doe"') && content.includes('"email": "john@example.com"')
+        );
+        const changeDetailsElement = screen.getByText(matcher);
         expect(changeDetailsElement).toBeInTheDocument();
     });
 

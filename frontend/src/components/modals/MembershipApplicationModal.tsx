@@ -1,7 +1,19 @@
 /* eslint-disable max-len */
 import React, { useState } from 'react';
 import {
-    Alert, AlertIcon, Button, Divider, Grid, GridItem, Heading, Link, ListItem, OrderedList, SimpleGrid, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, VStack,
+    Alert,
+    Button,
+    Grid,
+    GridItem,
+    Heading,
+    Link,
+    SimpleGrid,
+    Tabs,
+    Text,
+    Textarea,
+    VStack,
+    Separator,
+    List,
 } from '@chakra-ui/react';
 import moment from 'moment';
 import AppModal, { AppModalFooter } from '../AppModal';
@@ -30,7 +42,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
     const isAccepted = (membershipApplication.status === 'Accepted');
 
     return (
-        <AppModal isCentered size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ m: 3 }}>
+        <AppModal size="lg" isOpen={isOpen} onClose={onClose} contentProps={{ m: 3 }}>
             <Heading ml={3}>
                 Application -
                 &nbsp;
@@ -38,94 +50,91 @@ export default function MembershipApplicationModal(props: appModalProps) {
                     &nbsp;
                 {membershipApplication.lastName}
             </Heading>
-            <Divider />
-            <SimpleGrid columns={[1, 1, 1]} spacing={0.5} m={3}>
-                <Tabs variant="soft-rounded" bg="white" colorScheme="orange">
-                    <TabList>
-                        <Tab>Application Info</Tab>
-                        <Tab>Family Members</Tab>
-                        <Tab>Notes</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel>
-                            <NameAddressDisplay
-                                addressContainer={membershipApplication}
-                            />
-                            <Text size="md">
-                                {membershipApplication.occupation}
-                            </Text>
-                            <Text size="md">
-                                Recommended by
-                                &nbsp;
-                                {membershipApplication.referredBy}
-                            </Text>
-                            <Text size="lg">
-                                Application ID:
-                                &nbsp;
-                                {membershipApplication.id}
-                            </Text>
-                            <Text size="lg">
-                                Application received at
-                                &nbsp;
-                                {membershipApplication.receivedDate.toString()}
-                            </Text>
-                            <Link
-                                isExternal
-                                href={membershipApplication.googleLink}
-                            >
-                                Link to Google results for
-                                &nbsp;
-                                {membershipApplication.firstName}
-                            </Link>
-                        </TabPanel>
-                        <TabPanel>
-                            <OrderedList>
-                                {
-                                    membershipApplication.familyMembers && (membershipApplication.familyMembers.map((familyMember: any) => (
-                                        <ListItem>
-                                            {familyMember.firstName}
-                                                &nbsp;
-                                            {familyMember.lastName}
-                                                &nbsp;
-                                            {`(${moment(new Date()).diff(familyMember.dob, 'years')})`}
-                                        </ListItem>
-                                    )))
+            <Separator />
+            <SimpleGrid columns={[1, 1, 1]} gap={0.5} m={3}>
+                <Tabs.Root variant="subtle" bg="white" colorPalette="orange" defaultValue="info">
+                    <Tabs.List>
+                        <Tabs.Trigger value="info">Application Info</Tabs.Trigger>
+                        <Tabs.Trigger value="family">Family Members</Tabs.Trigger>
+                        <Tabs.Trigger value="notes">Notes</Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="info">
+                        <NameAddressDisplay
+                            addressContainer={membershipApplication}
+                        />
+                        <Text fontSize="md">
+                            {membershipApplication.occupation}
+                        </Text>
+                        <Text fontSize="md">
+                            Recommended by
+                            &nbsp;
+                            {membershipApplication.referredBy}
+                        </Text>
+                        <Text fontSize="lg">
+                            Application ID:
+                            &nbsp;
+                            {membershipApplication.id}
+                        </Text>
+                        <Text fontSize="lg">
+                            Application received at
+                            &nbsp;
+                            {membershipApplication.receivedDate.toString()}
+                        </Text>
+                        <Link
+                            href={membershipApplication.googleLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Link to Google results for
+                            &nbsp;
+                            {membershipApplication.firstName}
+                        </Link>
+                    </Tabs.Content>
+                    <Tabs.Content value="family">
+                        <List.Root as="ol">
+                            {
+                                membershipApplication.familyMembers && (membershipApplication.familyMembers.map((familyMember: any) => (
+                                    <List.Item>
+                                        {familyMember.firstName}
+                                            &nbsp;
+                                        {familyMember.lastName}
+                                            &nbsp;
+                                        {`(${moment(new Date()).diff(familyMember.dob, 'years')})`}
+                                    </List.Item>
+                                )))
+                            }
+                        </List.Root>
+                    </Tabs.Content>
+                    <Tabs.Content value="notes">
+                        <VStack gap={2}>
+                            <Text>Notes to applicant (emailed to applicant)</Text>
+                            <Textarea
+                                placeholder="Notes to applicant (sent in email)"
+                                onChange={
+                                    (e) => {
+                                        setApplicantNotes(e.target.value);
+                                    }
                                 }
-                            </OrderedList>
-                        </TabPanel>
-                        <TabPanel>
-                            <VStack spacing={2}>
-                                <Text>Notes to applicant (emailed to applicant)</Text>
-                                <Textarea
-                                    placeholder="Notes to applicant (sent in email)"
-                                    onChange={
-                                        (e) => {
-                                            setApplicantNotes(e.target.value);
-                                        }
+                                defaultValue={applicantNotes}
+                            />
+                            <Text>Internal Notes (not shared)</Text>
+                            <Textarea
+                                placeholder="Internal notes (not shared)"
+                                onChange={
+                                    (e) => {
+                                        setInternalNotes(e.target.value);
                                     }
-                                >
-                                    {applicantNotes}
-                                </Textarea>
-                                <Text>Internal Notes (not shared)</Text>
-                                <Textarea
-                                    placeholder="Internal notes (not shared)"
-                                    onChange={
-                                        (e) => {
-                                            setInternalNotes(e.target.value);
-                                        }
-                                    }
-                                >
-                                    {internalNotes}
-                                </Textarea>
-                            </VStack>
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
-                <Alert status="warning">
-                    <AlertIcon />
+                                }
+                                defaultValue={internalNotes}
+                            />
+                        </VStack>
+                    </Tabs.Content>
+                </Tabs.Root>
+                <Alert.Root status="warning">
+                    <Alert.Indicator />
                     Clicking the Accept or Reject buttons sends emails to the applicant, and also finalizes their
                     application status.
-                </Alert>
+                </Alert.Root>
             </SimpleGrid>
             <AppModalFooter>
                 <Grid templateColumns="repeat(2, 2fr)" gap={3}>
@@ -149,7 +158,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                             color="white"
                             variant="ghost"
                             size="lg"
-                            isDisabled={!reviewOrRejected}
+                            disabled={!reviewOrRejected}
                             onClick={
                                 async () => {
                                     await reviewMembershipApplication(props.token, membershipApplication.id, internalNotes, applicantNotes);
@@ -166,7 +175,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                             color="red"
                             variant="ghost"
                             size="lg"
-                            isDisabled={!reviewOrRejected}
+                            disabled={!reviewOrRejected}
                             onClick={
                                 async () => {
                                     await rejectMembershipApplication(props.token, membershipApplication.id, internalNotes, applicantNotes);
@@ -183,7 +192,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                             color="green"
                             variant="ghost"
                             size="lg"
-                            isDisabled={isAccepted}
+                            disabled={isAccepted}
                             onClick={
                                 async () => {
                                     await acceptMembershipApplication(props.token, membershipApplication.id, internalNotes, applicantNotes);
@@ -200,7 +209,7 @@ export default function MembershipApplicationModal(props: appModalProps) {
                             color="green"
                             size="lg"
                             variant="ghost"
-                            isDisabled={!reviewOrRejected}
+                            disabled={!reviewOrRejected}
                             onClick={
                                 async () => {
                                     await acceptMembershipApplication(props.token, membershipApplication.id, internalNotes, applicantNotes, true);

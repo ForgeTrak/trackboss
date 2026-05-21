@@ -1,9 +1,7 @@
 import React, { useState, useContext } from 'react';
 import _ from 'lodash';
 
-import {
-    Button, Divider, Grid, GridItem, Heading, Input, Text,
-} from '@chakra-ui/react';
+import { Button, Grid, GridItem, Heading, Input, Text, Separator } from '@chakra-ui/react';
 import PhoneInput from 'react-phone-number-input/input';
 import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 
@@ -44,13 +42,13 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
     const { state } = useContext(UserContext);
 
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
             >
                 Update Paid Laborer
             </Heading>
-            <Divider />
+            <Separator />
             <AppModalBody>
                 <Grid
                     templateRows="repeat(4, 1fr)"

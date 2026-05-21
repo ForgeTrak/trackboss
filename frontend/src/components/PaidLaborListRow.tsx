@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ExpanderComponentProps } from 'react-data-table-component';
 import _ from 'lodash';
-import { Box, Button, ButtonGroup } from '@chakra-ui/react';
+import { Box, Button, Group } from '@chakra-ui/react';
 import { BsTrash2, BsFillTelephoneFill } from 'react-icons/bs';
 
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
@@ -22,7 +22,7 @@ export default function PaidLaborListRow(props: PaidLaborRowProps) {
 
     return (
         <Box>
-            <ButtonGroup variant="outline" ml={10} spacing="6">
+            <Group variant="outline" ml={10} gap="6">
                 <Button
                     background="orange.300"
                     color="white"
@@ -38,8 +38,7 @@ export default function PaidLaborListRow(props: PaidLaborRowProps) {
                 <Button
                     background="green"
                     color="white"
-                    rightIcon={<BsFillTelephoneFill />}
-                    isDisabled={_.isEmpty(props.data.phoneNumber)}
+                    disabled={_.isEmpty(props.data.phoneNumber)}
                     style={{ visibility: state.user?.memberType === 'Admin' ? 'visible' : 'hidden' }}
                     onClick={
                         () => {
@@ -48,12 +47,12 @@ export default function PaidLaborListRow(props: PaidLaborRowProps) {
                     }
                 >
                     Call
+                    <BsFillTelephoneFill />
                 </Button>
                 <Button
                     aria-label="Remove"
                     background="red"
                     color="white"
-                    rightIcon={<BsTrash2 />}
                     onClick={
                         async () => {
                             await deletePaidLabor(state.token, props.data.paidLaborId || 0);
@@ -64,8 +63,9 @@ export default function PaidLaborListRow(props: PaidLaborRowProps) {
                     }
                 >
                     Delete
+                    <BsTrash2 />
                 </Button>
-            </ButtonGroup>
+            </Group>
             <PaidLaborModal
                 laborer={props.data}
                 editMode

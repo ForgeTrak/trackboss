@@ -1,11 +1,5 @@
 import React, { useContext } from 'react';
-import {
-    Tabs,
-    Tab,
-    TabPanel,
-    TabPanels,
-    TabList,
-} from '@chakra-ui/react';
+import { Tabs } from '@chakra-ui/react';
 
 import { BsWrench, BsFillPeopleFill } from 'react-icons/bs';
 import { FaMoneyBillAlt } from 'react-icons/fa';
@@ -20,48 +14,46 @@ export default function AccountPageTabs() {
     const { state } = useContext(UserContext);
 
     return (
-        <Tabs variant="soft-rounded" bg="white" colorScheme="orange" isLazy lazyBehavior="keepMounted">
-            <TabList>
-                <Tab>
+        <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue="general">
+            <Tabs.List>
+                <Tabs.Trigger value="general">
                     General Info &nbsp;
                     <BsWrench />
-                </Tab>
-                <Tab>
+                </Tabs.Trigger>
+                <Tabs.Trigger value="family">
                     Family & Bikes &nbsp;
                     <BsFillPeopleFill />
-                </Tab>
-                <Tab>
+                </Tabs.Trigger>
+                <Tabs.Trigger value="workpoints">
                     Work Point History &nbsp;
                     <IoMdBriefcase />
-                </Tab>
-                <Tab>
+                </Tabs.Trigger>
+                <Tabs.Trigger value="dues">
                     Dues & Waivers &nbsp;
                     <FaMoneyBillAlt />
-                </Tab>
-            </TabList>
-            <TabPanels>
-                <TabPanel>
-                    {
-                        state.user &&
-                        <GeneralInfo user={state.user} />
-                    }
-                </TabPanel>
-                <TabPanel>
-                    {
-                        state.user && (
-                            <FamilyAndBikes
-                                admin={state.user.memberType.includes('Admin')}
-                            />
-                        )
-                    }
-                </TabPanel>
-                <TabPanel>
-                    <WorkPointsHistory />
-                </TabPanel>
-                <TabPanel>
-                    <DuesAndWaivers />
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
+                </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="general">
+                {
+                    state.user &&
+                    <GeneralInfo user={state.user} />
+                }
+            </Tabs.Content>
+            <Tabs.Content value="family">
+                {
+                    state.user && (
+                        <FamilyAndBikes
+                            admin={state.user.memberType.includes('Admin')}
+                        />
+                    )
+                }
+            </Tabs.Content>
+            <Tabs.Content value="workpoints">
+                <WorkPointsHistory />
+            </Tabs.Content>
+            <Tabs.Content value="dues">
+                <DuesAndWaivers />
+            </Tabs.Content>
+        </Tabs.Root>
     );
 }

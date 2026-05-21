@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-    Button, Divider, Grid, GridItem, Heading, Text, Code,
-} from '@chakra-ui/react';
+import { Button, Grid, GridItem, Heading, Text, Code, Separator } from '@chakra-ui/react';
 import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
 
 interface ViewAuditLogModalProps {
@@ -12,13 +10,13 @@ interface ViewAuditLogModalProps {
 
 export default function ViewAuditLogModal(props: ViewAuditLogModalProps) {
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
             >
                 Audit Log Details
             </Heading>
-            <Divider />
+            <Separator />
             <AppModalBody>
                 <Grid columnGap={4} rowGap={4} templateColumns="repeat(3, 1fr)">
                     <GridItem colSpan={1}>
