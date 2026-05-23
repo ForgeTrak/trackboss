@@ -15,7 +15,7 @@ export default function AccountPageTabs() {
 
     return (
         <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue="general">
-            <Tabs.List>
+            <Tabs.List fontSize="md">
                 <Tabs.Trigger rounded="md" value="general">
                     General Info &nbsp;
                     <BsWrench />

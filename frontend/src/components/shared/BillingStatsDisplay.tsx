@@ -1,4 +1,4 @@
-import { Box, HStack, Link, Stat } from '@chakra-ui/react';
+import { Box, Link, SimpleGrid, Stat } from '@chakra-ui/react';
 import React from 'react';
 import { Bill } from '../../../../src/typedefs/bill';
 
@@ -10,7 +10,7 @@ export default function BillingStatsDisplay(props: billStatsProps) {
 
     return (
         <Box>
-            <HStack>
+            <SimpleGrid columns={2} gap={4}>
                 <Stat.Root>
                     <Stat.ValueText>
                         {bill?.membershipType}
@@ -40,7 +40,7 @@ export default function BillingStatsDisplay(props: billStatsProps) {
                         {`$${bill?.amountWithFee} w/ Square`}
                     </Stat.HelpText>
                 </Stat.Root>
-            </HStack>
+            </SimpleGrid>
             <Stat.Root>
                 <Stat.Label>
                     Bill generated on

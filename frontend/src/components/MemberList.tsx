@@ -1,4 +1,4 @@
-import { Accordion, Center, HStack, SimpleGrid, Stat } from '@chakra-ui/react';
+import { Accordion, Center, HStack, Separator, SimpleGrid, Stat } from '@chakra-ui/react';
 import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -147,6 +147,7 @@ export default function MemberList() {
     }
     return (
         <div>
+            <Separator maxWidth="75%" />
             <Accordion.Root collapsible maxWidth="75%">
                 <Accordion.Item value="item-0">
                     <Accordion.ItemTrigger>

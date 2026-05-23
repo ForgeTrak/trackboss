@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { createSystem, defaultConfig, defineSlotRecipe } from '@chakra-ui/react';
+import { createSystem, defaultConfig, defineRecipe, defineSlotRecipe } from '@chakra-ui/react';
 
 export default createSystem(defaultConfig, {
     globalCss: {
@@ -77,6 +77,31 @@ export default createSystem(defaultConfig, {
                     value: 'Roboto, sans-serif',
                 },
             },
+        },
+
+        recipes: {
+            heading: defineRecipe({
+                className: 'chakra-heading',
+                base: {
+                    fontFamily: 'heading',
+                    fontWeight: 'bold',
+                },
+                variants: {
+                    size: {
+                        xs: { fontSize: 'sm', lineHeight: 'short' },
+                        sm: { fontSize: 'md', lineHeight: 'short' },
+                        md: { fontSize: 'xl', lineHeight: 'short' },
+                        lg: { fontSize: '2xl', lineHeight: 'shorter' },
+                        xl: { fontSize: '3xl', lineHeight: '1.2' },
+                        '2xl': { fontSize: '4xl', lineHeight: '1.2' },
+                        '3xl': { fontSize: '5xl', lineHeight: '1' },
+                        '4xl': { fontSize: '6xl', lineHeight: '1' },
+                    },
+                },
+                defaultVariants: {
+                    size: 'xl',
+                },
+            }),
         },
 
         slotRecipes: {

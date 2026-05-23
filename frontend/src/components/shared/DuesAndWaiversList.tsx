@@ -8,6 +8,7 @@ import {
     IconButton,
     Link,
     NativeSelect,
+    SimpleGrid,
     Stat,
     Text,
     VStack,
@@ -178,7 +179,7 @@ export default function DuesAndWaiversList() {
                     setYear={setSelectedYear}
                 />
             </Center>
-            <Stat.Root>
+            <SimpleGrid columns={[2, null, 4]} gap={4}>
                 <Stat.Root>
                     <Stat.Label>Paid or Owes $0</Stat.Label>
                     <Stat.ValueText>{markedPaid}</Stat.ValueText>
@@ -201,7 +202,7 @@ export default function DuesAndWaiversList() {
                     <Stat.ValueText>{`${((allDone / allBillsData.length) * 100).toFixed(2)}%`}</Stat.ValueText>
                     <Stat.HelpText>{allDone}</Stat.HelpText>
                 </Stat.Root>
-            </Stat.Root>
+            </SimpleGrid>
             <HStack>
                 <DataSearchBox
                     onTextChange={setSearchTerm}

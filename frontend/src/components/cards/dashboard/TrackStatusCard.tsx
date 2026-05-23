@@ -22,7 +22,7 @@ export default function TrackStatusCard(props: cardProps) {
         }
         return (
             <Box p={2} borderWidth="1px" borderRadius="lg" bgColor={color} color="white" w="100%">
-                <Text fontSize="xl" fontStyle="bold">
+                <Text fontSize="xl" fontWeight="bold">
                     {area.name}
                 </Text>
                 {

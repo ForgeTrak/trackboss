@@ -64,7 +64,7 @@ export default function Header(props:pageProps) {
                         <Text
                             mt={2}
                             ml={10}
-                            fontStyle="bold"
+                            fontWeight="bold"
                             color="white"
                             fontSize="md"
                         >

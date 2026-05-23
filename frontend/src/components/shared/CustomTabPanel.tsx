@@ -11,7 +11,7 @@ export default function MemberSelector(props: CustomTabsProps) {
     const { tabs, panels } = props;
     return (
         <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue={tabs[0]?.label.toLowerCase()}>
-            <Tabs.List>
+            <Tabs.List fontSize="md">
                 {
                     tabs.map((tab) => (
                         // eslint-disable-next-line react/no-array-index-key

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Center, Group, Input, IconButton } from '@chakra-ui/react';
+import { Box, Center, Input, IconButton } from '@chakra-ui/react';
 import { BsBackspace, BsSearch } from 'react-icons/bs';
 
 interface dataSearchBoxProps {
@@ -12,12 +12,22 @@ export default function DataSearchBox(props: dataSearchBoxProps) {
     return (
         <Center>
             <Box maxWidth={500} padding={5}>
-                <Group attached>
-                    <Box pointerEvents="none" display="flex" alignItems="center" pl={3}>
+                <Box position="relative">
+                    <Box
+                        position="absolute"
+                        left={3}
+                        top="50%"
+                        transform="translateY(-50%)"
+                        pointerEvents="none"
+                        zIndex={1}
+                    >
                         <BsSearch color="gray" />
                     </Box>
                     <Input
                         size="lg"
+                        pl={10}
+                        pr={10}
+                        borderRadius="md"
                         placeholder="Search..."
                         value={props.searchValue}
                         onChange={
@@ -26,14 +36,22 @@ export default function DataSearchBox(props: dataSearchBoxProps) {
                             }
                         }
                     />
-                    <IconButton
-                        aria-label="Clear search"
-                        variant="ghost"
-                        onClick={() => props.onTextChange('')}
+                    <Box
+                        position="absolute"
+                        right={1}
+                        top="50%"
+                        transform="translateY(-50%)"
                     >
-                        <BsBackspace color="gray" />
-                    </IconButton>
-                </Group>
+                        <IconButton
+                            aria-label="Clear search"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => props.onTextChange('')}
+                        >
+                            <BsBackspace color="gray" />
+                        </IconButton>
+                    </Box>
+                </Box>
             </Box>
         </Center>
     );

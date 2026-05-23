@@ -3,7 +3,6 @@ import {
     Box,
     Center,
     Flex,
-    Group,
     IconButton,
     Input,
 } from '@chakra-ui/react';
@@ -158,17 +157,24 @@ export default function SignUpList(props: SignupListProps) {
         <div data-testid="table">
             <Center>
                 <Flex mt={5}>
-                    <Box>
-                        <Group attached>
-                            <Box pointerEvents="none" display="flex" alignItems="center" pl={3}>
-                                <BsSearch color="gray" />
-                            </Box>
-                            <Input
-                                size="lg"
-                                placeholder="Search..."
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </Group>
+                    <Box position="relative">
+                        <Box
+                            position="absolute"
+                            left={3}
+                            top="50%"
+                            transform="translateY(-50%)"
+                            pointerEvents="none"
+                            zIndex={1}
+                        >
+                            <BsSearch color="gray" />
+                        </Box>
+                        <Input
+                            size="lg"
+                            pl={10}
+                            borderRadius="md"
+                            placeholder="Search..."
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </Box>
                     <Box pl={5}>
                         <IconButton

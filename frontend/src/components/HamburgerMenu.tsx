@@ -30,10 +30,8 @@ interface pageProps {
 export default function HamburgerMenu(props: pageProps) {
     const { isOpen, onOpen, onClose } = useAppDisclosure();
     const history = useNavigate();
-    const activeButtonStyle = {
-        bg: 'white',
-        color: 'black',
-    };
+    const btnBg = (id: number) => (props.activeButtonId === id ? 'orange.300' : 'white');
+    const btnColor = (id: number) => (props.activeButtonId === id ? 'white' : 'black');
     const adminButtons = (
         <VStack width="100%" gap="0">
             <Separator borderColor="gray.300" />
@@ -43,13 +41,11 @@ export default function HamburgerMenu(props: pageProps) {
                 fontFamily="heading"
                 fontSize="xl"
                 width="100%"
-                bg="white"
-                color="black"
+                bg={btnBg(5)}
+                color={btnColor(5)}
                 borderRadius="0"
                 _hover={{ bg: 'gray.100' }}
-                _active={activeButtonStyle}
                 id="5"
-                data-active
             >
                 <AiOutlineNotification />
                 <Link to="/communicate">Communicate</Link>
@@ -61,13 +57,11 @@ export default function HamburgerMenu(props: pageProps) {
                 fontFamily="heading"
                 fontSize="xl"
                 width="100%"
-                bg="white"
-                color="black"
+                bg={btnBg(6)}
+                color={btnColor(6)}
                 borderRadius="0"
                 _hover={{ bg: 'gray.100' }}
-                _active={activeButtonStyle}
                 id="6"
-                data-active
             >
                 <AiFillBank />
                 <Link to="/administration">Club Administration</Link>
@@ -83,13 +77,11 @@ export default function HamburgerMenu(props: pageProps) {
                 fontFamily="heading"
                 fontSize="xl"
                 width="100%"
-                bg="white"
-                color="black"
+                bg={btnBg(7)}
+                color={btnColor(7)}
                 borderRadius="0"
                 _hover={{ bg: 'gray.100' }}
-                _active={activeButtonStyle}
-                id="6"
-                data-active
+                id="7"
             >
                 <AiFillFolderOpen />
                 <Link to="/early">Billing + Applications</Link>
@@ -143,13 +135,11 @@ export default function HamburgerMenu(props: pageProps) {
                                             fontFamily="heading"
                                             fontSize="xl"
                                             width="100%"
-                                            bg="white"
-                                            color="black"
+                                            bg={btnBg(1)}
+                                            color={btnColor(1)}
                                             borderRadius="0"
                                             _hover={{ bg: 'gray.100' }}
-                                            _active={activeButtonStyle}
                                             id="1"
-                                            data-active
                                         >
                                             <AiFillHome />
                                             <Link to="/">Dashboard</Link>
@@ -161,13 +151,11 @@ export default function HamburgerMenu(props: pageProps) {
                                             fontFamily="heading"
                                             fontSize="xl"
                                             width="100%"
-                                            bg="white"
-                                            color="black"
+                                            bg={btnBg(2)}
+                                            color={btnColor(2)}
                                             _hover={{ bg: 'gray.100' }}
-                                            _active={activeButtonStyle}
                                             borderRadius="0"
                                             id="2"
-                                            data-active
                                         >
                                             <AiFillCalendar />
                                             <Link to="/calendar">Calendar and Job Signup</Link>
@@ -179,13 +167,11 @@ export default function HamburgerMenu(props: pageProps) {
                                             fontFamily="heading"
                                             fontSize="xl"
                                             width="100%"
-                                            bg="white"
-                                            color="black"
+                                            bg={btnBg(3)}
+                                            color={btnColor(3)}
                                             borderRadius="0"
                                             _hover={{ bg: 'gray.100' }}
-                                            _active={activeButtonStyle}
                                             id="3"
-                                            data-active
                                         >
                                             <HiUsers />
                                             <Link to="/members">Members</Link>
@@ -197,13 +183,11 @@ export default function HamburgerMenu(props: pageProps) {
                                             fontFamily="heading"
                                             fontSize="xl"
                                             width="100%"
-                                            bg="white"
-                                            color="black"
+                                            bg={btnBg(4)}
+                                            color={btnColor(4)}
                                             borderRadius="0"
                                             _hover={{ bg: 'gray.100' }}
-                                            _active={activeButtonStyle}
                                             id="4"
-                                            data-active
                                         >
                                             <HiCog />
                                             <Link to="/settings">My Account</Link>
@@ -215,13 +199,11 @@ export default function HamburgerMenu(props: pageProps) {
                                             fontFamily="heading"
                                             fontSize="xl"
                                             width="100%"
-                                            bg="white"
-                                            color="black"
+                                            bg={btnBg(8)}
+                                            color={btnColor(8)}
                                             borderRadius="0"
                                             _hover={{ bg: 'gray.100' }}
-                                            _active={activeButtonStyle}
                                             id="8"
-                                            data-active
                                         >
                                             <BsCalendarCheck />
                                             <Link to="/attendance">My Visits</Link>
