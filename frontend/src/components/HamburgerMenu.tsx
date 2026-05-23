@@ -92,8 +92,9 @@ export default function HamburgerMenu(props: pageProps) {
         <HStack>
             <IconButton
                 aria-label="Back"
-                color="orange"
-                bg="white"
+                color="white"
+                bg="orange.300"
+                borderRadius="full"
                 size="lg"
                 onClick={() => history(-1)}
             >
@@ -103,8 +104,8 @@ export default function HamburgerMenu(props: pageProps) {
                 <IconButton
                     aria-label="Menu"
                     onClick={onOpen}
-                    background="white"
-                    color="orange"
+                    background="orange.300"
+                    color="white"
                     borderRadius="full"
                     size="lg"
                 >

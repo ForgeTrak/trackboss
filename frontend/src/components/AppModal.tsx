@@ -22,19 +22,19 @@ import { LuX } from 'react-icons/lu';
  */
 
 // Map Chakra v2 Modal size tokens to their original max-width values.
-// v3 Dialog uses wider defaults (e.g. xl went from 640px to 780px),
-// so we constrain Dialog.Content to preserve the v2 visual sizing.
+// v3 Dialog uses wider defaults, so we constrain Dialog.Content
+// to preserve the v2 visual sizing (v2 modal sizes map 1:1 to theme size tokens).
 const v2SizeMaxWidth: Record<string, string> = {
-    xs: '384px',
-    sm: '448px',
-    md: '512px',
-    lg: '576px',
-    xl: '640px',
-    '2xl': '768px',
-    '3xl': '896px',
-    '4xl': '1024px',
-    '5xl': '1152px',
-    '6xl': '1280px',
+    xs: '320px',
+    sm: '384px',
+    md: '448px',
+    lg: '512px',
+    xl: '576px',
+    '2xl': '672px',
+    '3xl': '768px',
+    '4xl': '896px',
+    '5xl': '1024px',
+    '6xl': '1152px',
     full: '100vw',
 };
 
@@ -89,6 +89,7 @@ export default function AppModal({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
+                        overflowX="hidden"
                         maxW={size ? v2SizeMaxWidth[size] : v2SizeMaxWidth.md}
                         padding={contentProps?.padding}
                         p={contentProps?.p}

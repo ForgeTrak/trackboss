@@ -162,7 +162,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                         )
                                     }
                                 </HStack>
-                                <SimpleGrid pb={4} columns={2}>
+                                <SimpleGrid pb={4} gridTemplateColumns="auto 1fr" gap={2}>
                                     <VStack gap={2} align="left">
                                         <Text fontSize="sm" fontWeight="bold">Name:</Text>
                                         <Text fontSize="sm" fontWeight="bold">Joined:</Text>
@@ -179,7 +179,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                         }
                                     </VStack>
 
-                                    <VStack ml="-70px" align="left">
+                                    <VStack align="left">
                                         <Text fontSize="sm">
                                             {`${selectedMember.firstName} ${selectedMember.lastName}`}
                                         </Text>
@@ -187,16 +187,28 @@ export default function MemberSummaryModal(props: modalProps) {
                                             {selectedMember.dateJoined.substring(0, 4)}
                                         </Text>
                                         <Text fontSize="sm">{selectedMember.membershipType}</Text>
-                                        <Link
-                                            href={`mailto:${selectedMember.email}`}
-                                        >
-                                            <Text fontSize="sm">{selectedMember.email}</Text>
-                                        </Link>
-                                        <Link
-                                            href={`sms:${selectedMember.phoneNumber}`}
-                                        >
-                                            <Text fontSize="sm">{selectedMember.phoneNumber}</Text>
-                                        </Link>
+                                        {
+                                            selectedMember.email ? (
+                                                <Link
+                                                    href={`mailto:${selectedMember.email}`}
+                                                >
+                                                    <Text fontSize="sm">{selectedMember.email}</Text>
+                                                </Link>
+                                            ) : (
+                                                <Text fontSize="sm">&mdash;</Text>
+                                            )
+                                        }
+                                        {
+                                            selectedMember.phoneNumber ? (
+                                                <Link
+                                                    href={`sms:${selectedMember.phoneNumber}`}
+                                                >
+                                                    <Text fontSize="sm">{selectedMember.phoneNumber}</Text>
+                                                </Link>
+                                            ) : (
+                                                <Text fontSize="sm">&mdash;</Text>
+                                            )
+                                        }
                                         {
                                             (adminMode || viewingSelf) && (
                                                 <>
@@ -381,7 +393,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                 </SimpleGrid>
                                             </HStack>
                                             <Text textAlign="left" fontSize="3xl" fontWeight="bold">Actions</Text>
-                                            <HStack align="left">
+                                            <HStack align="left" flexWrap="wrap" gap={2}>
                                                 <AddPointsModal
                                                     memberName={`${selectedMember.firstName} ${selectedMember.lastName}` || ''}
                                                     memberId={selectedMember.memberId as number}
@@ -518,7 +530,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                     }
                                                 />
                                             </HStack>
-                                            <Text size="sm">
+                                            <Text fontSize="sm">
                                                 Deactivating a member removes them from the list.  Use this feature carefully!
                                             </Text>
                                         </VStack>
