@@ -15,8 +15,7 @@ import {
 } from 'react-icons/ai';
 import { HiUsers, HiCog } from 'react-icons/hi';
 import { BsCalendarCheck } from 'react-icons/bs';
-import { IoIosArrowBack } from 'react-icons/io';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 
@@ -29,7 +28,6 @@ interface pageProps {
 
 export default function HamburgerMenu(props: pageProps) {
     const { isOpen, onOpen, onClose } = useAppDisclosure();
-    const history = useNavigate();
     const btnBg = (id: number) => (props.activeButtonId === id ? 'orange.300' : 'white');
     const btnColor = (id: number) => (props.activeButtonId === id ? 'white' : 'black');
     const adminButtons = (
@@ -90,16 +88,6 @@ export default function HamburgerMenu(props: pageProps) {
     );
     return (
         <HStack>
-            <IconButton
-                aria-label="Back"
-                color="white"
-                bg="orange.300"
-                borderRadius="full"
-                size="lg"
-                onClick={() => history(-1)}
-            >
-                <IoIosArrowBack size="lg" />
-            </IconButton>
             <div>
                 <IconButton
                     aria-label="Menu"
