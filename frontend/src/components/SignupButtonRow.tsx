@@ -133,7 +133,7 @@ export default function SignupButtonRow(props: any) {
             (isAdmin)
         );
         signupButton = (
-            <Group variant="outline" ml={10} gap="6">
+            <Group ml={10} gap="6">
                 <Button
                     aria-label="Remove"
                     background="red"

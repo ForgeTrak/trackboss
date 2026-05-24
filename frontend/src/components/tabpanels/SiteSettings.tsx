@@ -69,7 +69,7 @@ function SiteSettings() {
                         } else if (setting.settingType === 'string') {
                             settingInput = (
                                 <Box maxWidth={250}>
-                                    <Text size="sm">{setting.settingDisplayName}</Text>
+                                    <Text fontSize="sm">{setting.settingDisplayName}</Text>
                                     <Input
                                         variant="outline"
                                         colorPalette="orange"

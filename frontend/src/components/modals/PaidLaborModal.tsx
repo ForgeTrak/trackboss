@@ -96,7 +96,7 @@ export default function PaidLaborModal(props: PaidLaborModalProps) {
                     </GridItem>
                     <GridItem colSpan={2}>
                         <Text>Phone</Text>
-                        <Text size="xs">
+                        <Text fontSize="xs">
                             Phone must be ten digits and include area code. Number formatted automatically.
                         </Text>
                         <PhoneInput

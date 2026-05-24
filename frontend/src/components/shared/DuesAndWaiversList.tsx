@@ -281,7 +281,7 @@ export default function DuesAndWaiversList() {
                 <Heading>
                     {`Billing detail for ${selectedBill?.membershipAdmin} - ${selectedBill?.year}`}
                 </Heading>
-                <Text size="x-small">{`Bill ID: ${selectedBill?.billId}`}</Text>
+                <Text fontSize="x-small">{`Bill ID: ${selectedBill?.billId}`}</Text>
                 <BillingStatsDisplay bill={selectedBill} />
                 <WrappedSwitchInput
                     wrapperText="Contacted and renewing?"
@@ -324,10 +324,9 @@ export default function DuesAndWaiversList() {
                 {
                     !selectedBill?.curYearPaid && (
                         <Box maxWidth={175}>
-                            <NativeSelect.Root>
+                            <NativeSelect.Root size="sm">
                                 <NativeSelect.Field
                                     placeholder="Payment Method"
-                                    size="sm"
                                     onChange={
                                         (event) => {
                                             setPaymentMethod(event.target.value);

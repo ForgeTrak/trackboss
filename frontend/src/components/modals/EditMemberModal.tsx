@@ -198,7 +198,7 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                         </GridItem>
                         <GridItem colSpan={2} display={props.hasEmail ? 'block' : 'none'}>
                             <Text>email (Changing this changes the login email too)</Text>
-                            <Text color="red" size="xs" hidden={emailValid}>
+                            <Text color="red" fontSize="xs" hidden={emailValid}>
                                 email must be a valid email address
                             </Text>
                             <Input

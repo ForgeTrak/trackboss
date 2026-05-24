@@ -22,7 +22,7 @@ export default function PaidLaborListRow(props: PaidLaborRowProps) {
 
     return (
         <Box>
-            <Group variant="outline" ml={10} gap="6">
+            <Group ml={10} gap="6">
                 <Button
                     background="orange.300"
                     color="white"
