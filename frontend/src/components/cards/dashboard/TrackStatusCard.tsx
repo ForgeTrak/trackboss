@@ -53,9 +53,10 @@ export default function TrackStatusCard(props: cardProps) {
             alignSelf="center"
             bg="white"
             boxShadow="md"
-            border="1px"
+            borderWidth="1px"
+            borderStyle="solid"
             borderColor="gray.200"
-            w={[470, 470, 1498]}
+            w={['100%', '100%', 1498]}
             p={2}
             m={2}
         >

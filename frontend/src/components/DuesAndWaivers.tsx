@@ -78,7 +78,7 @@ export default function DuesAndWaivers() {
             <HStack>
                 <Heading>Dues and Waivers</Heading>
             </HStack>
-            <Text align="left">
+            <Text textAlign="left">
                 Your dues for 2023 and beyond are displayed below.  Note that payment links will be available on or
                 around December 1.  Until then, you can see your projected amount based on the work you have completed
                 so far.  This will change as you earn more points.  Billing is updated daily.
@@ -116,7 +116,6 @@ export default function DuesAndWaivers() {
                 responsive
                 subHeaderWrap
             />
-            (selectedBill &&
             <DuesAndWaiversModal
                 viewBill={selectedBill}
                 token={state.token}
@@ -129,7 +128,6 @@ export default function DuesAndWaivers() {
                     }
                 }
             />
-            );
         </VStack>
     );
 }

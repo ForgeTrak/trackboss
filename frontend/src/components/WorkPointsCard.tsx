@@ -33,7 +33,7 @@ export default function WorkPointsCard(props: cardProps) {
             m={2}
         >
             <Center>
-                <VStack p={0} w="full">
+                <VStack p={0}>
                     <GaugeChart
                         id="gauge-chart"
                         nrOfLevels={25}

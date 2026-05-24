@@ -34,7 +34,7 @@ export default function HamburgerMenu(props: pageProps) {
     const btnColor = (id: number) => (props.activeButtonId === id ? 'white' : 'black');
     const adminButtons = (
         <VStack width="100%" gap="0">
-            <Separator borderColor="gray.300" />
+            <Separator w="full" borderColor="gray.300" />
             <Button
                 justifyContent="flex-start"
                 height="80px"
@@ -50,7 +50,7 @@ export default function HamburgerMenu(props: pageProps) {
                 <AiOutlineNotification />
                 <Link to="/communicate">Communicate</Link>
             </Button>
-            <Separator borderColor="gray.300" />
+            <Separator w="full" borderColor="gray.300" />
             <Button
                 justifyContent="flex-start"
                 height="80px"
@@ -66,7 +66,7 @@ export default function HamburgerMenu(props: pageProps) {
                 <AiFillBank />
                 <Link to="/administration">Club Administration</Link>
             </Button>
-            <Separator borderColor="gray.300" />
+            <Separator w="full" borderColor="gray.300" />
         </VStack>
     );
     const boardMemberButtons = (
@@ -145,7 +145,7 @@ export default function HamburgerMenu(props: pageProps) {
                                             <AiFillHome />
                                             <Link to="/">Dashboard</Link>
                                         </Button>
-                                        <Separator borderColor="gray.300" />
+                                        <Separator w="full" borderColor="gray.300" />
                                         <Button
                                             justifyContent="flex-start"
                                             height="80px"
@@ -161,7 +161,7 @@ export default function HamburgerMenu(props: pageProps) {
                                             <AiFillCalendar />
                                             <Link to="/calendar">Calendar and Job Signup</Link>
                                         </Button>
-                                        <Separator borderColor="gray.300" />
+                                        <Separator w="full" borderColor="gray.300" />
                                         <Button
                                             justifyContent="flex-start"
                                             height="80px"
@@ -177,7 +177,7 @@ export default function HamburgerMenu(props: pageProps) {
                                             <HiUsers />
                                             <Link to="/members">Members</Link>
                                         </Button>
-                                        <Separator borderColor="gray.300" />
+                                        <Separator w="full" borderColor="gray.300" />
                                         <Button
                                             justifyContent="flex-start"
                                             height="80px"
@@ -193,7 +193,7 @@ export default function HamburgerMenu(props: pageProps) {
                                             <HiCog />
                                             <Link to="/settings">My Account</Link>
                                         </Button>
-                                        <Separator borderColor="gray.300" />
+                                        <Separator w="full" borderColor="gray.300" />
                                         <Button
                                             justifyContent="flex-start"
                                             height="80px"

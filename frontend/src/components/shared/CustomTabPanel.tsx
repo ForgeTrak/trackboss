@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs } from '@chakra-ui/react';
+import { Box, Tabs } from '@chakra-ui/react';
 import TabData from './TabData';
 
 interface CustomTabsProps {
@@ -10,7 +10,14 @@ interface CustomTabsProps {
 export default function MemberSelector(props: CustomTabsProps) {
     const { tabs, panels } = props;
     return (
-        <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue={tabs[0]?.label.toLowerCase()}>
+        <Tabs.Root
+            variant="subtle"
+            bg="white"
+            colorPalette="orange"
+            lazyMount
+            defaultValue={tabs[0]?.label.toLowerCase()}
+            paddingLeft={3}
+        >
             <Tabs.List fontSize="md">
                 {
                     tabs.map((tab) => (
@@ -25,10 +32,21 @@ export default function MemberSelector(props: CustomTabsProps) {
                 }
             </Tabs.List>
             {
-                panels.map((panel, index) => (
+                panels.map((panel, index) => {
                     // eslint-disable-next-line react/no-array-index-key
-                    (<Tabs.Content value={tabs[index]?.label.toLowerCase()} key={index}>{panel}</Tabs.Content>)
-                ))
+                    const tabContent = (
+                        <Tabs.Content
+                            value={tabs[index]?.label.toLowerCase()}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={index}
+                        >
+                            <Box padding="2">
+                                {panel}
+                            </Box>
+                        </Tabs.Content>
+                    );
+                    return tabContent;
+                })
             }
         </Tabs.Root>
     );
