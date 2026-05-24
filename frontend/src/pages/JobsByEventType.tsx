@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { Tabs } from '@chakra-ui/react';
 import { FaMoneyCheck, FaTeamspeak } from 'react-icons/fa';
 
 import Header from '../components/Header';
@@ -10,28 +10,26 @@ function JobsByEventType() {
     return (
         <>
             <Header title="Race Administration" activeButtonId={6} />
-            <Tabs variant="soft-rounded" bg="white" colorScheme="orange">
-                <TabList>
-                    <Tab>
+            <Tabs.Root variant="subtle" bg="white" colorPalette="orange" defaultValue="events">
+                <Tabs.List>
+                    <Tabs.Trigger rounded="md" value="events">
                         Event Job Structure
                         &nbsp;
                         <FaTeamspeak />
-                    </Tab>
-                    <Tab>
+                    </Tabs.Trigger>
+                    <Tabs.Trigger rounded="md" value="labor">
                         Paid Labor
                         &nbsp;
                         <FaMoneyCheck />
-                    </Tab>
-                </TabList>
-                <TabPanels>
-                    <TabPanel>
-                        <EventSignupSheet />
-                    </TabPanel>
-                    <TabPanel>
-                        <PaidLaborList />
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
+                    </Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="events">
+                    <EventSignupSheet />
+                </Tabs.Content>
+                <Tabs.Content value="labor">
+                    <PaidLaborList />
+                </Tabs.Content>
+            </Tabs.Root>
         </>
     );
 }

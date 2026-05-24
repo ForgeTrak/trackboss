@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import {
-    Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Button, Checkbox, CheckboxGroup, Divider,
-    Grid, GridItem, Heading, Input, Select, Text,
+    Accordion,
+    Button,
+    Checkbox,
+    CheckboxGroup,
+    Grid,
+    GridItem,
+    Heading,
+    Input,
+    NativeSelect,
+    Text,
+    Separator,
 } from '@chakra-ui/react';
 import ReactQuill from 'react-quill';
 import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
@@ -38,15 +47,15 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
 
     const tagCheckBoxes = tags?.map((tag) => {
         const tagCheckBox = (
-            <Checkbox
-                colorScheme="orange"
+            <Checkbox.Root
+                colorPalette="orange"
                 key={tag.id}
-                onChange={
+                onCheckedChange={
                     (e) => {
                         // tie the tag count to the checkbox, then subtract it if the box is unchecked.
                         // this allows updating the count in the UI in a fancy way.
                         let tagCount = tag.count || 0;
-                        if (!e.target.checked) {
+                        if (!e.checked) {
                             tagCount *= -1;
                             delete selectedTags[tag.value];
                             setSelectedTags(selectedTags);
@@ -58,8 +67,12 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                     }
                 }
             >
-                <Text fontSize="sm">{tag.value}</Text>
-            </Checkbox>
+                <Checkbox.HiddenInput />
+                <Checkbox.Control><Checkbox.Indicator /></Checkbox.Control>
+                <Checkbox.Label>
+                    <Text fontSize="sm">{tag.value}</Text>
+                </Checkbox.Label>
+            </Checkbox.Root>
         );
         return tagCheckBox;
     });
@@ -75,13 +88,13 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
     const toast = useAppToast();
 
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
             >
                 Communication to membership
             </Heading>
-            <Divider />
+            <Separator />
             <AppModalBody>
                 <Grid columnGap={2} rowGap={2}>
                     <GridItem colSpan={2}>
@@ -97,49 +110,54 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                     </GridItem>
                     <GridItem colSpan={2}>
                         <Text>Communication Type</Text>
-                        <Select
-                            colorScheme="orange"
-                            onChange={
-                                (e) => {
-                                    const selectedType = e.target.value;
-                                    if (selectedType === 'TEXT') {
-                                        setCharacterLimit(140);
-                                    } else {
-                                        setCharacterLimit(40000);
+                        <NativeSelect.Root>
+                            <NativeSelect.Field
+                                colorPalette="orange"
+                                onChange={
+                                    (e) => {
+                                        const selectedType = e.target.value;
+                                        if (selectedType === 'TEXT') {
+                                            setCharacterLimit(140);
+                                        } else {
+                                            setCharacterLimit(40000);
+                                        }
+                                        setMechanism(selectedType);
                                     }
-                                    setMechanism(selectedType);
                                 }
-                            }
-                        >
-                            <option value="EMAIL">Email</option>
-                            <option value="TEXT">Text (limited to 140 characters)</option>
-                        </Select>
+                            >
+                                <option value="EMAIL">Email</option>
+                                <option value="TEXT">Text (limited to 140 characters)</option>
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                        </NativeSelect.Root>
                     </GridItem>
                     <GridItem colSpan={2}>
-                        <Accordion allowToggle>
-                            <AccordionItem>
-                                <AccordionButton>
-                                    <AccordionIcon />
+                        <Accordion.Root collapsible>
+                            <Accordion.Item value="item-0">
+                                <Accordion.ItemTrigger>
+                                    <Accordion.ItemIndicator />
                                     <Text fontSize="sm">
                                         Audience Tags (choose zero to many).
                                         Choose no tags to send to all members.
                                     </Text>
-                                </AccordionButton>
-                                <AccordionPanel>
-                                    <Text fontSize="xs">
-                                        {`${totalCount} ${mechanism.toLowerCase()}(s) with selected tag(s).  `}
-                                        Note multiple members can have the same tag.  Duplicates will be filtered on
-                                        send, and each member will only get a notification one time.  These only go
-                                        to membership admins (primary person on the membership).
-                                    </Text>
-                                    <Grid templateRows="repeat(5, 1fr)" templateColumns="repeat(3, 1fr)">
-                                        <CheckboxGroup>
-                                            {tagCheckBoxes}
-                                        </CheckboxGroup>
-                                    </Grid>
-                                </AccordionPanel>
-                            </AccordionItem>
-                        </Accordion>
+                                </Accordion.ItemTrigger>
+                                <Accordion.ItemContent>
+                                    <Accordion.ItemBody>
+                                        <Text fontSize="xs">
+                                            {`${totalCount} ${mechanism.toLowerCase()}(s) with selected tag(s).  `}
+                                            Note multiple members can have the same tag.  Duplicates will be filtered on
+                                            send, and each member will only get a notification one time.  These only go
+                                            to membership admins (primary person on the membership).
+                                        </Text>
+                                        <Grid templateRows="repeat(5, 1fr)" templateColumns="repeat(3, 1fr)">
+                                            <CheckboxGroup>
+                                                {tagCheckBoxes}
+                                            </CheckboxGroup>
+                                        </Grid>
+                                    </Accordion.ItemBody>
+                                </Accordion.ItemContent>
+                            </Accordion.Item>
+                        </Accordion.Root>
                     </GridItem>
                     <GridItem colSpan={2}>
                         <Text>Communication Content (note text does not support formatting)</Text>

@@ -6,7 +6,7 @@ import {
     Input,
     Heading,
     VStack,
-    Select,
+    NativeSelect,
     Spinner,
     Center,
 } from '@chakra-ui/react';
@@ -65,7 +65,7 @@ export default function CreateEventModal(props: CreateEventModalProps) {
     return (
         <div>
             { error !== '' }
-            <AppModal isCentered size="xl" isOpen={isOpen} onClose={onClose}>
+            <AppModal size="xl" isOpen={isOpen} onClose={onClose}>
                 <AppModalHeader><Heading>Create New Event</Heading></AppModalHeader>
                 <AppModalCloseButton />
                 <AppModalBody>
@@ -76,7 +76,7 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                                 Please wait while the event(s) are created...
                             </Center>
                         ) : (
-                            <SimpleGrid minChildWidth="200px" spacing="40px">
+                            <SimpleGrid minChildWidth="200px" gap="40px">
                                 <VStack align="left">
                                     <Text fontSize="sm">Event Name:</Text>
                                     <Input
@@ -97,17 +97,20 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                                 </VStack>
                                 <VStack align="left">
                                     <Text fontSize="sm">Label:</Text>
-                                    <Select
-                                        _placeholder={{ color: 'gray.100' }}
-                                        placeholder="Select Label..."
-                                        onChange={
-                                            (e) => {
-                                                setEventTypeId(parseInt(e.target.value, 10));
+                                    <NativeSelect.Root>
+                                        <NativeSelect.Field
+                                            _placeholder={{ color: 'gray.100' }}
+                                            placeholder="Select Label..."
+                                            onChange={
+                                                (e) => {
+                                                    setEventTypeId(parseInt(e.target.value, 10));
+                                                }
                                             }
-                                        }
-                                    >
-                                        {generateEventTypeOptions(eventTypes)}
-                                    </Select>
+                                        >
+                                            {generateEventTypeOptions(eventTypes)}
+                                        </NativeSelect.Field>
+                                        <NativeSelect.Indicator />
+                                    </NativeSelect.Root>
                                 </VStack>
                                 <VStack align="left">
                                     <Text fontSize="sm">Start Date/Time:</Text>
@@ -154,7 +157,7 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                     <Button
                         variant="ghost"
                         mr={3}
-                        isDisabled={isEventCreating}
+                        disabled={isEventCreating}
                         onClick={onClose}
                     >
                         Close
@@ -162,7 +165,7 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                     <Button
                         bgColor="orange"
                         color="white"
-                        isDisabled={isEventCreating}
+                        disabled={isEventCreating}
                         onClick={
                             async () => {
                                 setIsEventCreating(true);

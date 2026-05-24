@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    Box, Button, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Heading, HStack, Menu, VStack, Portal } from '@chakra-ui/react';
 import { BsChevronDown } from 'react-icons/bs';
 import _ from 'lodash';
 import DataTable, { Media } from 'react-data-table-component';
@@ -79,26 +77,31 @@ function EventSignupSheet() {
                 <Heading size="md">
                     {`Job Structure for ${selectedEventType}`}
                 </Heading>
-                <Menu>
-                    <MenuButton bg="orange" color="white" as={Button} rightIcon={<BsChevronDown />} />
-                    <MenuList defaultValue={selectedEventType}>
-                        {
-                            _.map(eventTypes, (listEvent) => (
-                                <MenuItem
-                                    key={listEvent.type}
-                                    onClick={
-                                        () => {
-                                            setSelectedEventType(listEvent.type);
-                                            setSelectedEventTypeId(listEvent.eventTypeId);
-                                        }
-                                    }
-                                >
-                                    {listEvent.type}
-                                </MenuItem>
-                            ))
-                        }
-                    </MenuList>
-                </Menu>
+                <Menu.Root>
+                    <Menu.Trigger asChild><Button bg="orange" color="white"><BsChevronDown /></Button></Menu.Trigger>
+                    <Portal>
+                        <Menu.Positioner>
+                            <Menu.Content>
+                                {
+                                    _.map(eventTypes, (listEvent) => (
+                                        <Menu.Item
+                                            key={listEvent.type}
+                                            onSelect={
+                                                () => {
+                                                    setSelectedEventType(listEvent.type);
+                                                    setSelectedEventTypeId(listEvent.eventTypeId);
+                                                }
+                                            }
+                                            value="item-0"
+                                        >
+                                            {listEvent.type}
+                                        </Menu.Item>
+                                    ))
+                                }
+                            </Menu.Content>
+                        </Menu.Positioner>
+                    </Portal>
+                </Menu.Root>
                 {
                     isAdminUser && (
                         <>

@@ -1,7 +1,4 @@
-import {
-    Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel,
-    Center, HStack, SimpleGrid, Stat, StatLabel, StatNumber,
-} from '@chakra-ui/react';
+import { Accordion, Box, Center, HStack, Separator, SimpleGrid, Stat } from '@chakra-ui/react';
 import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -150,26 +147,31 @@ export default function MemberList() {
     }
     return (
         <div>
-            <Accordion allowToggle maxWidth="75%">
-                <AccordionItem>
-                    <AccordionButton>
-                        {`${totalMemberships} total memberships (click for detailed view)`}
-                        <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel>
-                        <SimpleGrid columns={[3, null, 6]} m={5}>
-                            {
-                                membershipCounts.map((membershipType) => (
-                                    <Stat>
-                                        <StatLabel>{membershipType.type}</StatLabel>
-                                        <StatNumber>{membershipType.count}</StatNumber>
-                                    </Stat>
-                                ))
-                            }
-                        </SimpleGrid>
-                    </AccordionPanel>
-                </AccordionItem>
-            </Accordion>
+            <Box p={5}>
+                <Separator maxWidth="75%" />
+                <Accordion.Root collapsible maxWidth="75%">
+                    <Accordion.Item value="item-0">
+                        <Accordion.ItemTrigger>
+                            {`${totalMemberships} total memberships (click for detailed view)`}
+                            <Accordion.ItemIndicator />
+                        </Accordion.ItemTrigger>
+                        <Accordion.ItemContent>
+                            <Accordion.ItemBody>
+                                <SimpleGrid columns={[3, null, 6]} m={5}>
+                                    {
+                                        membershipCounts.map((membershipType) => (
+                                            <Stat.Root>
+                                                <Stat.Label>{membershipType.type}</Stat.Label>
+                                                <Stat.ValueText>{membershipType.count}</Stat.ValueText>
+                                            </Stat.Root>
+                                        ))
+                                    }
+                                </SimpleGrid>
+                            </Accordion.ItemBody>
+                        </Accordion.ItemContent>
+                    </Accordion.Item>
+                </Accordion.Root>
+            </Box>
             <HStack align="center">
                 <DataSearchBox
                     searchValue={searchTerm}

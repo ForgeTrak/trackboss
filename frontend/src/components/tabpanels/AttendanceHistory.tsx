@@ -1,10 +1,4 @@
-import {
-    Button,
-    Center,
-    Heading,
-    Text,
-    VStack,
-} from '@chakra-ui/react';
+import { Button, Center, Heading, Text, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import moment from 'moment-timezone';
 import DataTable from 'react-data-table-component';
@@ -92,7 +86,7 @@ export default function AttendanceHistory() {
     ];
 
     return (
-        <VStack mt={25} spacing={4}>
+        <VStack mt={25} gap={4}>
             <Button
                 size="lg"
                 backgroundColor="orange"

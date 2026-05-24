@@ -1,9 +1,6 @@
 /* eslint-disable max-len */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    Box,
-    Button, Divider, Heading,
-} from '@chakra-ui/react';
+import { Box, Button, Heading, Separator } from '@chakra-ui/react';
 import AppModal, { AppModalFooter } from '../AppModal';
 import { Bill } from '../../../../src/typedefs/bill';
 import { UserContext } from '../../contexts/UserContext';
@@ -144,7 +141,7 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
     }
 
     return (
-        <AppModal isCentered size="lg" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="lg" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading m={3}>
                 {`${billingYear + 1} bill and attestation`}
             </Heading>
@@ -156,7 +153,7 @@ export default function DuesAndWaiversModal(props: duesModalProps) {
                 <BillingStatsDisplay bill={props.viewBill} />
                 {renewalAttestationComponent}
             </Box>
-            <Divider />
+            <Separator />
             <AppModalFooter>
                 {renewalPaymentComponent}
             </AppModalFooter>

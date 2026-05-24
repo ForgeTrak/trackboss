@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider, Heading, HStack, SimpleGrid, Switch, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, SimpleGrid, Switch, Text, VStack, Separator } from '@chakra-ui/react';
 import { RidingAreaStatus } from '../../../../../src/typedefs/ridingAreaStatus';
 
 interface cardProps {
@@ -22,22 +22,27 @@ export default function TrackStatusCard(props: cardProps) {
         }
         return (
             <Box p={2} borderWidth="1px" borderRadius="lg" bgColor={color} color="white" w="100%">
-                <Text fontSize="xl" fontStyle="bold">
+                <Text fontSize="xl" fontWeight="bold">
                     {area.name}
                 </Text>
                 {
                     isAdmin && (
-                        <Switch
-                            colorScheme="orange"
+                        <Switch.Root
+                            colorPalette="orange"
                             size="lg"
                             defaultChecked={area.isOpen}
-                            onChange={
+                            onCheckedChange={
                                 async () => {
                                     area.isOpen = !area.isOpen;
                                     await props.updateArea(area);
                                 }
                             }
-                        />
+                        >
+                            <Switch.HiddenInput />
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch.Root>
                     )
                 }
             </Box>
@@ -48,17 +53,18 @@ export default function TrackStatusCard(props: cardProps) {
             alignSelf="center"
             bg="white"
             boxShadow="md"
-            border="1px"
+            borderWidth="1px"
+            borderStyle="solid"
             borderColor="gray.200"
-            w={[470, 470, 1498]}
+            w={['100%', '100%', 1498]}
             p={2}
             m={2}
         >
-            <VStack align="left" spacing="2em">
+            <VStack align="left" gap="2em">
                 <Heading alignContent="left" size="lg">Track Status</Heading>
-                <Divider />
+                <Separator />
                 <HStack>
-                    <SimpleGrid w="100%" columns={[1, null, 3]} spacing="20px">
+                    <SimpleGrid w="100%" columns={[1, null, 3]} gap="20px">
                         {ridingAreaDisplay}
                     </SimpleGrid>
                 </HStack>

@@ -1,11 +1,5 @@
 import React, { useContext } from 'react';
-import {
-    Center,
-    Heading,
-    Highlight,
-    Text,
-    VStack,
-} from '@chakra-ui/react';
+import { Center, Heading, Highlight, Text, VStack } from '@chakra-ui/react';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { Bill } from '../../../src/typedefs/bill';
 import DuesAndWaiversModal from './modals/DuesAndWaiversModal';
@@ -41,9 +35,17 @@ export default function Header(props: pageProps) {
     return (
         <Center>
             <VStack>
-                <Heading size="2xl">
+                <Heading fontSize="4xl">
                     Hi, {/*eslint-disable-line*/}
-                    <Heading sx={{ display: 'inline' }} color="orange" size="2xl">
+                    <Heading
+                        css={
+                            {
+                                display: 'inline',
+                            }
+                        }
+                        color="orange"
+                        fontSize="4xl"
+                    >
                         {props.name}
                     </Heading>
                 </Heading>

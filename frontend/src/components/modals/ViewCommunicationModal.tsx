@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-    Button, Divider, Grid, GridItem, Heading, Input, Text,
-} from '@chakra-ui/react';
-import AppModal, { AppModalBody, AppModalFooter } from '../AppModal';
+import { Button, Grid, GridItem, Heading, Input, Text, Separator } from '@chakra-ui/react';
+import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter } from '../AppModal';
 import { MemberCommunication } from '../../../../src/typedefs/memberCommunication';
 import 'react-quill/dist/quill.snow.css';
 
@@ -14,13 +12,14 @@ interface ViewCommunicationModalProps {
 
 export default function ViewCommunicationModal(props: ViewCommunicationModalProps) {
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+            <AppModalCloseButton />
             <Heading
                 textAlign="center"
             >
                 Communication to membership
             </Heading>
-            <Divider />
+            <Separator />
             <AppModalBody>
                 <Grid columnGap={2} rowGap={2}>
                     <GridItem colSpan={2}>
@@ -57,7 +56,7 @@ export default function ViewCommunicationModal(props: ViewCommunicationModalProp
                 </Grid>
             </AppModalBody>
             <AppModalFooter>
-                <Button backgroundColor="white" onClick={props.onClose}>
+                <Button variant="outline" onClick={props.onClose} backgroundColor="orange.300" color="white">
                     Close
                 </Button>
             </AppModalFooter>

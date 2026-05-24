@@ -24,14 +24,14 @@ interface AppDisclosure {
 }
 
 export function useAppDisclosure(options?: AppDisclosureOptions): AppDisclosure {
-    const { isOpen, onOpen, onClose, onToggle } = useDisclosure({
-        defaultIsOpen: options?.defaultIsOpen,
+    const { open, onOpen, onClose, onToggle } = useDisclosure({
+        defaultOpen: options?.defaultIsOpen,
         onOpen: options?.onOpen,
         onClose: options?.onClose,
     });
 
     return {
-        isOpen,
+        isOpen: open,
         onOpen,
         onClose,
         onToggle,

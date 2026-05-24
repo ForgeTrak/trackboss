@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { useToast } from '@chakra-ui/react';
 import { useCallback } from 'react';
+import { toaster } from '../components/ui/toaster';
 
 /**
  * Centralized toast hook for consistent toast notifications across the app.
@@ -25,59 +25,41 @@ interface AppToast {
 const DEFAULT_DURATION = 5000;
 
 export function useAppToast(): AppToast {
-    const toast = useToast();
-
     const success = useCallback((options: ToastOptions) => {
-        toast({
-            containerStyle: {
-                background: 'orange',
-            },
+        toaster.success({
             title: options.title,
             description: options.description,
-            status: 'success',
             duration: options.duration ?? DEFAULT_DURATION,
-            isClosable: options.isClosable ?? true,
+            closable: options.isClosable ?? true,
         });
-    }, [toast]);
+    }, []);
 
     const error = useCallback((options: ToastOptions) => {
-        toast({
-            containerStyle: {
-                background: 'red',
-            },
+        toaster.error({
             title: options.title,
             description: options.description,
-            status: 'error',
             duration: options.duration ?? DEFAULT_DURATION,
-            isClosable: options.isClosable ?? true,
+            closable: options.isClosable ?? true,
         });
-    }, [toast]);
+    }, []);
 
     const info = useCallback((options: ToastOptions) => {
-        toast({
-            containerStyle: {
-                background: 'blue',
-            },
+        toaster.info({
             title: options.title,
             description: options.description,
-            status: 'info',
             duration: options.duration ?? DEFAULT_DURATION,
-            isClosable: options.isClosable ?? true,
+            closable: options.isClosable ?? true,
         });
-    }, [toast]);
+    }, []);
 
     const warning = useCallback((options: ToastOptions) => {
-        toast({
-            containerStyle: {
-                background: 'yellow',
-            },
+        toaster.warning({
             title: options.title,
             description: options.description,
-            status: 'warning',
             duration: options.duration ?? DEFAULT_DURATION,
-            isClosable: options.isClosable ?? true,
+            closable: options.isClosable ?? true,
         });
-    }, [toast]);
+    }, []);
 
     return {
         success,

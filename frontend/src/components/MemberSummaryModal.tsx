@@ -9,21 +9,17 @@ import {
     SimpleGrid,
     Heading,
     VStack,
-    Divider,
     Container,
     HStack,
-    UnorderedList,
-    ListItem,
     ButtonGroup,
     Switch,
     Tag,
-    TagLabel,
-    TagCloseButton,
     Input,
     Link,
+    Separator,
+    List,
 } from '@chakra-ui/react';
 import Select from 'react-select';
-import { BsTags } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalHeader } from './AppModal';
 import { UserContext } from '../contexts/UserContext';
@@ -142,13 +138,13 @@ export default function MemberSummaryModal(props: modalProps) {
             <AppModalHeader>
                 <Heading textAlign="center">Member Summary</Heading>
             </AppModalHeader>
-            <Divider />
+            <Separator />
             <AppModalCloseButton />
             <AppModalBody>
                 { error !== '' }
                 {
                     selectedMember && bikes && (
-                        <SimpleGrid columns={[1, null, 2]} spacing={4}>
+                        <SimpleGrid columns={[1, null, 2]} gap={4}>
                             <VStack borderRightWidth={1} borderRightColor="light-grey" align="left">
                                 <HStack>
                                     <Text textAlign="left" fontSize="3xl" fontWeight="bold">Info</Text>
@@ -166,8 +162,8 @@ export default function MemberSummaryModal(props: modalProps) {
                                         )
                                     }
                                 </HStack>
-                                <SimpleGrid pb={4} columns={2}>
-                                    <VStack spacing={2} align="left">
+                                <SimpleGrid pb={4} gridTemplateColumns="auto 1fr" gap={2}>
+                                    <VStack gap={2} align="left">
                                         <Text fontSize="sm" fontWeight="bold">Name:</Text>
                                         <Text fontSize="sm" fontWeight="bold">Joined:</Text>
                                         <Text fontSize="sm" fontWeight="bold">Status:</Text>
@@ -183,7 +179,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                         }
                                     </VStack>
 
-                                    <VStack ml="-70px" align="left">
+                                    <VStack align="left">
                                         <Text fontSize="sm">
                                             {`${selectedMember.firstName} ${selectedMember.lastName}`}
                                         </Text>
@@ -191,16 +187,28 @@ export default function MemberSummaryModal(props: modalProps) {
                                             {selectedMember.dateJoined.substring(0, 4)}
                                         </Text>
                                         <Text fontSize="sm">{selectedMember.membershipType}</Text>
-                                        <Link
-                                            href={`mailto:${selectedMember.email}`}
-                                        >
-                                            <Text fontSize="sm">{selectedMember.email}</Text>
-                                        </Link>
-                                        <Link
-                                            href={`sms:${selectedMember.phoneNumber}`}
-                                        >
-                                            <Text fontSize="sm">{selectedMember.phoneNumber}</Text>
-                                        </Link>
+                                        {
+                                            selectedMember.email ? (
+                                                <Link
+                                                    href={`mailto:${selectedMember.email}`}
+                                                >
+                                                    <Text fontSize="sm">{selectedMember.email}</Text>
+                                                </Link>
+                                            ) : (
+                                                <Text fontSize="sm">&mdash;</Text>
+                                            )
+                                        }
+                                        {
+                                            selectedMember.phoneNumber ? (
+                                                <Link
+                                                    href={`sms:${selectedMember.phoneNumber}`}
+                                                >
+                                                    <Text fontSize="sm">{selectedMember.phoneNumber}</Text>
+                                                </Link>
+                                            ) : (
+                                                <Text fontSize="sm">&mdash;</Text>
+                                            )
+                                        }
                                         {
                                             (adminMode || viewingSelf) && (
                                                 <>
@@ -224,23 +232,23 @@ export default function MemberSummaryModal(props: modalProps) {
                                     <Text textAlign="left" fontSize="3xl" fontWeight="bold">Family</Text>
                                 </HStack>
                                 <Text textAlign="left" fontSize="1xl" fontWeight="bold">Members</Text>
-                                <UnorderedList pl={10}>
+                                <List.Root as="ul" pl={10}>
                                     {
                                         family && _.map(family, (member) => (
 
-                                            member.memberId === state.user!.memberId ? <ListItem key={member.memberId}>{`${member.firstName} ${member.lastName} - ${member.dependentStatus} (you)`}</ListItem>
-                                                : <ListItem key={member.memberId}>{`${member.firstName} ${member.lastName} - ${member.dependentStatus}`}</ListItem>
+                                            member.memberId === state.user!.memberId ? <List.Item key={member.memberId}>{`${member.firstName} ${member.lastName} - ${member.dependentStatus} (you)`}</List.Item>
+                                                : <List.Item key={member.memberId}>{`${member.firstName} ${member.lastName} - ${member.dependentStatus}`}</List.Item>
                                         ))
                                     }
-                                </UnorderedList>
+                                </List.Root>
                                 <Text textAlign="left" fontSize="1xl" fontWeight="bold">Bikes</Text>
-                                <UnorderedList pl={10}>
+                                <List.Root as="ul" pl={10}>
                                     {
                                         bikes.map((bike) => (
-                                            <ListItem key={bike.bikeId}>{`${bike.year} ${bike.make} ${bike.model}`}</ListItem>
+                                            <List.Item key={bike.bikeId}>{`${bike.year} ${bike.make} ${bike.model}`}</List.Item>
                                         ))
                                     }
-                                </UnorderedList>
+                                </List.Root>
                             </VStack>
                             <VStack align="left">
                                 <HStack>
@@ -275,7 +283,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                 {
                                     editingMemberRole ? (
                                         <VStack align="left">
-                                            <ButtonGroup size="sm" isAttached variant="outline">
+                                            <ButtonGroup size="sm" attached variant="outline">
                                                 <Button
                                                     onClick={
                                                         () => {
@@ -319,7 +327,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                             </Button>
                                         </VStack>
                                     ) : (
-                                        <ButtonGroup size="sm" isAttached variant="outline">
+                                        <ButtonGroup size="sm" attached variant="outline">
                                             <Button
                                                 userSelect="none"
                                                 mr="-px"
@@ -342,19 +350,19 @@ export default function MemberSummaryModal(props: modalProps) {
                                         <VStack align="left">
                                             <Text textAlign="left" fontSize="3xl" fontWeight="bold">Tags</Text>
                                             <HStack align="left">
-                                                <SimpleGrid columns={1} spacing={2}>
+                                                <SimpleGrid columns={1} gap={2}>
                                                     {
                                                         tags.map((tag) => (
-                                                            <Tag key={tag.id} variant="subtle" colorScheme="orange">
-                                                                <TagLabel>{tag.value}</TagLabel>
-                                                                <TagCloseButton onClick={
+                                                            <Tag.Root key={tag.id} variant="subtle" colorPalette="orange">
+                                                                <Tag.Label>{tag.value}</Tag.Label>
+                                                                <Tag.CloseTrigger onClick={
                                                                     async () => {
                                                                         await deleteMembershipTags(state.token, props.memberInfo.membershipId, [tag.value]);
                                                                         setNewTagValue(tag.value);
                                                                     }
                                                                 }
                                                                 />
-                                                            </Tag>
+                                                            </Tag.Root>
                                                         ))
                                                     }
                                                     <HStack>
@@ -369,7 +377,6 @@ export default function MemberSummaryModal(props: modalProps) {
                                                             }
                                                         />
                                                         <Button
-                                                            rightIcon={<BsTags />}
                                                             background="orange"
                                                             size="xs"
                                                             color="white"
@@ -386,7 +393,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                 </SimpleGrid>
                                             </HStack>
                                             <Text textAlign="left" fontSize="3xl" fontWeight="bold">Actions</Text>
-                                            <HStack align="left">
+                                            <HStack align="left" flexWrap="wrap" gap={2}>
                                                 <AddPointsModal
                                                     memberName={`${selectedMember.firstName} ${selectedMember.lastName}` || ''}
                                                     memberId={selectedMember.memberId as number}
@@ -417,7 +424,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                     Act As Member
                                                 </Button>
                                                 <Button
-                                                    isDisabled={!selectedMember.active}
+                                                    disabled={!selectedMember.active}
                                                     variant="outline"
                                                     style={
                                                         {
@@ -450,7 +457,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                     <Button
                                                         backgroundColor="red"
                                                         variant="outline"
-                                                        isDisabled={!deactivateEnabled}
+                                                        disabled={!deactivateEnabled}
                                                         style={
                                                             {
                                                                 whiteSpace: 'normal',
@@ -477,16 +484,21 @@ export default function MemberSummaryModal(props: modalProps) {
                                                         De-Activate Member
                                                     </Button>
                                                 </VStack>
-                                                <Switch
-                                                    colorScheme="orange"
+                                                <Switch.Root
+                                                    colorPalette="orange"
                                                     visibility={selectedMember.active ? 'visible' : 'hidden'}
-                                                    isChecked={deactivateEnabled}
-                                                    onChange={
+                                                    checked={deactivateEnabled}
+                                                    onCheckedChange={
                                                         () => {
                                                             setDeactivateEnabled(!deactivateEnabled);
                                                         }
                                                     }
-                                                />
+                                                >
+                                                    <Switch.HiddenInput />
+                                                    <Switch.Control>
+                                                        <Switch.Thumb />
+                                                    </Switch.Control>
+                                                </Switch.Root>
                                             </HStack>
                                             <HStack>
                                                 <Text fontSize="sm" fontWeight="bold">Reason:</Text>
@@ -518,7 +530,7 @@ export default function MemberSummaryModal(props: modalProps) {
                                                     }
                                                 />
                                             </HStack>
-                                            <Text size="sm">
+                                            <Text fontSize="sm">
                                                 Deactivating a member removes them from the list.  Use this feature carefully!
                                             </Text>
                                         </VStack>

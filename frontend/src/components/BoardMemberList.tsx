@@ -1,4 +1,4 @@
-import { Box, Center, Input, InputGroup, InputLeftElement, VStack } from '@chakra-ui/react';
+import { Box, Center, Input, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { BsSearch } from 'react-icons/bs';
@@ -125,17 +125,24 @@ export default function BoardMemberList() {
         <div>
             <Center>
                 <VStack>
-                    <Box maxWidth={300}>
-                        <InputGroup>
-                            <InputLeftElement pointerEvents="none">
-                                <BsSearch color="gray.300" />
-                            </InputLeftElement>
-                            <Input
-                                size="lg"
-                                placeholder="Search..."
-                                onChange={(e) => setSearchTerm(e.target.value?.toLowerCase())}
-                            />
-                        </InputGroup>
+                    <Box maxWidth={300} position="relative">
+                        <Box
+                            position="absolute"
+                            left={3}
+                            top="50%"
+                            transform="translateY(-50%)"
+                            pointerEvents="none"
+                            zIndex={1}
+                        >
+                            <BsSearch color="gray" />
+                        </Box>
+                        <Input
+                            size="lg"
+                            pl={10}
+                            borderRadius="md"
+                            placeholder="Search..."
+                            onChange={(e) => setSearchTerm(e.target.value?.toLowerCase())}
+                        />
                     </Box>
                     <YearsDropDown
                         years={dropdownYears}

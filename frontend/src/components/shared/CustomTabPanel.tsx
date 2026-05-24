@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-    Tabs,
-    TabList,
-    TabPanels,
-    Tab,
-    TabPanel,
-    TabsProps,
-} from '@chakra-ui/react';
+import { Box, Tabs } from '@chakra-ui/react';
 import TabData from './TabData';
 
-interface CustomTabsProps extends Omit<TabsProps, 'children'> {
+interface CustomTabsProps {
     tabs: TabData[]; // Labels for the tabs
     panels: React.ReactNode[]; // Content for each panel
 }
@@ -17,27 +10,44 @@ interface CustomTabsProps extends Omit<TabsProps, 'children'> {
 export default function MemberSelector(props: CustomTabsProps) {
     const { tabs, panels } = props;
     return (
-        <Tabs variant="soft-rounded" bg="white" colorScheme="orange" isLazy lazyBehavior="keepMounted">
-            <TabList>
+        <Tabs.Root
+            variant="subtle"
+            bg="white"
+            colorPalette="orange"
+            lazyMount
+            defaultValue={tabs[0]?.label.toLowerCase()}
+            paddingLeft={3}
+        >
+            <Tabs.List fontSize="md">
                 {
                     tabs.map((tab) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <Tab key={tab.label.toLowerCase()}>
-                            {tab.label}
-                            &nbsp;
-                            {tab.icon}
-                        </Tab>
+                        (
+                            <Tabs.Trigger rounded="md" value={tab.label.toLowerCase()} key={tab.label.toLowerCase()}>
+                                {tab.label}
+                                {tab.icon}
+                            </Tabs.Trigger>
+                        )
                     ))
                 }
-            </TabList>
-            <TabPanels>
-                {
-                    panels.map((panel, index) => (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <TabPanel key={index}>{panel}</TabPanel>
-                    ))
-                }
-            </TabPanels>
-        </Tabs>
+            </Tabs.List>
+            {
+                panels.map((panel, index) => {
+                    // eslint-disable-next-line react/no-array-index-key
+                    const tabContent = (
+                        <Tabs.Content
+                            value={tabs[index]?.label.toLowerCase()}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={index}
+                        >
+                            <Box padding="2">
+                                {panel}
+                            </Box>
+                        </Tabs.Content>
+                    );
+                    return tabContent;
+                })
+            }
+        </Tabs.Root>
     );
 }

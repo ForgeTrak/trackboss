@@ -12,7 +12,25 @@ const renderWithContext = (component: React.ReactElement) => (
                     state: {
                         loggedIn: true,
                         token: 'test-token',
-                        user: { membershipId: 1, tenantId: 'tenant', memberId: 1, membershipAdmin: 'Chippah', membershipAdminId: 1, firstName: 'Test', lastName: 'User', email: 'test@example.com', phone: '1234567890', address: '123 Test St', city: 'Test City', state: 'TS', zip: '12345', country: 'US', timezone: 'America/New_York', createdAt: new Date(), updatedAt: new Date() },
+                        user: {
+                            membershipId: 1,
+                            tenantId: 'tenant',
+                            memberId: 1,
+                            membershipAdmin: 'Chippah',
+                            membershipAdminId: 1,
+                            firstName: 'Test',
+                            lastName: 'User',
+                            email: 'test@example.com',
+                            phone: '1234567890',
+                            address: '123 Test St',
+                            city: 'Test City',
+                            state: 'TS',
+                            zip: '12345',
+                            country: 'US',
+                            timezone: 'America/New_York',
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
                         storedUser: undefined,
                         isInitializing: false,
                     },
@@ -46,7 +64,10 @@ describe('AddJobTypeModal', () => {
             />,
         );
 
-        expect(screen.getByText((content) => content.includes('Add a') && content.includes('Work Day') && content.includes('job'))).toBeInTheDocument();
+        const matcher = (content: string) => (
+            content.includes('Add a') && content.includes('Work Day') && content.includes('job')
+        );
+        expect(screen.getByText(matcher)).toBeInTheDocument();
         expect(screen.getByText('Cancel')).toBeInTheDocument();
         expect(screen.getByText('Save')).toBeInTheDocument();
     });

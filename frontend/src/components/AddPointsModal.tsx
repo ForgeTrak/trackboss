@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
     Button,
-    IconButton, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField,
-    NumberInputStepper, VStack,
+    IconButton,
+    Input,
+    NumberInput,
+    VStack,
 } from '@chakra-ui/react';
 import { BsPlus } from 'react-icons/bs';
 import moment from 'moment';
@@ -41,12 +43,13 @@ export default function AddPointsModal(props: AddPointsModalProps) {
         (
             <IconButton
                 aria-label="add"
-                icon={<BsPlus />}
                 background="orange"
                 color="white"
                 hidden={!props.visible}
                 onClick={onOpen}
-            />
+            >
+                <BsPlus />
+            </IconButton>
         );
     // if the button text is passed in, use a text button instead of the default Plus icon.
     if (props.buttonText) {
@@ -60,7 +63,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                             wordWrap: 'break-word',
                         }
                     }
-                    isDisabled={!props.visible}
+                    disabled={!props.visible}
                     onClick={onOpen}
                 >
                     {props.buttonText}
@@ -92,33 +95,26 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                                 }
                             }
                         />
-                        <NumberInput
+                        <NumberInput.Root
                             min={0}
                             max={30}
-                            defaultValue={0}
+                            defaultValue="0"
                             step={0.25}
-                            onChange={
-                                (changeValue) => {
-                                    setPointValue(Number(changeValue));
+                            onValueChange={
+                                (details) => {
+                                    setPointValue(details.valueAsNumber);
                                     setDirty(true);
                                 }
                             }
                         >
-                            <NumberInputField
+                            <NumberInput.Input
                                 placeholder="Points earned"
-                                value={pointValue}
-                                onChange={
-                                    (e) => {
-                                        setPointValue(Number(e.target.value));
-                                        setDirty(true);
-                                    }
-                                }
                             />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
+                            <NumberInput.Control>
+                                <NumberInput.IncrementTrigger />
+                                <NumberInput.DecrementTrigger />
+                            </NumberInput.Control>
+                        </NumberInput.Root>
                         <DatePicker
                             onChange={setWorkDate}
                             value={workDate}
@@ -132,7 +128,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                     <Button
                         mr={4}
                         backgroundColor="orange"
-                        isDisabled={!dirty}
+                        disabled={!dirty}
                         color="white"
                         onClick={
                             async () => {

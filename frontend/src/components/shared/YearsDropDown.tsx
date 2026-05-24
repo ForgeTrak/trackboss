@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Heading, HStack, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import { Button, Heading, HStack, Menu, Portal } from '@chakra-ui/react';
 import { BsChevronDown } from 'react-icons/bs';
 import _ from 'lodash';
 
@@ -21,29 +21,37 @@ export default function YearsDropDown(props: YearsDropDownProps) {
 
     return (
         <HStack align="center">
-            <Menu>
-                <MenuButton bg="orange" color="white" as={Button} rightIcon={<BsChevronDown />}>
-                    Past Years
-                </MenuButton>
-                <MenuList>
-                    {
-                        // eslint-disable-next-line arrow-body-style
-                        _.map(props.years, (listYear) => (
-                            <MenuItem
-                                key={listYear}
-                                onClick={
-                                    () => {
-                                        props.setYear(listYear);
-                                        setYear(listYear);
-                                    }
-                                }
-                            >
-                                {listYear}
-                            </MenuItem>
-                        ))
-                    }
-                </MenuList>
-            </Menu>
+            <Menu.Root>
+                <Menu.Trigger asChild>
+                    <Button bg="orange" color="white">
+                        Past Years
+                        <BsChevronDown />
+                    </Button>
+                </Menu.Trigger>
+                <Portal>
+                    <Menu.Positioner>
+                        <Menu.Content>
+                            {
+                                // eslint-disable-next-line arrow-body-style
+                                _.map(props.years, (listYear) => (
+                                    <Menu.Item
+                                        key={listYear}
+                                        onClick={
+                                            () => {
+                                                props.setYear(listYear);
+                                                setYear(listYear);
+                                            }
+                                        }
+                                        value={String(listYear)}
+                                    >
+                                        {listYear}
+                                    </Menu.Item>
+                                ))
+                            }
+                        </Menu.Content>
+                    </Menu.Positioner>
+                </Portal>
+            </Menu.Root>
             <Heading size="lg">
                 {props.header}
                 (

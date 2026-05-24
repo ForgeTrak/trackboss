@@ -100,7 +100,7 @@ export default function EventCalendar() {
                 <Button
                     background="orange.300"
                     color="white"
-                    isDisabled={state.user?.memberType !== 'Admin'}
+                    disabled={state.user?.memberType !== 'Admin'}
                     onClick={
                         () => {
                             setDefaultStartDate(new Date());
@@ -172,7 +172,10 @@ export default function EventCalendar() {
             {
                 selectedEvent && (
                     <SelectedEventModal
-                        key={`${'eventId' in selectedEvent ? selectedEvent.eventId : ''}-${'jobId' in selectedEvent ? selectedEvent.jobId : ''}`}
+                        key={
+                            `${'eventId' in selectedEvent ? selectedEvent.eventId : ''}` +
+                            `-${'jobId' in selectedEvent ? selectedEvent.jobId : ''}`
+                        }
                         isOpen={isViewEventOpen}
                         onClose={onViewEventClose}
                         selectedEvent={selectedEvent}

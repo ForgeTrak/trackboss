@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
-import theme from '../theme';
+import system from '../theme';
+import { Toaster } from './ui/toaster';
 
 /**
  * Centralized provider component wrapping ChakraProvider with the app theme.
@@ -18,8 +19,9 @@ interface AppProviderProps {
 
 export default function AppProvider({ children }: AppProviderProps) {
     return (
-        <ChakraProvider theme={theme}>
+        <ChakraProvider value={system}>
             {children}
+            <Toaster />
         </ChakraProvider>
     );
 }

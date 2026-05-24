@@ -1,6 +1,4 @@
-import {
-    Button, ButtonGroup, SimpleGrid,
-} from '@chakra-ui/react';
+import { Button, Group, SimpleGrid } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import { BsCurrencyDollar, BsTrash2 } from 'react-icons/bs';
 import moment from 'moment-timezone';
@@ -57,7 +55,7 @@ export default function SignupButtonRow(props: any) {
     let signupButton;
     if (!props.data.member) {
         signupButton = (
-            <SimpleGrid columns={[1, null, 3]} spacing="20px">
+            <SimpleGrid columns={[1, null, 3]} gap="20px">
                 {
                     (!isAdmin && selfSignupAllowed) && (
 
@@ -106,7 +104,7 @@ export default function SignupButtonRow(props: any) {
                         <Button
                             backgroundColor="orange.300"
                             color="white"
-                            isDisabled={!selectedPaidLaborOption?.value}
+                            disabled={!selectedPaidLaborOption?.value}
                             onClick={
                                 async () => {
                                     if (!selectedPaidLaborOption?.value) return;
@@ -135,26 +133,25 @@ export default function SignupButtonRow(props: any) {
             (isAdmin)
         );
         signupButton = (
-            <ButtonGroup variant="outline" ml={10} spacing="6">
+            <Group ml={10} gap="6">
                 <Button
                     aria-label="Remove"
                     background="red"
                     color="white"
-                    rightIcon={<BsTrash2 />}
                     onClick={
                         async () => {
                             await removeSignup(state.token, jobId);
                             await props.refreshData();
                         }
                     }
-                    isDisabled={!allowDelete}
+                    disabled={!allowDelete}
                 >
                     Remove Signup
+                    <BsTrash2 />
                 </Button>
                 <Button
                     background={markedPaid ? 'orange.300' : 'green'}
                     color="white"
-                    rightIcon={<BsCurrencyDollar />}
                     onClick={
                         async () => {
                             await setPaidState(state.token, jobId);
@@ -162,10 +159,11 @@ export default function SignupButtonRow(props: any) {
                             await props.refreshData();
                         }
                     }
-                    isDisabled={!props.data.cashPayout}
+                    disabled={!props.data.cashPayout}
                     hidden={(!selfSignupAllowed || !isAdmin)}
                 >
                     {markedPaid ? 'Unmark paid' : 'Mark as Paid'}
+                    <BsCurrencyDollar />
                 </Button>
                 <Button
                     background="orange.300"
@@ -187,7 +185,7 @@ export default function SignupButtonRow(props: any) {
                     isOpen={isEditPointsOpen}
                     onClose={onEditPointsClose}
                 />
-            </ButtonGroup>
+            </Group>
         );
     }
     return signupButton;

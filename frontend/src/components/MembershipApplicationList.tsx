@@ -162,8 +162,9 @@ export default function MembershipApplicationList() {
                             window.location.href = objectUrl;
                         }
                     }
-                    icon={<BsPrinter />}
-                />
+                >
+                    <BsPrinter />
+                </IconButton>
                 <WrappedSwitchInput
                     maxWidth={100}
                     defaultChecked={false}

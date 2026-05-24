@@ -1,10 +1,5 @@
 import React, { useContext } from 'react';
-import {
-    Button,
-    Divider,
-    Heading,
-    SimpleGrid,
-} from '@chakra-ui/react';
+import { Button, Heading, SimpleGrid, Separator } from '@chakra-ui/react';
 import moment from 'moment';
 import AppModal, { AppModalCloseButton, AppModalFooter } from './AppModal';
 import { Member } from '../../../src/typedefs/member';
@@ -44,11 +39,11 @@ export default function FamilySignUpModal(props: modalProps) {
     }
 
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading pl={2} pr={2} textAlign="left">Select member to sign up</Heading>
-            <Divider mb={5} />
+            <Separator mb={5} />
             <AppModalCloseButton />
-            <SimpleGrid spacing={2} columns={3}>
+            <SimpleGrid gap={2} columns={3}>
                 {
                     props.familyMembers.map((member) => (
                         <Button
@@ -70,7 +65,7 @@ export default function FamilySignUpModal(props: modalProps) {
                     ))
                 }
             </SimpleGrid>
-            <Divider />
+            <Separator />
             <AppModalFooter>
                 <Button
                     variant="ghost"

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-    Button,
-    Divider,
-    Heading,
-    Text,
-} from '@chakra-ui/react';
+import { Button, Heading, Text, Separator } from '@chakra-ui/react';
 import AppModal, { AppModalFooter } from './AppModal';
 
 interface alertProps {
@@ -15,14 +10,14 @@ interface alertProps {
 
 export default function DeleteAlert(props: alertProps) {
     return (
-        <AppModal isCentered size="md" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="md" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading
                 textAlign="center"
             >
                 Are you sure?
             </Heading>
             <Text textAlign="center" fontSize="2xl">You can&apos;t undo this action afterwards.</Text>
-            <Divider />
+            <Separator />
             <AppModalFooter>
                 <Button
                     variant="ghost"

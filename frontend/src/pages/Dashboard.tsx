@@ -97,7 +97,7 @@ function Dashboard() {
 
     return (
         <>
-            <VStack align="left" spacing="2em">
+            <VStack align="left" gap="2em">
                 <Header title="Dashboard" activeButtonId={1} />
                 {
                     state.user && lastBill && (
@@ -110,7 +110,7 @@ function Dashboard() {
                     )
                 }
                 <Center>
-                    <SimpleGrid columns={[1, null, 3]} spacing="20px">
+                    <SimpleGrid columns={[1, null, 3]} gap="20px">
                         <WorkPointsCard percent={percent} year={(new Date()).getFullYear()} />
                         {
                             eventCardProps ? (

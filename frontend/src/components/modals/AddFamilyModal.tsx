@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-    Button,
-    Heading,
-    Divider,
-    Box,
-    Input,
-    Spinner,
-    Text,
-} from '@chakra-ui/react';
+import { Button, Heading, Box, Input, Spinner, Text, Separator } from '@chakra-ui/react';
 import DatePicker from 'react-date-picker';
 import Select from 'react-select';
 
@@ -41,11 +33,11 @@ export default function AddFamilyModal(props: modalProps) {
     const [dependentStatus, setDependentStatus] = useState<string>();
 
     return (
-        <AppModal isCentered size="xl" isOpen={props.isOpen} onClose={props.onClose}>
+        <AppModal size="xl" isOpen={props.isOpen} onClose={props.onClose}>
             <Heading pl={2} pr={2} textAlign="center">
                 Add family member
             </Heading>
-            <Divider />
+            <Separator />
             <Box width={300}>
                 <Box m={3}>
                     <Input
@@ -180,7 +172,7 @@ export default function AddFamilyModal(props: modalProps) {
                     bgColor="green"
                     mr={3}
                     size="lg"
-                    isDisabled={
+                    disabled={
                         (!firstName) ||
                             (!lastName) ||
                             (!birthDate) ||

@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    Box, Text, Input, Link, SimpleGrid,
-} from '@chakra-ui/react';
+import { Box, Text, Input, Link, SimpleGrid } from '@chakra-ui/react';
 import { useAppToast } from '../../hooks/useAppToast';
 import { UserContext } from '../../contexts/UserContext';
 import { DefaultSetting } from '../../../../src/typedefs/defaultSetting';
@@ -41,7 +39,7 @@ function SiteSettings() {
 
     return (
         <Box>
-            <SimpleGrid columns={2} spacing={5} maxWidth={700}>
+            <SimpleGrid columns={2} gap={5} maxWidth={700}>
                 {
                     // eslint-disable-next-line arrow-body-style
                     defaultSettings?.map((setting) => {
@@ -71,10 +69,10 @@ function SiteSettings() {
                         } else if (setting.settingType === 'string') {
                             settingInput = (
                                 <Box maxWidth={250}>
-                                    <Text size="sm">{setting.settingDisplayName}</Text>
+                                    <Text fontSize="sm">{setting.settingDisplayName}</Text>
                                     <Input
                                         variant="outline"
-                                        colorScheme="orange"
+                                        colorPalette="orange"
                                         placeholder={setting.settingValue}
                                         onChange={
                                             async (e) => {

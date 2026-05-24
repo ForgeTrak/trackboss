@@ -1,6 +1,10 @@
 import {
     Alert,
-    Box, Center, Flex, IconButton, Input, InputGroup, InputLeftElement,
+    Box,
+    Center,
+    Flex,
+    IconButton,
+    Input,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -153,17 +157,24 @@ export default function SignUpList(props: SignupListProps) {
         <div data-testid="table">
             <Center>
                 <Flex mt={5}>
-                    <Box>
-                        <InputGroup>
-                            <InputLeftElement pointerEvents="none">
-                                <BsSearch color="gray.300" />
-                            </InputLeftElement>
-                            <Input
-                                size="lg"
-                                placeholder="Search..."
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </InputGroup>
+                    <Box position="relative">
+                        <Box
+                            position="absolute"
+                            left={3}
+                            top="50%"
+                            transform="translateY(-50%)"
+                            pointerEvents="none"
+                            zIndex={1}
+                        >
+                            <BsSearch color="gray" />
+                        </Box>
+                        <Input
+                            size="lg"
+                            pl={10}
+                            borderRadius="md"
+                            placeholder="Search..."
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </Box>
                     <Box pl={5}>
                         <IconButton
@@ -185,17 +196,18 @@ export default function SignUpList(props: SignupListProps) {
                                     window.location.href = objectUrl;
                                 }
                             }
-                            icon={<BsPrinter />}
-                        />
+                        >
+                            <BsPrinter />
+                        </IconButton>
                     </Box>
                 </Flex>
             </Center>
             <Box>
-                <Alert status="warning">
+                <Alert.Root status="warning">
                     To choose a job expands its row, and click the signup button.  If you are an admin you can also
                     choose a name from the drop down, or type it in the dropdown to narrow the list.  Admins can also
                     assign a non member to a job.
-                </Alert>
+                </Alert.Root>
                 <Box mt={1} mb={1}>
                     {
                         `${signupsCount} of ${allJobsCount} 

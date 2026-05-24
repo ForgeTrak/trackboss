@@ -21,11 +21,19 @@ export default function NameAddressDisplay(props: any) {
                 &nbsp;
                 {addressContainer.zip}
             </Text>
-            <Link href={`tel:${addressContainer.phone}`} isExternal>
+            <Link
+                href={`tel:${addressContainer.phone}`}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 {addressContainer.phone}
             </Link>
             <br />
-            <Link href={`mailto:${addressContainer.email}`} isExternal>
+            <Link
+                href={`mailto:${addressContainer.email}`}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 {addressContainer.email}
             </Link>
             <br />

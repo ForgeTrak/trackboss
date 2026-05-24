@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {
-    Text,
-    Heading,
-    VStack,
-    HStack,
-    Divider,
-    SimpleGrid,
-} from '@chakra-ui/react';
+import { Text, Heading, VStack, HStack, SimpleGrid, Separator } from '@chakra-ui/react';
 import { Member } from '../../../src/typedefs/member';
 import { getMember } from '../controller/member';
 import { UserContext } from '../contexts/UserContext';
@@ -45,11 +38,11 @@ export default function GeneralInfo(props: cardProps) {
                     )
                 }
             </HStack>
-            <Divider />
+            <Separator />
             {
                 memberInfo && (
                     <SimpleGrid pt={10} columns={2}>
-                        <VStack spacing={2} align="left">
+                        <VStack gap={2} align="left">
                             <Text fontSize="xl" fontWeight="bold">Name:</Text>
                             <Text fontSize="xl" fontWeight="bold">Address:</Text>
                             <Text fontSize="xl" fontWeight="bold">Email:</Text>

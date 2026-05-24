@@ -22,9 +22,10 @@ export default function VerifyButton(props: buttonProps) {
         verifyButton = (
             <Button
                 ml={4}
-                variant={verified ? 'verified' : 'unverified'}
+                bg={verified ? 'green' : 'red'}
+                color="white"
                 onClick={handleClick}
-                isDisabled={!props.member}
+                disabled={!props.member}
             >
                 {verified ? 'Verified' : 'Verify'}
             </Button>
