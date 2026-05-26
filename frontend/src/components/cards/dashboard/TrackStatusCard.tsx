@@ -50,15 +50,15 @@ export default function TrackStatusCard(props: cardProps) {
     });
     return (
         <Box
-            alignSelf="center"
+            alignSelf="stretch"
             bg="white"
             boxShadow="md"
             borderWidth="1px"
             borderStyle="solid"
             borderColor="gray.200"
-            w={['100%', '100%', 1498]}
             p={2}
-            m={2}
+            mx={2}
+            my={2}
         >
             <VStack align="left" gap="2em">
                 <Heading alignContent="left" size="lg">Track Status</Heading>

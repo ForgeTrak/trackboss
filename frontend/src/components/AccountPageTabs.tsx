@@ -15,21 +15,21 @@ export default function AccountPageTabs() {
 
     return (
         <Tabs.Root variant="subtle" bg="white" colorPalette="orange" lazyMount defaultValue="general">
-            <Tabs.List fontSize="md">
-                <Tabs.Trigger rounded="md" value="general">
-                    General Info &nbsp;
+            <Tabs.List fontSize="md" flexWrap="wrap" overflow="visible">
+                <Tabs.Trigger rounded="md" value="general" gap="1" alignItems="center" whiteSpace="nowrap">
+                    General Info
                     <BsWrench />
                 </Tabs.Trigger>
-                <Tabs.Trigger rounded="md" value="family">
-                    Family & Bikes &nbsp;
+                <Tabs.Trigger rounded="md" value="family" gap="1" alignItems="center" whiteSpace="nowrap">
+                    Family & Bikes
                     <BsFillPeopleFill />
                 </Tabs.Trigger>
-                <Tabs.Trigger rounded="md" value="workpoints">
-                    Work Point History &nbsp;
+                <Tabs.Trigger rounded="md" value="workpoints" gap="1" alignItems="center" whiteSpace="nowrap">
+                    Work Point History
                     <IoMdBriefcase />
                 </Tabs.Trigger>
-                <Tabs.Trigger rounded="md" value="dues">
-                    Dues & Waivers &nbsp;
+                <Tabs.Trigger rounded="md" value="dues" gap="1" alignItems="center" whiteSpace="nowrap">
+                    Dues & Waivers
                     <FaMoneyBillAlt />
                 </Tabs.Trigger>
             </Tabs.List>

@@ -29,19 +29,22 @@ export default function WorkPointsCard(props: cardProps) {
             borderStyle="solid"
             borderColor="gray.200"
             h="375px"
+            overflow="hidden"
             p={3}
             m={2}
         >
             <Center>
-                <VStack p={0}>
-                    <GaugeChart
-                        id="gauge-chart"
-                        nrOfLevels={25}
-                        percent={gaugePercent / 100}
-                        colors={['#FF9F46', '#76CE6F']}
-                        hideText
-                        arcWidth={0.3}
-                    />
+                <VStack p={0} w="100%">
+                    <Box w="100%" maxW="500px">
+                        <GaugeChart
+                            id="gauge-chart"
+                            nrOfLevels={25}
+                            percent={gaugePercent / 100}
+                            colors={['#FF9F46', '#76CE6F']}
+                            hideText
+                            arcWidth={0.3}
+                        />
+                    </Box>
                     <VStack gap={0}>
                         <Text pt={5} fontSize="xl">You have completed (or signed up for)</Text>
                         <Text color="orange" fontSize="2xl">

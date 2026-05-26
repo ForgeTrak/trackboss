@@ -96,79 +96,75 @@ function Dashboard() {
     }
 
     return (
-        <>
-            <VStack align="left" gap="2em">
-                <Header title="Dashboard" activeButtonId={1} />
-                {
-                    state.user && lastBill && (
-                        <GreetingText
-                            name={`${state.user.firstName} ${state.user.lastName}`}
-                            billYear={lastBill?.year || (new Date()).getFullYear() - 1}
-                            gateCode={gateCode}
-                            lastBill={lastBill}
-                        />
-                    )
-                }
-                <Center>
-                    <SimpleGrid columns={[1, null, 3]} gap="20px">
-                        <WorkPointsCard percent={percent} year={(new Date()).getFullYear()} />
-                        {
-                            eventCardProps ? (
-                                <EventCard
-                                    date={eventCardProps.start}
-                                    startTime={eventCardProps.time}
-                                    name={eventCardProps.title}
-                                    endDate={eventCardProps.end}
-                                    id={eventCardProps.id}
-                                    allowsSignIn={allowsSignIn}
-                                    description={eventCardProps.description}
-                                    signupHandler={
-                                        async () => {
-                                            try {
-                                                await signupForOpenEventJob(
-                                                    state.token,
-                                                    eventCardProps.id,
-                                                    state.user?.memberId || 0,
-                                                );
-                                            } catch (error) {
-                                                // eslint-disable-next-line no-console
-                                                console.error(error);
-                                            }
-                                            toast.success({
-                                                title: 'Signed in!',
-                                                description: `You've been signed into ${eventCardProps.title}`,
-                                            });
-                                        }
-                                    }
-                                />
-                            ) : (
-                                <EventCard
-                                    date=""
-                                    startTime=""
-                                    name=""
-                                    endDate=""
-                                    description=""
-                                    id={0}
-                                    signupHandler={() => false}
-                                    allowsSignIn={false}
-                                />
-                            )
-                        }
-                        <ImportantLinksCard
-                            dashboardLinks={dashboardLinks}
-                        />
-                    </SimpleGrid>
-                </Center>
-            </VStack>
+        <VStack align="left" gap="2em">
+            <Header title="Dashboard" activeButtonId={1} />
+            {
+                state.user && lastBill && (
+                    <GreetingText
+                        name={`${state.user.firstName} ${state.user.lastName}`}
+                        billYear={lastBill?.year || (new Date()).getFullYear() - 1}
+                        gateCode={gateCode}
+                        lastBill={lastBill}
+                    />
+                )
+            }
             <Center>
-                <TrackStatusCard
-                    areaStatusList={ridingAreaStatuses}
-                    isAdmin={state.user?.memberType === 'Admin'}
-                    // eslint-disable-next-line react/jsx-no-bind
-                    updateArea={updateArea}
-                />
+                <SimpleGrid columns={[1, null, 3]} gap="20px">
+                    <WorkPointsCard percent={percent} year={(new Date()).getFullYear()} />
+                    {
+                        eventCardProps ? (
+                            <EventCard
+                                date={eventCardProps.start}
+                                startTime={eventCardProps.time}
+                                name={eventCardProps.title}
+                                endDate={eventCardProps.end}
+                                id={eventCardProps.id}
+                                allowsSignIn={allowsSignIn}
+                                description={eventCardProps.description}
+                                signupHandler={
+                                    async () => {
+                                        try {
+                                            await signupForOpenEventJob(
+                                                state.token,
+                                                eventCardProps.id,
+                                                state.user?.memberId || 0,
+                                            );
+                                        } catch (error) {
+                                            // eslint-disable-next-line no-console
+                                            console.error(error);
+                                        }
+                                        toast.success({
+                                            title: 'Signed in!',
+                                            description: `You've been signed into ${eventCardProps.title}`,
+                                        });
+                                    }
+                                }
+                            />
+                        ) : (
+                            <EventCard
+                                date=""
+                                startTime=""
+                                name=""
+                                endDate=""
+                                description=""
+                                id={0}
+                                signupHandler={() => false}
+                                allowsSignIn={false}
+                            />
+                        )
+                    }
+                    <ImportantLinksCard
+                        dashboardLinks={dashboardLinks}
+                    />
+                </SimpleGrid>
             </Center>
-        </>
+            <TrackStatusCard
+                areaStatusList={ridingAreaStatuses}
+                isAdmin={state.user?.memberType === 'Admin'}
+                // eslint-disable-next-line react/jsx-no-bind
+                updateArea={updateArea}
+            />
+        </VStack>
     );
 }
 

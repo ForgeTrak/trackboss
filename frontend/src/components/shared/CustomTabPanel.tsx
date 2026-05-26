@@ -18,12 +18,19 @@ export default function MemberSelector(props: CustomTabsProps) {
             defaultValue={tabs[0]?.label.toLowerCase()}
             paddingLeft={3}
         >
-            <Tabs.List fontSize="md">
+            <Tabs.List fontSize="md" flexWrap="wrap" overflow="visible">
                 {
                     tabs.map((tab) => (
                         // eslint-disable-next-line react/no-array-index-key
                         (
-                            <Tabs.Trigger rounded="md" value={tab.label.toLowerCase()} key={tab.label.toLowerCase()}>
+                            <Tabs.Trigger
+                                rounded="md"
+                                value={tab.label.toLowerCase()}
+                                key={tab.label.toLowerCase()}
+                                gap="1"
+                                alignItems="center"
+                                whiteSpace="nowrap"
+                            >
                                 {tab.label}
                                 {tab.icon}
                             </Tabs.Trigger>

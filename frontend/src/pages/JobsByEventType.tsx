@@ -11,15 +11,13 @@ function JobsByEventType() {
         <>
             <Header title="Race Administration" activeButtonId={6} />
             <Tabs.Root variant="subtle" bg="white" colorPalette="orange" defaultValue="events">
-                <Tabs.List>
-                    <Tabs.Trigger rounded="md" value="events">
+                <Tabs.List flexWrap="wrap" overflow="visible">
+                    <Tabs.Trigger rounded="md" value="events" gap="1" alignItems="center" whiteSpace="nowrap">
                         Event Job Structure
-                        &nbsp;
                         <FaTeamspeak />
                     </Tabs.Trigger>
-                    <Tabs.Trigger rounded="md" value="labor">
+                    <Tabs.Trigger rounded="md" value="labor" gap="1" alignItems="center" whiteSpace="nowrap">
                         Paid Labor
-                        &nbsp;
                         <FaMoneyCheck />
                     </Tabs.Trigger>
                 </Tabs.List>

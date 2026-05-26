@@ -53,10 +53,10 @@ export default function MembershipApplicationModal(props: appModalProps) {
             <Separator />
             <SimpleGrid columns={[1, 1, 1]} gap={0.5} m={3}>
                 <Tabs.Root variant="subtle" bg="white" colorPalette="orange" defaultValue="info">
-                    <Tabs.List fontSize="md">
-                        <Tabs.Trigger rounded="md" value="info">Application Info</Tabs.Trigger>
-                        <Tabs.Trigger rounded="md" value="family">Family Members</Tabs.Trigger>
-                        <Tabs.Trigger rounded="md" value="notes">Notes</Tabs.Trigger>
+                    <Tabs.List fontSize="md" flexWrap="wrap" overflow="visible">
+                        <Tabs.Trigger rounded="md" value="info" whiteSpace="nowrap">Application Info</Tabs.Trigger>
+                        <Tabs.Trigger rounded="md" value="family" whiteSpace="nowrap">Family Members</Tabs.Trigger>
+                        <Tabs.Trigger rounded="md" value="notes" whiteSpace="nowrap">Notes</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="info">
                         <NameAddressDisplay
