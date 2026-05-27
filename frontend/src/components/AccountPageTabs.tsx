@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Tabs } from '@chakra-ui/react';
+import { Box, Tabs } from '@chakra-ui/react';
 
 import { BsWrench, BsFillPeopleFill } from 'react-icons/bs';
 import { FaMoneyBillAlt } from 'react-icons/fa';
@@ -34,25 +34,33 @@ export default function AccountPageTabs() {
                 </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="general">
-                {
-                    state.user &&
-                    <GeneralInfo user={state.user} />
-                }
+                <Box padding={2}>
+                    {
+                        state.user &&
+                        <GeneralInfo user={state.user} />
+                    }
+                </Box>
             </Tabs.Content>
             <Tabs.Content value="family">
-                {
-                    state.user && (
-                        <FamilyAndBikes
-                            admin={state.user.memberType.includes('Admin')}
-                        />
-                    )
-                }
+                <Box padding={2}>
+                    {
+                        state.user && (
+                            <FamilyAndBikes
+                                admin={state.user.memberType.includes('Admin')}
+                            />
+                        )
+                    }
+                </Box>
             </Tabs.Content>
             <Tabs.Content value="workpoints">
-                <WorkPointsHistory />
+                <Box padding={2}>
+                    <WorkPointsHistory />
+                </Box>
             </Tabs.Content>
             <Tabs.Content value="dues">
-                <DuesAndWaivers />
+                <Box padding={2}>
+                    <DuesAndWaivers />
+                </Box>
             </Tabs.Content>
         </Tabs.Root>
     );

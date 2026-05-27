@@ -96,7 +96,6 @@ export default function GeneralInfo(props: cardProps) {
                     {
                         props.admin && (
                             <Button
-                                mr={400}
                                 textDecoration="underline"
                                 color="orange"
                                 variant="ghost"

@@ -28,8 +28,7 @@ export default function WorkPointsCard(props: cardProps) {
             borderWidth="1px"
             borderStyle="solid"
             borderColor="gray.200"
-            h="375px"
-            overflow="hidden"
+            minH="375px"
             p={3}
             m={2}
         >
