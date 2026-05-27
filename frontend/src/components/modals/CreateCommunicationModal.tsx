@@ -149,7 +149,7 @@ export default function CreateCommunicationModal(props: CreateCommunicationModal
                                             send, and each member will only get a notification one time.  These only go
                                             to membership admins (primary person on the membership).
                                         </Text>
-                                        <Grid templateRows="repeat(5, 1fr)" templateColumns="repeat(3, 1fr)">
+                                        <Grid templateColumns="repeat(3, 1fr)" gap={1}>
                                             <CheckboxGroup>
                                                 {tagCheckBoxes}
                                             </CheckboxGroup>
