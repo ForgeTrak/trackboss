@@ -89,7 +89,7 @@ export default function AppModal({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
-                        overflowX="hidden"
+                        overflow="visible"
                         maxW={size ? v2SizeMaxWidth[size] : v2SizeMaxWidth.md}
                         padding={contentProps?.padding}
                         p={contentProps?.p}
