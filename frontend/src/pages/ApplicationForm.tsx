@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input/input';
 import 'react-phone-number-input/style.css';
-import { isEmail } from 'validator';
+import isEmail from 'validator/es/lib/isEmail';
 import Autocomplete from 'react-google-autocomplete';
 import DatePicker from 'react-date-picker';
 import moment from 'moment';

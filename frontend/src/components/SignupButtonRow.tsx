@@ -1,7 +1,8 @@
 import { Button, Group, SimpleGrid } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import { BsCurrencyDollar, BsTrash2 } from 'react-icons/bs';
-import moment from 'moment-timezone';
+import { isBefore } from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
@@ -40,8 +41,8 @@ export default function SignupButtonRow(props: any) {
         !props.restrictSignups
     );
 
-    const startEastern = moment(props.data.start, 'YYYY-MM-DD HH:mm:ss').tz('America/New_York', true);
-    const disableForMembers = startEastern.isBefore(moment());
+    const startEastern = fromZonedTime(props.data.start.replace(' ', 'T'), 'America/New_York');
+    const disableForMembers = isBefore(startEastern, new Date());
 
     useEffect(() => {
         async function signupForJobDropdown() {

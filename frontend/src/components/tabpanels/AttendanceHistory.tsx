@@ -1,6 +1,6 @@
 import { Button, Center, Heading, Text, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
-import moment from 'moment-timezone';
+import { formatInTimeZone } from 'date-fns-tz';
 import DataTable from 'react-data-table-component';
 import { Attendance } from '../../../../src/typedefs/attendance';
 import { UserContext } from '../../contexts/UserContext';
@@ -74,13 +74,13 @@ export default function AttendanceHistory() {
     const columns: any = [
         {
             name: 'Date',
-            selector: (row: Attendance) => `${moment(row.checkInTime).tz('America/New_York').format('dddd, MMMM D YYYY')}`,
+            selector: (row: Attendance) => formatInTimeZone(row.checkInTime, 'America/New_York', 'EEEE, MMMM d yyyy'),
             sortable: true,
             wrap: true,
         },
         {
             name: 'Time',
-            selector: (row: Attendance) => `${moment(row.checkInTime).tz('America/New_York').format('h:mm A')}`,
+            selector: (row: Attendance) => formatInTimeZone(row.checkInTime, 'America/New_York', 'h:mm a'),
             sortable: false,
         },
     ];
