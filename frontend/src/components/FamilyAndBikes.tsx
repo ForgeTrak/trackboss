@@ -6,9 +6,8 @@ import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { GetMemberListResponse, Member } from '../../../src/typedefs/member';
 import { Bike, GetBikeListResponse } from '../../../src/typedefs/bike';
 import DeleteAlert from './DeleteAlert';
-import EditBikesModal from './EditBikeModal';
 import AddFamilyModal from './modals/AddFamilyModal';
-import AddBikeModal from './AddBikeModal';
+import BikeModal from './modals/BikeModal';
 import { getFamilyMembers, updateMember } from '../controller/member';
 import { UserContext } from '../contexts/UserContext';
 import { createBike, deleteBike, getBikeList, updateBike } from '../controller/bike';
@@ -260,12 +259,16 @@ export default function GeneralInfo(props: cardProps) {
             }
             {
                 isEditBikeOpen && bikeToEdit && (
-                    <EditBikesModal
+                    <BikeModal
                         isOpen={isEditBikeOpen}
                         onClose={onEditBikeClose}
                         bikeToEdit={bikeToEdit}
                         // eslint-disable-next-line react/jsx-no-bind
-                        editBike={editBike}
+                        onSave={
+                            (year: string, make: string, model: string) => {
+                                editBike(bikeToEdit, year, make, model);
+                            }
+                        }
                     />
                 )
             }
@@ -283,11 +286,11 @@ export default function GeneralInfo(props: cardProps) {
             }
             {
                 isAddBikeOpen && (
-                    <AddBikeModal
+                    <BikeModal
                         isOpen={isAddBikeOpen}
                         onClose={onAddBikeClose}
                         // eslint-disable-next-line react/jsx-no-bind
-                        addBike={addBike}
+                        onSave={addBike}
                     />
                 )
             }
