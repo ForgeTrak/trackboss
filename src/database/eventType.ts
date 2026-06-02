@@ -68,7 +68,7 @@ export async function getEventType(id: number, tenantId: string): Promise<EventT
 export async function getEventTypeList(tenantId: string): Promise<EventType[]> {
     const sql =
         // eslint-disable-next-line max-len
-        'SELECT event_type_id, type, active, last_modified_by, last_modified_date FROM v_event_type where tenant_id = ? order by type';
+        'SELECT event_type_id, type, active, last_modified_by, last_modified_date FROM v_event_type where tenant_id = ? and active =1 order by type';
     const values: string[] = [tenantId];
 
     let results;

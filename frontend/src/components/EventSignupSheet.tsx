@@ -92,7 +92,7 @@ function EventSignupSheet() {
                                                     setSelectedEventTypeId(listEvent.eventTypeId);
                                                 }
                                             }
-                                            value="item-0"
+                                            value={listEvent.type}
                                         >
                                             {listEvent.type}
                                         </Menu.Item>
