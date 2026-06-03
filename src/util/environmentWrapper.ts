@@ -41,6 +41,40 @@ export async function getCognitoClientId() {
     return process.env.COGNITO_CLIENT_ID || getEnvironmentParameter('cognitoClientId');
 }
 
+// The single app client used for the hosted-UI authorization code flow. The
+// verifier's cognitoClientId may be a comma-separated whitelist (web + API clients),
+// but the token endpoint must authenticate as exactly one client. Prefer an explicit
+// value, otherwise fall back to the first entry of the client id list.
+export async function getCognitoOAuthClientId() {
+    const explicit = process.env.COGNITO_OAUTH_CLIENT_ID;
+    if (explicit) {
+        return explicit;
+    }
+    const clientIds = await getCognitoClientId();
+    return clientIds.split(',')[0].trim();
+}
+
+// Optional: only set for confidential (secret-bearing) app clients. Returns '' when the
+// app client is public so the token exchange can skip the Basic auth header.
+export async function getCognitoClientSecret() {
+    return process.env.COGNITO_CLIENT_SECRET || getEnvironmentParameter('cognitoClientSecret');
+}
+
+// Base URL of the Cognito hosted UI / OAuth domain, e.g. https://auth.forgetrak.com
+// (matches the frontend VITE_AUTH_URL). Used to build the /oauth2/token endpoint.
+export async function getCognitoAuthUrl() {
+    return process.env.COGNITO_AUTH_URL || getEnvironmentParameter('cognitoAuthUrl');
+}
+
+export async function getCognitoTokenEndpoint() {
+    const baseUrl = await getCognitoAuthUrl();
+    if (!baseUrl) {
+        logger.error('No Cognito auth URL configured (COGNITO_AUTH_URL env or cognitoAuthUrl SSM parameter)');
+        throw new Error('Cognito auth URL is not configured');
+    }
+    return `${baseUrl.replace(/\/$/, '')}/oauth2/token`;
+}
+
 export async function getConnectionObject() {
     const secretId = process.env.RDS_CONNECTION_ID || '';
     if (secretId) {

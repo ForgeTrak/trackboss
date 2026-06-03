@@ -50,7 +50,7 @@ export default function Header(props:pageProps) {
                             const { origin } = window.location;
                             const encodedState = buildOAuthState({ origin });
                             // eslint-disable-next-line max-len
-                            const authTarget = `${VITE_AUTH_URL}/login?client_id=${VITE_CLIENT_ID}&state=${encodedState}&response_type=token&scope=email+openid+phone&redirect_uri=${VITE_CALLBACK_URL}`;
+                            const authTarget = `${VITE_AUTH_URL}/login?client_id=${VITE_CLIENT_ID}&state=${encodedState}&response_type=code&scope=email+openid+phone&redirect_uri=${VITE_CALLBACK_URL}`;
                             window.location.href = authTarget;
                         }
                     }
