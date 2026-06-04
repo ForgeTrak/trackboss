@@ -216,7 +216,7 @@ export class DeployStack extends Stack {
     const cognitoAuthUrl = new ssm.StringParameter(this, 'cognitoAuthUrl', {
       allowedPattern: '.*',
       parameterName: 'cognitoAuthUrl',
-      stringValue: process.env.COGNITO_AUTH_URL || '',
+      stringValue: process.env.COGNITO_AUTH_URL || 'https://auth.forgetrak.com',
       tier: ssm.ParameterTier.STANDARD,
     });
 
