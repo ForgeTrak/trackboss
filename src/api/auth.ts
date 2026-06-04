@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import {
-    getCognitoClientId,
+    getCognitoOAuthClientId,
     getCognitoClientSecret,
     getCognitoTokenEndpoint,
 } from '../util/environmentWrapper';
@@ -22,18 +22,14 @@ const auth = Router();
  * client); public app clients send the client_id in the body instead.
  */
 async function requestCognitoTokens(params: Record<string, string>) {
+    // Use the single interactive OAuth client (not the verifier's comma-separated
+    // allow-list) so client authentication at the token endpoint matches the client
+    // that issued the authorization code.
     const [tokenEndpoint, clientId, clientSecret] = await Promise.all([
         getCognitoTokenEndpoint(),
-        getCognitoClientId(),
+        getCognitoOAuthClientId(),
         getCognitoClientSecret(),
     ]);
-
-    // Diagnostic (non-sensitive): client IDs are public (they appear in the login URL).
-    // Confirms the client_id used here matches the frontend VITE_CLIENT_ID that issued
-    // the code, and that it isn't a comma-separated multi-client list.
-    const secretLen = clientSecret ? clientSecret.length : 0;
-    logger.info(`auth - token request: clientId="${clientId}", hasComma=${clientId.includes(',')}`);
-    logger.info(`auth - token request: secret set=${!!clientSecret}, secret length=${secretLen}`);
 
     const body = new URLSearchParams({ client_id: clientId, ...params });
     const headers: Record<string, string> = {
