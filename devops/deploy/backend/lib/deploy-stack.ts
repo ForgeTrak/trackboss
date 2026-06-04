@@ -349,10 +349,10 @@ export class DeployStack extends Stack {
             // Confidential app client secret for the authorization-code token exchange.
             // Sourced from deploy-time env (Lambda encrypts env vars at rest with KMS);
             // CloudFormation cannot create SSM SecureString parameters.
-            COGNITO_CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET || '',
+            COGNITO_CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET || 'dummyValue',
             // Optional: pin the single interactive client when cognitoClientId is a
             // comma-separated allow-list and the interactive client isn't the first entry.
-            COGNITO_OAUTH_CLIENT_ID: process.env.COGNITO_OAUTH_CLIENT_ID || '',
+            COGNITO_OAUTH_CLIENT_ID: process.env.COGNITO_OAUTH_CLIENT_ID || 'dummyValue',
             MYSQL_HOST: forgeTrakRdsInstance.dbInstanceEndpointAddress,
             MYSQL_USER: forgeTrakRdsInstance.secret?.secretValueFromJson('username').unsafeUnwrap() || '',
             MYSQL_PASS: forgeTrakRdsInstance.secret?.secretValueFromJson('password').unsafeUnwrap() || '',
