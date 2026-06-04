@@ -42,6 +42,8 @@ export default function Header(props:pageProps) {
                 <Spacer />
                 <Button
                     backgroundColor="white"
+                    color="black"
+                    _hover={{ bg: 'gray.100' }}
                     onClick={
                         () => {
                             localStorage.removeItem('trackboss_auth_token');
