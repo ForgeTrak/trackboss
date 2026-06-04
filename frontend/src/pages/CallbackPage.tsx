@@ -18,18 +18,13 @@ export default function CallbackPage() {
     useEffect(() => {
         async function handleCallback() {
             try {
-                const hash = window.location.hash.substring(1); // strip leading #
-                if (!hash) {
-                    setError('No authentication data received from login provider.');
-                    return;
-                }
-
-                const params = new URLSearchParams(hash);
-                const idToken = params.get('id_token');
+                // Authorization code grant returns the code + state in the query string.
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get('code');
                 const stateRaw = params.get('state');
 
-                if (!idToken) {
-                    setError('No token received from login provider.');
+                if (!code) {
+                    setError('No authorization code received from login provider.');
                     return;
                 }
 
@@ -46,9 +41,9 @@ export default function CallbackPage() {
                 const slug = new URL(callerOrigin).hostname.split('.')[0];
                 await getTenantBySlug(slug);
 
-                // Redirect to the tenant's domain with the token in the hash.
-                // encodeURIComponent ensures base64url chars survive the redirect.
-                const target = `${callerOrigin}/#id_token=${encodeURIComponent(idToken)}&state=${encodeURIComponent(stateRaw)}`;
+                // Redirect to the tenant's domain with the code in the query string so
+                // App.tsx can exchange it for tokens via the backend.
+                const target = `${callerOrigin}/?code=${encodeURIComponent(code)}&state=${encodeURIComponent(stateRaw)}`;
                 window.location.replace(target);
             } catch (e: any) {
                 // eslint-disable-next-line no-console

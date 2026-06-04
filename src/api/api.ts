@@ -29,6 +29,7 @@ import auditLog from './auditLog';
 import dashboard from './dashboard';
 import tenant from './tenant';
 import attendance from './attendance';
+import auth from './auth';
 
 const api = Router();
 
@@ -106,4 +107,5 @@ api.use('/auditLog', auditLog);
 api.use('/dashboard', dashboard);
 api.use('/tenant', tenant);
 api.use('/attendance', attendance);
+api.use('/auth', auth);
 export default api;

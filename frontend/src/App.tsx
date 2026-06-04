@@ -9,6 +9,7 @@ import Settings from './pages/Settings';
 import CalendarPage from './pages/CalendarPage';
 import SignUpPage from './pages/SignUpPage';
 import me from './controller/api';
+import { exchangeCode, refreshIdToken } from './controller/auth';
 import MemberCommunicationsPage from './pages/MemberCommunicationsPage';
 import ApplicationForm from './pages/ApplicationForm';
 import RaceAdministration from './pages/RaceAdministration';
@@ -24,28 +25,34 @@ export function App() {
     // Helper function to redirect to login
     const redirectToLogin = useCallback(async () => {
         localStorage.removeItem('trackboss_auth_token');
-        update({ loggedIn: false, token: '', user: undefined, storedUser: undefined, isInitializing: false });
+        update({
+            loggedIn: false, token: '', refreshToken: '', user: undefined, storedUser: undefined, isInitializing: false,
+        });
         const hostFirstPart = window.location.hostname.split('.')[0];
         const tenant = await getTenantBySlug(hostFirstPart);
         const encodedState = buildOAuthState({ tenant, origin: window.location.origin });
         // this is the only reasonable way to do this other than repeated string concatenation
         // eslint-disable-next-line max-len
-        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${encodedState}&response_type=token&scope=email+openid+phone&redirect_uri=${import.meta.env.VITE_CALLBACK_URL}`;
+        const authTarget = `${import.meta.env.VITE_AUTH_URL}/login?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${encodedState}&response_type=code&scope=email+openid+phone&redirect_uri=${import.meta.env.VITE_CALLBACK_URL}`;
         window.location.href = authTarget;
     }, [update]);
 
     // Helper function to verify token and update state
-    const updateState = useCallback(async (token: string) => {
+    const updateState = useCallback(async (token: string, refreshToken?: string) => {
         // Set initializing to true while we verify the token
         update((prev) => ({ ...prev, isInitializing: true }));
         try {
             const user = await me(token);
-            // Token is valid, set loggedIn to true and isInitializing to false
-            update({ loggedIn: true, token, user, storedUser: undefined, isInitializing: false });
-            // Clean up URL hash after extracting token
-            if (window.location.hash.includes('#id_token=')) {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            }
+            // Token is valid, set loggedIn to true and isInitializing to false.
+            // Preserve any existing refresh token if a new one wasn't supplied.
+            update((prev) => ({
+                loggedIn: true,
+                token,
+                refreshToken: refreshToken ?? prev.refreshToken,
+                user,
+                storedUser: undefined,
+                isInitializing: false,
+            }));
         } catch (error: any) {
             // If token is invalid (401/403) or expired, redirect to login
             if (error?.status === 401 || error?.status === 403) {
@@ -57,17 +64,31 @@ export function App() {
         }
     }, [update, redirectToLogin]);
 
+    // Exchange an authorization code (from the Cognito redirect) for tokens, then
+    // verify the resulting id_token and clean the code out of the URL.
+    const handleAuthCode = useCallback(async (code: string) => {
+        update((prev) => ({ ...prev, isInitializing: true }));
+        try {
+            const { idToken, refreshToken } = await exchangeCode(code, import.meta.env.VITE_CALLBACK_URL);
+            window.history.replaceState(null, '', window.location.pathname);
+            await updateState(idToken, refreshToken);
+        } catch (error: any) {
+            // eslint-disable-next-line no-console
+            console.error('Auth code exchange failed:', error?.status, error?.message, error);
+            redirectToLogin();
+        }
+    }, [update, updateState, redirectToLogin]);
+
     // Effect to handle initial authentication and token validation
     useEffect(() => {
         const isPublicPage = location.pathname.includes('apply') || location.pathname.includes('callback');
         if (!state.loggedIn && state.isInitializing && !isPublicPage) {
-            // First check if there's a token in the URL hash (from Cognito redirect)
-            const hashStr = location.hash.split('#id_token=')[1];
-            if (hashStr) {
-                const token = hashStr.split('&')[0];
-                updateState(token);
+            // First check if there's an authorization code in the URL (from Cognito redirect)
+            const code = new URLSearchParams(location.search).get('code');
+            if (code) {
+                handleAuthCode(code);
             } else if (state.token) {
-                // If no hash but we have a stored token, try to verify it
+                // If no code but we have a stored token, try to verify it
                 updateState(state.token);
             } else {
                 // No token at all, redirect to login
@@ -79,8 +100,9 @@ export function App() {
         state.token,
         state.isInitializing,
         location.pathname,
-        location.hash,
+        location.search,
         updateState,
+        handleAuthCode,
         redirectToLogin,
     ]);
 
@@ -94,8 +116,21 @@ export function App() {
                 try {
                     await me(state.token);
                 } catch (error: any) {
-                    // Token is invalid or expired
+                    // Token is invalid or expired - attempt a silent refresh before giving up
                     if (error?.status === 401 || error?.status === 403) {
+                        if (state.refreshToken) {
+                            try {
+                                const refreshed = await refreshIdToken(state.refreshToken);
+                                update((prev) => ({
+                                    ...prev,
+                                    token: refreshed.idToken,
+                                    refreshToken: refreshed.refreshToken ?? prev.refreshToken,
+                                }));
+                                return;
+                            } catch {
+                                // refresh failed - fall through to re-login
+                            }
+                        }
                         redirectToLogin();
                     }
                 }
@@ -103,7 +138,7 @@ export function App() {
 
             return () => clearInterval(validationInterval);
         }
-    }, [state.loggedIn, state.token, location.pathname, update, redirectToLogin]);
+    }, [state.loggedIn, state.token, state.refreshToken, location.pathname, update, redirectToLogin]);
 
     // Don't render routes until authentication is complete (either logged in or redirected)
     // This prevents components from making API calls with invalid/empty tokens
