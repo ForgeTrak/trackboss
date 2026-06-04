@@ -2,6 +2,53 @@ import moment from 'moment';
 
 export const API_BASE = import.meta.env.VITE_API_URL;
 
+const TOKEN_STORAGE_KEY = 'forgetrak_auth_token';
+const REFRESH_TOKEN_STORAGE_KEY = 'forgetrak_refresh_token';
+
+// Shared in-flight refresh so concurrent 401s trigger only one refresh request.
+let refreshInFlight: Promise<string | null> | null = null;
+
+/**
+ * Attempt to obtain a fresh id_token using the stored refresh token. Updates
+ * localStorage on success and returns the new token, or null if refresh fails.
+ * Inlined here (rather than importing from ./auth) to avoid a circular import.
+ */
+async function refreshAccessToken(): Promise<string | null> {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
+    if (!refreshToken) {
+        return null;
+    }
+    if (!refreshInFlight) {
+        refreshInFlight = (async () => {
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/refresh`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken }),
+                });
+                if (!response.ok) {
+                    return null;
+                }
+                const data = await response.json();
+                if (data.idToken) {
+                    localStorage.setItem(TOKEN_STORAGE_KEY, data.idToken);
+                    if (data.refreshToken) {
+                        localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refreshToken);
+                    }
+                    return data.idToken;
+                }
+                return null;
+            } catch {
+                return null;
+            } finally {
+                refreshInFlight = null;
+            }
+        })();
+    }
+    return refreshInFlight;
+}
+
 /* eslint-disable radix */
 export function generateHeaders(token: string): Headers {
     return new Headers({
@@ -21,12 +68,21 @@ export async function apiRequest<T>(
     if (options?.dateRange) {
         url += `?dateRange=${encodeURIComponent(options.dateRange)}`;
     }
-    const response = await fetch(url, {
+    const doFetch = (authToken: string) => fetch(url, {
         method,
         mode: options?.mode || 'cors',
-        headers: generateHeaders(token),
+        headers: generateHeaders(authToken),
         ...(body !== undefined && { body: JSON.stringify(body) }),
     });
+
+    let response = await doFetch(token);
+    // On an auth failure, try a single silent refresh + retry before giving up.
+    if (response.status === 401 || response.status === 403) {
+        const refreshedToken = await refreshAccessToken();
+        if (refreshedToken) {
+            response = await doFetch(refreshedToken);
+        }
+    }
     return response.json();
 }
 

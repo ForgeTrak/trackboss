@@ -211,6 +211,15 @@ export class DeployStack extends Stack {
       tier: ssm.ParameterTier.STANDARD,
     });
 
+    // Cognito hosted-UI / OAuth domain (matches the frontend VITE_AUTH_URL), used to
+    // build the /oauth2/token endpoint for the authorization-code token exchange.
+    const cognitoAuthUrl = new ssm.StringParameter(this, 'cognitoAuthUrl', {
+      allowedPattern: '.*',
+      parameterName: 'cognitoAuthUrl',
+      stringValue: process.env.COGNITO_AUTH_URL || '',
+      tier: ssm.ParameterTier.STANDARD,
+    });
+
     const accountParam = new ssm.StringParameter(this, 'account', {
         allowedPattern: '.*',
         parameterName: 'account',
@@ -243,7 +252,7 @@ export class DeployStack extends Stack {
     appRunnerRole.addToPolicy(appRunnerSnsPolicy);
     
     const appRunnerParamStorePolicy = new iam.PolicyStatement();
-    [cognitoClientId, cognitoPoolId, accountParam, regionParam].forEach((ssmParam) => {
+    [cognitoClientId, cognitoPoolId, cognitoAuthUrl, accountParam, regionParam].forEach((ssmParam) => {
         appRunnerParamStorePolicy.addActions('ssm:GetParameter');
         appRunnerParamStorePolicy.addResources(ssmParam.parameterArn);
     });
@@ -335,6 +344,15 @@ export class DeployStack extends Stack {
             FORGETRAK_ENVIRONMENT: forgetrakEnvironment,
             COGNITO_POOL_ID: cognitoPoolId.stringValue,
             COGNITO_CLIENT_ID: cognitoClientId.stringValue,
+            // Cognito OAuth domain used to build the /oauth2/token endpoint
+            COGNITO_AUTH_URL: cognitoAuthUrl.stringValue,
+            // Confidential app client secret for the authorization-code token exchange.
+            // Sourced from deploy-time env (Lambda encrypts env vars at rest with KMS);
+            // CloudFormation cannot create SSM SecureString parameters.
+            COGNITO_CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET || '',
+            // Optional: pin the single interactive client when cognitoClientId is a
+            // comma-separated allow-list and the interactive client isn't the first entry.
+            COGNITO_OAUTH_CLIENT_ID: process.env.COGNITO_OAUTH_CLIENT_ID || '',
             MYSQL_HOST: forgeTrakRdsInstance.dbInstanceEndpointAddress,
             MYSQL_USER: forgeTrakRdsInstance.secret?.secretValueFromJson('username').unsafeUnwrap() || '',
             MYSQL_PASS: forgeTrakRdsInstance.secret?.secretValueFromJson('password').unsafeUnwrap() || '',
