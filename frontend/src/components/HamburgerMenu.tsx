@@ -87,7 +87,7 @@ export default function HamburgerMenu(props: pageProps) {
         </VStack>
     );
     return (
-        <HStack paddingLeft={10} paddingRight={10}>
+        <HStack paddingLeft={{ base: 2, md: 10 }} paddingRight={{ base: 2, md: 10 }}>
             <div>
                 <IconButton
                     aria-label="Menu"
