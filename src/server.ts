@@ -4,6 +4,7 @@ import api from './api/api';
 import logger from './logger';
 import { checkHeader, createVerifier, verify } from './util/auth';
 import { getEnvironmentParameter } from './util/environmentWrapper';
+import { getTenantBySlug } from './database/tenant';
 import { configReady } from './database/pool';
 import startBillingJob from './jobs/billingJob';
 
@@ -27,13 +28,52 @@ const port = process.env.PORT || 8080;
 
 const verifierReady = createVerifier();
 
+/**
+ * Extract the subdomain (slug) from the request Origin header.
+ * Returns undefined when Origin is missing or has no subdomain.
+ */
+function getSlugFromOrigin(origin: string | undefined): string | undefined {
+    if (!origin) return undefined;
+    try {
+        const { hostname } = new URL(origin);
+        const parts = hostname.split('.');
+        // Expect at least slug.domain.tld (3 parts) to treat first part as slug
+        if (parts.length >= 3) {
+            return parts[0];
+        }
+        // For local dev (e.g. localhost) fall back to first part if there's only one dot
+        if (parts.length === 1 && parts[0] === 'localhost') {
+            return parts[0];
+        }
+    } catch { /* malformed origin - ignore */ }
+    return undefined;
+}
+
 const addTenantToRequest = async (req : any, res : any, next : () => void) => {
     const headerCheck = checkHeader(req.headers.authorization);
     if (headerCheck.token) {
         try {
             const verifiedToken = await verify(headerCheck.token);
-            const tenantId = verifiedToken.active_tenant_id as string;
+            let tenantId = verifiedToken.active_tenant_id as string;
             const uuid = verifiedToken['cognito:username'];
+
+            // Resolve tenant from Origin header and validate against user's tenant list
+            const slug = getSlugFromOrigin(req.headers.origin);
+            if (slug) {
+                try {
+                    const originTenant = await getTenantBySlug(slug);
+                    const userTenants: string[] = JSON.parse((verifiedToken.tenant_ids as string) || '[]');
+                    if (userTenants.includes(originTenant.tenantId)) {
+                        tenantId = originTenant.tenantId;
+                    } else {
+                        logger.warn(`Tenant ${originTenant.tenantId} (slug: ${slug}) not in user's tenant list`);
+                    }
+                } catch (e: any) {
+                    // Slug not found or DB error - fall back to token's active_tenant_id
+                    logger.debug(`Origin tenant resolution failed for slug '${slug}': ${e.message}`);
+                }
+            }
+
             req.user = {
                 tenantId,
                 uuid,
