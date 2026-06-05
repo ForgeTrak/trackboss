@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Heading, Flex, Spacer, Box, Text, Button } from '@chakra-ui/react';
+import { AiOutlineLogout } from 'react-icons/ai';
 
 import { useNavigate } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
@@ -26,15 +27,15 @@ export default function Header(props:pageProps) {
     }
     return (
         <div>
-            <Flex bg="white" boxShadow="lg" padding="4">
+            <Flex bg="white" boxShadow="lg" padding="4" alignItems="center" gap={2}>
                 <HamburgerMenu
                     activeButtonId={props.activeButtonId}
                     admin={state.user?.memberType === 'Admin'}
                     boardMember={state.user?.isBoardMember || false}
                 />
                 <Spacer />
-                <Box>
-                    <Heading pr={90} size="md">{`Trackboss: ${props.title}`}</Heading>
+                <Box minW={0}>
+                    <Heading pr={{ base: 0, md: 90 }} size={{ base: 'sm', md: 'md' }}>{`Trackboss: ${props.title}`}</Heading>
                     <Text fontSize="sm">Powered by ForgeTrak</Text>
                     <Text fontSize="xs">{`${loggedInAs}`}</Text>
                     <Text fontSize="xs">{`Tenant ID: ${state.user?.tenantId}`}</Text>
@@ -43,6 +44,10 @@ export default function Header(props:pageProps) {
                 <Button
                     backgroundColor="white"
                     color="black"
+                    flexShrink={0}
+                    size={{ base: 'sm', md: 'md' }}
+                    px={{ base: 2, md: 4 }}
+                    aria-label="Logout"
                     _hover={{ bg: 'gray.100' }}
                     onClick={
                         () => {
@@ -57,7 +62,8 @@ export default function Header(props:pageProps) {
                         }
                     }
                 >
-                    Logout
+                    <AiOutlineLogout />
+                    <Box as="span" display={{ base: 'none', md: 'inline' }}>Logout</Box>
                 </Button>
             </Flex>
             {
