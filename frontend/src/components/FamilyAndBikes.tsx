@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
 import { GetMemberListResponse, Member } from '../../../src/typedefs/member';
 import { Bike, GetBikeListResponse } from '../../../src/typedefs/bike';
-import DeleteAlert from './DeleteAlert';
+import DeleteAlert from './modals/DeleteAlert';
 import AddFamilyModal from './modals/AddFamilyModal';
 import BikeModal from './modals/BikeModal';
 import { getFamilyMembers, updateMember } from '../controller/member';
