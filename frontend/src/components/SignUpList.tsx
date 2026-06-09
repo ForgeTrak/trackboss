@@ -5,6 +5,7 @@ import {
     Flex,
     IconButton,
     Input,
+    Progress,
 } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
@@ -208,11 +209,18 @@ export default function SignUpList(props: SignupListProps) {
                     choose a name from the drop down, or type it in the dropdown to narrow the list.  Admins can also
                     assign a non member to a job.
                 </Alert.Root>
-                <Box mt={1} mb={1}>
-                    {
-                        `${signupsCount} of ${allJobsCount} 
-                        (${(signupsCount / allJobsCount * 100).toFixed(2)}%) jobs filled`
-                    }
+                <Box m={1}>
+                    <Progress.Root colorPalette="orange" defaultValue={(signupsCount / allJobsCount * 100)}>
+                        <Progress.Track>
+                            <Progress.Range />
+                        </Progress.Track>
+                        <Progress.Label>
+                            {`${signupsCount} of ${allJobsCount} jobs filled`}
+                        </Progress.Label>
+                        <Progress.ValueText>
+                            {`(${(signupsCount / allJobsCount * 100).toFixed(2)}%)`}
+                        </Progress.ValueText>
+                    </Progress.Root>
                 </Box>
                 <DataTable
                     columns={columns}
