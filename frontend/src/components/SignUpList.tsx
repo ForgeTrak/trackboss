@@ -210,7 +210,7 @@ export default function SignUpList(props: SignupListProps) {
                     assign a non member to a job.
                 </Alert.Root>
                 <Box m={1}>
-                    <Progress.Root colorPalette="orange" defaultValue={(signupsCount / allJobsCount * 100)}>
+                    <Progress.Root colorPalette="orange" value={allJobsCount > 0 ? (signupsCount / allJobsCount * 100) : 0}>
                         <Progress.Track>
                             <Progress.Range />
                         </Progress.Track>
