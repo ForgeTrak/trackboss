@@ -24,7 +24,8 @@ export function App() {
 
     // Helper function to redirect to login
     const redirectToLogin = useCallback(async () => {
-        localStorage.removeItem('trackboss_auth_token');
+        localStorage.removeItem('forgetrak_auth_token');
+        localStorage.removeItem('forgetrak_refresh_token');
         update({
             loggedIn: false, token: '', refreshToken: '', user: undefined, storedUser: undefined, isInitializing: false,
         });
@@ -54,8 +55,29 @@ export function App() {
                 isInitializing: false,
             }));
         } catch (error: any) {
-            // If token is invalid (401/403) or expired, redirect to login
+            // If the id token is invalid/expired, attempt a silent refresh with the
+            // stored refresh token before falling back to a full re-login.
             if (error?.status === 401 || error?.status === 403) {
+                const storedRefreshToken = refreshToken
+                    || localStorage.getItem('forgetrak_refresh_token')
+                    || '';
+                if (storedRefreshToken) {
+                    try {
+                        const refreshed = await refreshIdToken(storedRefreshToken);
+                        const user = await me(refreshed.idToken);
+                        update({
+                            loggedIn: true,
+                            token: refreshed.idToken,
+                            refreshToken: refreshed.refreshToken ?? storedRefreshToken,
+                            user,
+                            storedUser: undefined,
+                            isInitializing: false,
+                        });
+                        return;
+                    } catch {
+                        // refresh failed - fall through to re-login
+                    }
+                }
                 redirectToLogin();
             } else {
                 // For other errors, also redirect to login to be safe
