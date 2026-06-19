@@ -27,6 +27,8 @@ function Dashboard() {
     // eslint-disable-next-line no-unused-vars
     const [dashboardLinks, setDashboardLinks] = useState<Link[]>([]);
     const [lastBill, setLastBill] = useState<Bill>();
+    const [yearThreshold, setYearThreshold] = useState<number>(0);
+    const [earned, setEarned] = useState<number>(0);
 
     const allowsSignIn = (
         ((eventCardProps?.eventType === 'work day') || (eventCardProps?.eventType === 'meeting')) &&
@@ -62,6 +64,8 @@ function Dashboard() {
             // Work points percentage
             const workPoints = data.workPoints?.total || 0;
             const threshold = data.threshold?.threshold || 0;
+            setYearThreshold(threshold);
+            setEarned(workPoints);
             if (threshold > 0) {
                 setPercent(Math.ceil((workPoints / threshold) * 100));
             }
@@ -110,7 +114,7 @@ function Dashboard() {
             }
             <Center>
                 <SimpleGrid columns={[1, null, 3]} gap="20px">
-                    <WorkPointsCard percent={percent} year={(new Date()).getFullYear()} />
+                    <WorkPointsCard percent={percent} year={(new Date()).getFullYear()} earned={earned} threshold={yearThreshold} />
                     {
                         eventCardProps ? (
                             <EventCard
