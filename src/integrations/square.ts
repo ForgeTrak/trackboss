@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { SquareClient } from 'square';
 import { Bill } from '../typedefs/bill';
 import logger from '../logger';
@@ -20,7 +21,7 @@ export default async function createPaymentLink(memberBill: Bill) {
         const paymentAmount = (memberBill.amountWithFee * 100).toFixed(0);
 
         const response = await client.checkout.paymentLinks.create({
-            idempotencyKey: v4(),
+            idempotencyKey: randomUUID(),
             order: {
                 locationId,
                 referenceId: memberBill.billId.toString(),

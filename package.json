@@ -53,7 +53,6 @@
         "mysql2": "^3.11.5",
         "sanitize-html": "^2.13.1",
         "square": "^43.0.2",
-        "uuid": "^9.0.1",
         "winston": "^3.8.2",
         "winston-cloudwatch": "^6.1.1"
     },
