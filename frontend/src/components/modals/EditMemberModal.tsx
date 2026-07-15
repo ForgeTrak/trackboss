@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Button, Grid, GridItem, Input, Text } from '@chakra-ui/react';
 import isEmail from 'validator/es/lib/isEmail';
 import isMobilePhone from 'validator/es/lib/isMobilePhone';
-import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import Select from 'react-select';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from '../AppModal';
@@ -20,6 +19,7 @@ import { updateMembership } from '../../controller/membership';
 
 import MembershipTypeSelector from '../shared/MembershipTypeSelector';
 import WrappedSwitchInput from '../input/WrappedSwitchInput';
+import AppDatePicker from '../input/AppDatePicker';
 
 interface EditMemberModalProps {
     member: Member,
@@ -131,14 +131,14 @@ export default function EditMemberModal(props: EditMemberModalProps) {
                         </GridItem>
                         <GridItem colSpan={1}>
                             <Text>DOB</Text>
-                            <DatePicker
+                            <AppDatePicker
                                 onChange={
-                                    (date:any) => {
+                                    (date?: Date) => {
                                         setBirthDate(date);
                                         setDirty(true);
                                     }
                                 }
-                                value={birthdate instanceof Date && !Number.isNaN(birthdate.getTime()) ? birthdate : null}
+                                value={birthdate instanceof Date && !Number.isNaN(birthdate.getTime()) ? birthdate : undefined}
                                 required
                                 maxDate={new Date()}
                             />

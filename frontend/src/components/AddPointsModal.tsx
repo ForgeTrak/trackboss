@@ -8,7 +8,6 @@ import {
 } from '@chakra-ui/react';
 import { BsPlus } from 'react-icons/bs';
 import moment from 'moment';
-import DatePicker from 'react-date-picker';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
 import { useAppToast } from '../hooks/useAppToast';
 import { useAppDisclosure } from '../hooks/useAppDisclosure';
@@ -17,6 +16,7 @@ import { JobType, PostNewJobTypeRequest } from '../../../src/typedefs/jobType';
 import { Job, PostNewJobRequest } from '../../../src/typedefs/job';
 import { createJob } from '../controller/job';
 import MemberSelector from './shared/MemberSelector';
+import AppDatePicker from './input/AppDatePicker';
 
 interface AddPointsModalProps {
     memberName: string,
@@ -115,7 +115,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                                 <NumberInput.DecrementTrigger />
                             </NumberInput.Control>
                         </NumberInput.Root>
-                        <DatePicker
+                        <AppDatePicker
                             onChange={setWorkDate}
                             value={workDate}
                             required

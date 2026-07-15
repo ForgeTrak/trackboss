@@ -17,7 +17,6 @@ import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input/input';
 import 'react-phone-number-input/style.css';
 import isEmail from 'validator/es/lib/isEmail';
 import Autocomplete from 'react-google-autocomplete';
-import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -26,6 +25,7 @@ import { applicationExists } from '../controller/membershipApplication';
 import { memberExistsByEmail } from '../controller/member';
 import SimpleAlertModal from '../components/modals/SimpleAlertModal';
 import { getApplicationSetting } from '../controller/defaultSettings';
+import AppDatePicker from '../components/input/AppDatePicker';
 
 function ApplicationForm() {
     const chakraStyleForNonChakra = {
@@ -279,15 +279,14 @@ function ApplicationForm() {
                     <Box m={2}>
                         <Text>Date of Birth*</Text>
                         <Text fontSize="xs">Primary members MUST be over 18.</Text>
-                        <DatePicker
-                            defaultActiveStartDate={eightteenYearsAgo}
+                        <AppDatePicker
                             value={birthDate}
                             required
                             minDate={moment().subtract(85, 'years').toDate()}
                             maxDate={eightteenYearsAgo}
                             onChange={
-                                (e: any) => {
-                                    setBirthDate(e);
+                                (date?: Date) => {
+                                    setBirthDate(date);
                                 }
                             }
                         />
@@ -353,16 +352,14 @@ function ApplicationForm() {
                                                 }
                                             }
                                         />
-                                        <DatePicker
+                                        <AppDatePicker
                                             required
                                             minDate={moment().subtract(85, 'years').toDate()}
                                             maxDate={new Date()}
                                             value={newFamilyDob}
-                                            defaultValue="hi"
-                                            disableCalendar
                                             onChange={
-                                                (e: any) => {
-                                                    setNewFamilyDob(e);
+                                                (date?: Date) => {
+                                                    setNewFamilyDob(date);
                                                 }
                                             }
                                         />

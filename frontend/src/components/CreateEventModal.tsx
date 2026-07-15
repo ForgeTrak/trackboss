@@ -10,11 +10,8 @@ import {
     Spinner,
     Center,
 } from '@chakra-ui/react';
-import DateTimePicker from 'react-datetime-picker';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter, AppModalHeader } from './AppModal';
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
+import AppDateTimePicker from './input/AppDateTimePicker';
 import { UserContext } from '../contexts/UserContext';
 import { getEventTypeList } from '../controller/eventType';
 import { EventType } from '../../../src/typedefs/eventType';
@@ -114,26 +111,25 @@ export default function CreateEventModal(props: CreateEventModalProps) {
                                 </VStack>
                                 <VStack align="left">
                                     <Text fontSize="sm">Start Date/Time:</Text>
-                                    <DateTimePicker
-                                        disableClock
+                                    <AppDateTimePicker
                                         onChange={
-                                            (date: any) => {
-                                                setStartDateTime(date);
-                                                // when the start is picked - set the end to the start. This is just
-                                                // for ease of use and picking dates.
-                                                setEndDateTime(date);
+                                            (date?: Date) => {
+                                                if (date) {
+                                                    setStartDateTime(date);
+                                                    // when the start is picked - set the end to the start. This is
+                                                    // just for ease of use and picking dates.
+                                                    setEndDateTime(date);
+                                                }
                                             }
                                         }
-                                        onCalendarClose={() => setEndDateTime(startDateTime)}
                                         value={startDateTime}
                                     />
                                 </VStack>
                                 <VStack align="left">
                                     <Text fontSize="sm">End Date/Time:</Text>
-                                    <DateTimePicker
-                                        disableClock
+                                    <AppDateTimePicker
                                         minDate={startDateTime}
-                                        onChange={(date: any) => setEndDateTime(date)}
+                                        onChange={(date?: Date) => { if (date) setEndDateTime(date); }}
                                         value={endDateTime}
                                     />
                                 </VStack>
