@@ -58,9 +58,7 @@ export function App() {
             // If the id token is invalid/expired, attempt a silent refresh with the
             // stored refresh token before falling back to a full re-login.
             if (error?.status === 401 || error?.status === 403) {
-                const storedRefreshToken = refreshToken
-                    || localStorage.getItem('forgetrak_refresh_token')
-                    || '';
+                const storedRefreshToken = refreshToken || localStorage.getItem('forgetrak_refresh_token') || '';
                 if (storedRefreshToken) {
                     try {
                         const refreshed = await refreshIdToken(storedRefreshToken);

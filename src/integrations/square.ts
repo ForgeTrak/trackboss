@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { randomUUID } from 'crypto';
 import { SquareClient } from 'square';
 import { Bill } from '../typedefs/bill';

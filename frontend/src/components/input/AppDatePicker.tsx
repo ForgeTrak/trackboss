@@ -51,11 +51,13 @@ export default function AppDatePicker(props: AppDatePickerProps) {
         >
             <DatePicker.Control width="full">
                 <DatePicker.Input flex="1" />
-                {clearable && (
-                    <DatePicker.ClearTrigger>
-                        <BsX />
-                    </DatePicker.ClearTrigger>
-                )}
+                {
+                    clearable && (
+                        <DatePicker.ClearTrigger>
+                            <BsX />
+                        </DatePicker.ClearTrigger>
+                    )
+                }
                 <DatePicker.Trigger>
                     <BsCalendar />
                 </DatePicker.Trigger>
@@ -65,127 +67,147 @@ export default function AppDatePicker(props: AppDatePickerProps) {
                     <DatePicker.Content>
                         <DatePicker.View view="day">
                             <DatePicker.Context>
-                                {(api) => (
-                                    <>
-                                        <DatePicker.ViewControl>
-                                            <DatePicker.PrevTrigger>
-                                                <BsChevronLeft />
-                                            </DatePicker.PrevTrigger>
-                                            <DatePicker.ViewTrigger>
-                                                <DatePicker.RangeText />
-                                            </DatePicker.ViewTrigger>
-                                            <DatePicker.NextTrigger>
-                                                <BsChevronRight />
-                                            </DatePicker.NextTrigger>
-                                        </DatePicker.ViewControl>
-                                        <DatePicker.Table>
-                                            <DatePicker.TableHead>
-                                                <DatePicker.TableRow>
-                                                    {api.weekDays.map((weekDay, i) => (
-                                                        // eslint-disable-next-line react/no-array-index-key
-                                                        <DatePicker.TableHeader key={i}>
-                                                            {weekDay.short}
-                                                        </DatePicker.TableHeader>
-                                                    ))}
-                                                </DatePicker.TableRow>
-                                            </DatePicker.TableHead>
-                                            <DatePicker.TableBody>
-                                                {api.weeks.map((week, i) => (
-                                                    // eslint-disable-next-line react/no-array-index-key
-                                                    <DatePicker.TableRow key={i}>
-                                                        {week.map((day, j) => (
-                                                            <DatePicker.TableCell
+                                {
+                                    (api) => (
+                                        <>
+                                            <DatePicker.ViewControl>
+                                                <DatePicker.PrevTrigger>
+                                                    <BsChevronLeft />
+                                                </DatePicker.PrevTrigger>
+                                                <DatePicker.ViewTrigger>
+                                                    <DatePicker.RangeText />
+                                                </DatePicker.ViewTrigger>
+                                                <DatePicker.NextTrigger>
+                                                    <BsChevronRight />
+                                                </DatePicker.NextTrigger>
+                                            </DatePicker.ViewControl>
+                                            <DatePicker.Table>
+                                                <DatePicker.TableHead>
+                                                    <DatePicker.TableRow>
+                                                        {
+                                                            api.weekDays.map((weekDay, i) => (
                                                                 // eslint-disable-next-line react/no-array-index-key
-                                                                key={j}
-                                                                value={day}
-                                                            >
-                                                                <DatePicker.TableCellTrigger>
-                                                                    {day.day}
-                                                                </DatePicker.TableCellTrigger>
-                                                            </DatePicker.TableCell>
-                                                        ))}
+                                                                <DatePicker.TableHeader key={i}>
+                                                                    {weekDay.short}
+                                                                </DatePicker.TableHeader>
+                                                            ))
+                                                        }
                                                     </DatePicker.TableRow>
-                                                ))}
-                                            </DatePicker.TableBody>
-                                        </DatePicker.Table>
-                                    </>
-                                )}
+                                                </DatePicker.TableHead>
+                                                <DatePicker.TableBody>
+                                                    {
+                                                        api.weeks.map((week, i) => (
+                                                            // eslint-disable-next-line react/no-array-index-key
+                                                            <DatePicker.TableRow key={i}>
+                                                                {
+                                                                    week.map((day, j) => (
+                                                                        <DatePicker.TableCell
+                                                                            // eslint-disable-next-line react/no-array-index-key
+                                                                            key={j}
+                                                                            value={day}
+                                                                        >
+                                                                            <DatePicker.TableCellTrigger>
+                                                                                {day.day}
+                                                                            </DatePicker.TableCellTrigger>
+                                                                        </DatePicker.TableCell>
+                                                                    ))
+                                                                }
+                                                            </DatePicker.TableRow>
+                                                        ))
+                                                    }
+                                                </DatePicker.TableBody>
+                                            </DatePicker.Table>
+                                        </>
+                                    )
+                                }
                             </DatePicker.Context>
                         </DatePicker.View>
                         <DatePicker.View view="month">
                             <DatePicker.Context>
-                                {(api) => (
-                                    <>
-                                        <DatePicker.ViewControl>
-                                            <DatePicker.PrevTrigger>
-                                                <BsChevronLeft />
-                                            </DatePicker.PrevTrigger>
-                                            <DatePicker.ViewTrigger>
-                                                <DatePicker.RangeText />
-                                            </DatePicker.ViewTrigger>
-                                            <DatePicker.NextTrigger>
-                                                <BsChevronRight />
-                                            </DatePicker.NextTrigger>
-                                        </DatePicker.ViewControl>
-                                        <DatePicker.Table>
-                                            <DatePicker.TableBody>
-                                                {api.getMonthsGrid({ columns: 4, format: 'short' }).map((months, i) => (
-                                                    // eslint-disable-next-line react/no-array-index-key
-                                                    <DatePicker.TableRow key={i}>
-                                                        {months.map((month) => (
-                                                            <DatePicker.TableCell
-                                                                key={month.value}
-                                                                value={month.value}
-                                                            >
-                                                                <DatePicker.TableCellTrigger>
-                                                                    {month.label}
-                                                                </DatePicker.TableCellTrigger>
-                                                            </DatePicker.TableCell>
-                                                        ))}
-                                                    </DatePicker.TableRow>
-                                                ))}
-                                            </DatePicker.TableBody>
-                                        </DatePicker.Table>
-                                    </>
-                                )}
+                                {
+                                    (api) => (
+                                        <>
+                                            <DatePicker.ViewControl>
+                                                <DatePicker.PrevTrigger>
+                                                    <BsChevronLeft />
+                                                </DatePicker.PrevTrigger>
+                                                <DatePicker.ViewTrigger>
+                                                    <DatePicker.RangeText />
+                                                </DatePicker.ViewTrigger>
+                                                <DatePicker.NextTrigger>
+                                                    <BsChevronRight />
+                                                </DatePicker.NextTrigger>
+                                            </DatePicker.ViewControl>
+                                            <DatePicker.Table>
+                                                <DatePicker.TableBody>
+                                                    {
+                                                        api.getMonthsGrid({ columns: 4, format: 'short' }).map((months, i) => (
+                                                            // eslint-disable-next-line react/no-array-index-key
+                                                            <DatePicker.TableRow key={i}>
+                                                                {
+                                                                    months.map((month) => (
+                                                                        <DatePicker.TableCell
+                                                                            key={month.value}
+                                                                            value={month.value}
+                                                                        >
+                                                                            <DatePicker.TableCellTrigger>
+                                                                                {month.label}
+                                                                            </DatePicker.TableCellTrigger>
+                                                                        </DatePicker.TableCell>
+                                                                    ))
+                                                                }
+                                                            </DatePicker.TableRow>
+                                                        ))
+                                                    }
+                                                </DatePicker.TableBody>
+                                            </DatePicker.Table>
+                                        </>
+                                    )
+                                }
                             </DatePicker.Context>
                         </DatePicker.View>
                         <DatePicker.View view="year">
                             <DatePicker.Context>
-                                {(api) => (
-                                    <>
-                                        <DatePicker.ViewControl>
-                                            <DatePicker.PrevTrigger>
-                                                <BsChevronLeft />
-                                            </DatePicker.PrevTrigger>
-                                            <DatePicker.ViewTrigger>
-                                                <DatePicker.RangeText />
-                                            </DatePicker.ViewTrigger>
-                                            <DatePicker.NextTrigger>
-                                                <BsChevronRight />
-                                            </DatePicker.NextTrigger>
-                                        </DatePicker.ViewControl>
-                                        <DatePicker.Table>
-                                            <DatePicker.TableBody>
-                                                {api.getYearsGrid({ columns: 4 }).map((years, i) => (
-                                                    // eslint-disable-next-line react/no-array-index-key
-                                                    <DatePicker.TableRow key={i}>
-                                                        {years.map((year) => (
-                                                            <DatePicker.TableCell
-                                                                key={year.value}
-                                                                value={year.value}
-                                                            >
-                                                                <DatePicker.TableCellTrigger>
-                                                                    {year.label}
-                                                                </DatePicker.TableCellTrigger>
-                                                            </DatePicker.TableCell>
-                                                        ))}
-                                                    </DatePicker.TableRow>
-                                                ))}
-                                            </DatePicker.TableBody>
-                                        </DatePicker.Table>
-                                    </>
-                                )}
+                                {
+                                    (api) => (
+                                        <>
+                                            <DatePicker.ViewControl>
+                                                <DatePicker.PrevTrigger>
+                                                    <BsChevronLeft />
+                                                </DatePicker.PrevTrigger>
+                                                <DatePicker.ViewTrigger>
+                                                    <DatePicker.RangeText />
+                                                </DatePicker.ViewTrigger>
+                                                <DatePicker.NextTrigger>
+                                                    <BsChevronRight />
+                                                </DatePicker.NextTrigger>
+                                            </DatePicker.ViewControl>
+                                            <DatePicker.Table>
+                                                <DatePicker.TableBody>
+                                                    {
+                                                        api.getYearsGrid({ columns: 4 }).map((years, i) => (
+                                                            // eslint-disable-next-line react/no-array-index-key
+                                                            <DatePicker.TableRow key={i}>
+                                                                {
+                                                                    years.map((year) => (
+                                                                        <DatePicker.TableCell
+                                                                            key={year.value}
+                                                                            value={year.value}
+                                                                        >
+                                                                            <DatePicker.TableCellTrigger>
+                                                                                {year.label}
+                                                                            </DatePicker.TableCellTrigger>
+                                                                        </DatePicker.TableCell>
+                                                                    ))
+                                                                }
+                                                            </DatePicker.TableRow>
+                                                        ))
+                                                    }
+                                                </DatePicker.TableBody>
+                                            </DatePicker.Table>
+                                        </>
+                                    )
+                                }
                             </DatePicker.Context>
                         </DatePicker.View>
                     </DatePicker.Content>
