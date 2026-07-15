@@ -14,11 +14,8 @@ import {
 } from '@chakra-ui/react';
 import moment from 'moment';
 import { BsTrash2 } from 'react-icons/bs';
-import DateTimePicker from 'react-datetime-picker';
 import AppModal, { AppModalBody, AppModalCloseButton, AppModalFooter } from './AppModal';
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
+import AppDateTimePicker from './input/AppDateTimePicker';
 import { getEventMonthDaySpan, getEventStartAndEndTime } from '../controller/utils';
 import { UserContext } from '../contexts/UserContext';
 import { PatchJobRequest } from '../../../src/typedefs/job';
@@ -108,29 +105,29 @@ export default function SelectedEventModal(props: modalProps) {
                                         <SimpleGrid>
                                             <VStack align="left">
                                                 <Text>Start Date/Time:</Text>
-                                                <DateTimePicker
-                                                    disableClock
-                                                    disableCalendar
+                                                <AppDateTimePicker
                                                     value={startDateTime}
                                                     onChange={
-                                                        (date: any) => {
-                                                            setStartDateTime(date);
-                                                            setDatesDirty(true);
+                                                        (date?: Date) => {
+                                                            if (date) {
+                                                                setStartDateTime(date);
+                                                                setDatesDirty(true);
+                                                            }
                                                         }
                                                     }
                                                 />
                                             </VStack>
                                             <VStack align="left">
                                                 <Text>End Date/Time:</Text>
-                                                <DateTimePicker
-                                                    disableClock
-                                                    disableCalendar
+                                                <AppDateTimePicker
                                                     value={endDateTime}
                                                     minDate={startDateTime}
                                                     onChange={
-                                                        (date: any) => {
-                                                            setEndDateTime(date);
-                                                            setDatesDirty(true);
+                                                        (date?: Date) => {
+                                                            if (date) {
+                                                                setEndDateTime(date);
+                                                                setDatesDirty(true);
+                                                            }
                                                         }
                                                     }
                                                 />

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Heading, Box, Input, Spinner, Text, Separator } from '@chakra-ui/react';
-import DatePicker from 'react-date-picker';
 import Select from 'react-select';
 
 import moment from 'moment';
 import AppModal, { AppModalFooter } from '../AppModal';
 import WrappedSwitchInput from '../input/WrappedSwitchInput';
+import AppDatePicker from '../input/AppDatePicker';
 import { Member, PostNewMemberRequest } from '../../../../src/typedefs/member';
 
-import 'react-date-picker/dist/DatePicker.css';
-import '../../css/date-picker.css';
 import { createMember, getMemberByEmail } from '../../controller/member';
 
 interface modalProps {
@@ -63,15 +61,14 @@ export default function AddFamilyModal(props: modalProps) {
                 </Box>
                 <Box m={3}>
                     <Text>Birth date</Text>
-                    <DatePicker
+                    <AppDatePicker
                         minDate={moment().subtract(100, 'years').toDate()}
                         maxDate={moment().subtract(1, 'months').toDate()}
                         onChange={
-                            (date: any) => {
+                            (date?: Date) => {
                                 setBirthDate(date);
                             }
                         }
-                        onCalendarClose={() => setBirthDate(birthDate)}
                         value={birthDate}
                     />
                 </Box>
