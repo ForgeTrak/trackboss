@@ -53,7 +53,7 @@
         "jsdom": "^29.0.1",
         "typescript": "^5.3.3",
         "vite": "^6.1.0",
-        "vitest": "^4.1.2"
+        "vitest": "^4.1.10"
     },
     "scripts": {
         "start": "VITE_API_URL=\"http://localhost:8080\" VITE_AUTH_URL=\"https://auth.forgetrak.com\" VITE_CLIENT_ID=7ffktlqd0dfr9eo7a57uq6a5in VITE_CALLBACK_URL=\"http://localhost:3000/callback\" vite",
