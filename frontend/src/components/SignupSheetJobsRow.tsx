@@ -8,7 +8,7 @@ import { EventJob } from '../../../src/typedefs/eventJob';
 import { UserContext } from '../contexts/UserContext';
 import { getEventJob, updateEventJob, deleteEventJob } from '../controller/eventJob';
 import { updateJobType } from '../controller/jobType';
-import DeleteAlert from './DeleteAlert';
+import DeleteAlert from './modals/DeleteAlert';
 import DaysOfWeekSelect from './input/DaysOfWeekSelect';
 import WrappedSwitchInput from './input/WrappedSwitchInput';
 
