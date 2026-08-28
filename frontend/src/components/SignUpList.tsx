@@ -189,7 +189,8 @@ export default function SignUpList(props: SignupListProps) {
                                     const retrieveJobs = (
                                         props.eventType.toLowerCase().includes('race') ||
                                         (props.eventType === 'Harescramble') ||
-                                        props.eventType === 'Camp And Ride'
+                                        props.eventType === 'Camp And Ride' ||
+                                        props.eventType.toLowerCase().includes('jobs')
                                     );
                                     const signupListExcel =
                                         await getSignupListExcel(state.token, props.eventId, retrieveJobs);
