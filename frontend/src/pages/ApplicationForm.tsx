@@ -95,7 +95,7 @@ function ApplicationForm() {
             >
                 <SimpleGrid columns={2} maxWidth={800} m={5}>
                     <Box maxW={200}>
-                        <Image width={200} height={90} src="logo192.png" />
+                        <Image width={200} height={90} src="https://palmyramx.com/cdn/shop/files/Hogback_Hill_Logo5_1.png" />
                     </Box>
                     <Text fontSize="2xl">
                         {`Palmyra Racing Association Application - ${season} season`}
