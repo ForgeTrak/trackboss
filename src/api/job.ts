@@ -258,7 +258,7 @@ job.get('/list/excel', async (req: Request, res: Response) => {
         });
         formatWorkbook(worksheet);
         // write workbook to buffer.
-        httpOutputWorkbook(workbook, res, `signups${new Date().getTime()}.xlsx`);
+        httpOutputWorkbook(workbook, res, `signups${new Date().getTime()}`);
     } catch (error: any) {
         logger.error(`job - Error at path ${req.path}`, error);
         res.status(500);
