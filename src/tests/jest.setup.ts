@@ -17,3 +17,10 @@ jest.mock('../util/environmentWrapper', () => ({
     getSquareObject: jest.fn().mockResolvedValue({}),
     getConnectionObject: jest.fn().mockResolvedValue({}),
 }));
+
+/** Mock sanitize-html so Jest does not attempt to parse htmlparser2 ESM in CommonJS mode. */
+jest.mock('sanitize-html', () => ({
+    __esModule: true,
+    default: jest.fn((str: string) => (str ? str.replace(/<[^>]*>/g, '') : str)),
+}));
+
