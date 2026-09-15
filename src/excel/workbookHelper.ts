@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Response } from 'express';
 import writeXlsxFile from 'write-excel-file/node';
 
@@ -9,8 +10,11 @@ export interface WorksheetColumn {
 
 export class Worksheet {
     title: string;
+
     columns: WorksheetColumn[] = [];
+
     rows: Record<string, any>[] = [];
+
     formatted: boolean = false;
 
     constructor(title: string) {
@@ -27,8 +31,10 @@ export class Worksheet {
 }
 
 export class Workbook {
-    creator: string = 'Palmyra Racing Association - Track Boss';
+    creator: string = 'Forgetrak - Track Boss';
+
     created: Date = new Date();
+
     worksheet?: Worksheet;
 
     addWorksheet(title: string): Worksheet {
@@ -40,6 +46,9 @@ export class Workbook {
         if (!this.worksheet) {
             throw new Error('No worksheet found in workbook');
         }
+        // allowing this disable on purpose. functions is here, and it's a chicken/egg problem so I choose
+        // the chicken (with your choice of flavoring, as long as it's not corn syrup filled BBQ sauce, yuck)
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return generateWorkbookBuffer(this.worksheet);
     }
 
@@ -107,7 +116,7 @@ async function generateWorkbookBuffer(worksheet: Worksheet): Promise<Buffer> {
 
     const sheetData = [headerRow, ...dataRows];
     const sanitizedTitle = (worksheet.title || 'Sheet1')
-        .replace(/[*?:/\\\[\]]/g, '')
+        .replace(/[*?:/\\\\[\]]/g, '')
         .slice(0, 31)
         .trim() || 'Sheet1';
 
@@ -137,4 +146,3 @@ export async function httpOutputWorkbook(workbook: Workbook, res: Response, file
     res.setHeader('Content-Disposition', `attachment; filename=${cleanFilename}.xlsx`);
     res.send(buffer);
 }
-
