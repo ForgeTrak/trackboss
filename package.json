@@ -43,7 +43,6 @@
         "body-parser": "^1.20.1",
         "date-fns": "^2.29.3",
         "dotenv": "^16.0.3",
-        "exceljs": "^4.3.0",
         "express": "^4.18.2",
         "handlebars": "^4.7.8",
         "ical-generator": "^8.1.1",
@@ -54,7 +53,8 @@
         "sanitize-html": "^2.13.1",
         "square": "^43.0.2",
         "winston": "^3.8.2",
-        "winston-cloudwatch": "^6.1.1"
+        "winston-cloudwatch": "^6.1.1",
+        "write-excel-file": "^4.1.1"
     },
     "devDependencies": {
         "@babel/core": "^7.17.4",
