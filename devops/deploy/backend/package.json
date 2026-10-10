@@ -19,9 +19,13 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "aws-cdk": "^2.1128.1",
-    "aws-cdk-lib": "^2.260.0",
+    "aws-cdk": "^2.1145.0",
+    "aws-cdk-lib": "^2.273.0",
     "cdk-fck-nat": "^1.6.22",
     "constructs": "^10.4.4"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }
