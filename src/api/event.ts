@@ -16,6 +16,8 @@ import {
 import { checkHeader, verify } from '../util/auth';
 import logger from '../logger';
 import logAuditEvent from '../database/auditLog';
+import { httpOutputCalendar } from '../excel/calendarHelper';
+import { getTenantById } from '../database/tenant';
 
 const event = Router();
 
@@ -139,6 +141,40 @@ event.get('/list', async (req: Request, res: Response) => {
         }
     }
     res.send(response);
+});
+
+// Printable calendar. Accepts the token as ?id= so it can be opened via a plain link (no Authorization header).
+event.get('/calendar/excel', async (req: Request, res: Response) => {
+    try {
+        const queryToken = req.query.id as string | undefined;
+        const headerCheck = queryToken ? checkHeader(`Bearer ${queryToken}`) : checkHeader(req.headers.authorization);
+        if (!headerCheck.valid) {
+            res.status(401).send({ reason: headerCheck.reason });
+            return;
+        }
+        const token = await verify(headerCheck.token);
+        const tenantId = token.active_tenant_id as string;
+        const yearParam = req.query.year as string | undefined;
+        if (typeof yearParam !== 'undefined' && !/^\d{4}$/.test(yearParam)) {
+            throw new Error('user input error');
+        }
+        const year = yearParam ? Number(yearParam) : new Date().getFullYear();
+        const [eventList, tenant] = await Promise.all([
+            getEventList(tenantId, `${year}-01-01`),
+            getTenantById(tenantId),
+        ]);
+        logger.info(`event - printable calendar for ${year} requested for tenant ${tenantId}`);
+        await httpOutputCalendar(year, eventList, tenant.name, res, `calendar-${year}`);
+    } catch (e: any) {
+        logger.error(`event - Error at path ${req.path}`, e);
+        if (e.message === 'user input error') {
+            res.status(400).send({ reason: 'bad request' });
+        } else if (e.message === 'Authorization Failed') {
+            res.status(401).send({ reason: 'not authorized' });
+        } else {
+            res.status(500).send({ reason: 'internal server error' });
+        }
+    }
 });
 
 event.get('/:eventID', async (req: Request, res: Response) => {

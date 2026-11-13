@@ -1128,6 +1128,41 @@ paths:
           $ref: "#/components/responses/unauthorizedError"
         500:
           $ref: "#/components/responses/internalServerError"
+  /api/event/calendar/excel:
+    get:
+      tags:
+        - event
+      summary: Download a single-page printable year calendar (legend, race/special event lists, 12 month grid) as an Excel workbook.
+      description: |
+        Intended to be opened via a plain link, so the JWT ID token is accepted in the `id` query parameter.
+        An `Authorization: Bearer` header is used as a fallback when `id` is not supplied.
+        The dashboard "Club Info and Links" card links here directly.
+      parameters:
+        - name: id
+          in: query
+          description: JWT ID token.
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: Four digit year. Defaults to the current year.
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+      responses:
+        200:
+          description: OK
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        400:
+          $ref: "#/components/responses/badRequestError"
+        401:
+          $ref: "#/components/responses/unauthorizedError"
+        500:
+          $ref: "#/components/responses/internalServerError"
   /api/event/{eventID}:
     parameters:
       - name: eventID
