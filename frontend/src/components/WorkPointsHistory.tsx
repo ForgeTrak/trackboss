@@ -67,6 +67,10 @@ const customStyles = {
     },
 };
 
+export function filterJobsByYear(jobs: Job[], year: number): Job[] {
+    return _.filter(jobs, (job) => moment.utc(job.start).year() === year);
+}
+
 export default function WorkPointsHistory() {
     const [cells, setCells] = useState<Job[]>([]);
     const [allJobs, setAllJobs] = useState<Job[]>([]);
@@ -119,7 +123,7 @@ export default function WorkPointsHistory() {
     }, []);
 
     useEffect(() => {
-        setCells(_.filter(allJobs, (job) => new Date(job.start).getFullYear() === year));
+        setCells(filterJobsByYear(allJobs, year));
     }, [year, allJobs]);
 
     useEffect(() => {
