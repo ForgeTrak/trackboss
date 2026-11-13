@@ -16,6 +16,7 @@ import { createJobType } from '../../controller/jobType';
 import { JobType, PostNewJobTypeRequest } from '../../../../src/typedefs/jobType';
 import DaysOfWeekSelect from '../input/DaysOfWeekSelect';
 import WrappedSwitchInput from '../input/WrappedSwitchInput';
+import roundToQuarter from '../../util/points';
 
 interface alertProps {
     eventType: string,
@@ -64,7 +65,7 @@ export default function AddJobTypeModal(props: alertProps) {
                         <NumberInput.Input
                             onChange={
                                 (event) => {
-                                    setPointValue(parseFloat(event.target.value));
+                                    setPointValue(roundToQuarter(parseFloat(event.target.value)));
                                 }
                             }
                         />

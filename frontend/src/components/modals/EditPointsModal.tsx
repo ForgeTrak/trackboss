@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import {
     Button,
@@ -10,6 +10,7 @@ import { useAppToast } from '../../hooks/useAppToast';
 import { Job } from '../../../../src/typedefs/job';
 import { modifyJobPoints, removeSignup } from '../../controller/job';
 import { UserContext } from '../../contexts/UserContext';
+import roundToQuarter from '../../util/points';
 
 interface EditPointsModalProps {
     memberName: string,
@@ -23,6 +24,7 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
     const { selectedJob } = props;
     const { state } = useContext(UserContext);
     const toast = useAppToast();
+    const [points, setPoints] = useState<number>(selectedJob.pointsAwarded);
 
     return (
         <AppModal closeOnOverlayClick={false} isOpen={props.isOpen} onClose={props.onClose}>
@@ -35,17 +37,7 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
                         max={30}
                         defaultValue={String(props.selectedJob.pointsAwarded)}
                         step={0.25}
-                        onValueChange={
-                            async (details) => {
-                                // eslint-disable-next-line max-len
-                                await modifyJobPoints(state.token, selectedJob.jobId, details.valueAsNumber || 0);
-                                props.refreshPoints();
-                                toast.success({
-                                    title: 'Points updated!',
-                                    description: `${selectedJob.member} ${selectedJob.title}, ${details.value}`,
-                                });
-                            }
-                        }
+                        onValueChange={(details) => setPoints(details.valueAsNumber)}
                     >
                         <NumberInput.Input
                             placeholder="Points earned"
@@ -59,7 +51,18 @@ export default function ExportPointsModal(props: EditPointsModalProps) {
             </AppModalBody>
             <AppModalFooter>
                 <Button
-                    onClick={props.onClose}
+                    onClick={
+                        async () => {
+                            const rounded = roundToQuarter(points);
+                            await modifyJobPoints(state.token, selectedJob.jobId, rounded);
+                            props.refreshPoints();
+                            toast.success({
+                                title: 'Points updated!',
+                                description: `${selectedJob.member} ${selectedJob.title}, ${rounded}`,
+                            });
+                            props.onClose();
+                        }
+                    }
                     backgroundColor="orange"
                     color="white"
                     mr={3}

@@ -11,6 +11,7 @@ import { updateJobType } from '../controller/jobType';
 import DeleteAlert from './modals/DeleteAlert';
 import DaysOfWeekSelect from './input/DaysOfWeekSelect';
 import WrappedSwitchInput from './input/WrappedSwitchInput';
+import roundToQuarter from '../util/points';
 
 /**
  * A component representing a row in a signup sheet, with all the data to represent a job.
@@ -67,7 +68,7 @@ function SignupSheetJobsRow(props: any) {
                             placeholder={`${data.pointValue}`}
                             onChange={
                                 (event) => {
-                                    setPointValue(parseFloat(event.target.value));
+                                    setPointValue(roundToQuarter(parseFloat(event.target.value)));
                                     setDirty(true);
                                 }
                             }

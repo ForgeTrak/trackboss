@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import AppProvider from '../../../components/AppProvider';
 import EditPointsModal from '../../../components/modals/EditPointsModal';
 import { UserContext } from '../../../contexts/UserContext';
 import * as jobController from '../../../controller/job';
@@ -72,7 +74,7 @@ const renderWithContext = (component: React.ReactElement) => (
                 }
             }
         >
-            {component}
+            <AppProvider>{component}</AppProvider>
         </UserContext.Provider>,
     )
 );
@@ -132,10 +134,10 @@ describe('EditPointsModal', () => {
 
         const numberInput = screen.getByRole('spinbutton');
         expect(numberInput).toBeInTheDocument();
-        expect(numberInput.getAttribute('value')).toBe('3.00');
+        expect(numberInput.getAttribute('value')).toBe('3');
     });
 
-    it('calls onClose when Save button is clicked', () => {
+    it('saves the existing value, refreshes, and closes when Save is clicked without changes', async () => {
         renderWithContext(
             <EditPointsModal
                 memberName="John Doe"
@@ -147,7 +149,74 @@ describe('EditPointsModal', () => {
         );
 
         fireEvent.click(screen.getByText('Save'));
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(jobController.modifyJobPoints).toHaveBeenCalledWith('test-token', 101, 3);
+        });
+        await waitFor(() => {
+            expect(mockRefreshPoints).toHaveBeenCalledTimes(1);
+        });
+        await waitFor(() => {
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('does not save while typing', async () => {
+        const user = userEvent.setup();
+        renderWithContext(
+            <EditPointsModal
+                memberName="John Doe"
+                selectedJob={mockSelectedJob}
+                refreshPoints={mockRefreshPoints}
+                isOpen
+                onClose={mockOnClose}
+            />,
+        );
+
+        const input = screen.getByRole('spinbutton');
+        await user.clear(input);
+        await user.type(input, '2.7');
+        expect(jobController.modifyJobPoints).not.toHaveBeenCalled();
+    });
+
+    it('rounds the typed value to the nearest quarter on Save', async () => {
+        const user = userEvent.setup();
+        renderWithContext(
+            <EditPointsModal
+                memberName="John Doe"
+                selectedJob={mockSelectedJob}
+                refreshPoints={mockRefreshPoints}
+                isOpen
+                onClose={mockOnClose}
+            />,
+        );
+
+        const input = screen.getByRole('spinbutton');
+        await user.clear(input);
+        await user.type(input, '2.7');
+        await user.click(screen.getByText('Save'));
+        await waitFor(() => {
+            expect(jobController.modifyJobPoints).toHaveBeenCalledWith('test-token', 101, 2.75);
+        });
+        expect(jobController.modifyJobPoints).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not save when Cancel is clicked after typing', async () => {
+        const user = userEvent.setup();
+        renderWithContext(
+            <EditPointsModal
+                memberName="John Doe"
+                selectedJob={mockSelectedJob}
+                refreshPoints={mockRefreshPoints}
+                isOpen
+                onClose={mockOnClose}
+            />,
+        );
+
+        const input = screen.getByRole('spinbutton');
+        await user.clear(input);
+        await user.type(input, '5');
+        await user.click(screen.getByText('Cancel'));
+        expect(jobController.modifyJobPoints).not.toHaveBeenCalled();
     });
 
     it('calls onClose when Cancel button is clicked', () => {
@@ -235,6 +304,6 @@ describe('EditPointsModal', () => {
         );
 
         const numberInput = screen.getByRole('spinbutton');
-        expect(numberInput.getAttribute('value')).toBe('0.00');
+        expect(numberInput.getAttribute('value')).toBe('0');
     });
 });

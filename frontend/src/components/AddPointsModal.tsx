@@ -17,6 +17,7 @@ import { Job, PostNewJobRequest } from '../../../src/typedefs/job';
 import { createJob } from '../controller/job';
 import MemberSelector from './shared/MemberSelector';
 import AppDatePicker from './input/AppDatePicker';
+import roundToQuarter from '../util/points';
 
 interface AddPointsModalProps {
     memberName: string,
@@ -134,7 +135,7 @@ export default function AddPointsModal(props: AddPointsModalProps) {
                             async () => {
                                 const createJobTypeRequest : PostNewJobTypeRequest = {
                                     title: description,
-                                    pointValue,
+                                    pointValue: roundToQuarter(pointValue),
                                     cashValue: 0,
                                     reserved: false,
                                     online: true,
