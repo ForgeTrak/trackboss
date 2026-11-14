@@ -15,7 +15,7 @@ export async function getTenants(): Promise<Tenant[]> {
     }
     return results.map((result) => ({
         tenantId: result.tenant_id,
-        name: result.name,
+        name: result.tenant_name,
         slug: result.slug,
         contactName: result.tenant_contact_name,
         contactEmail: result.tenant_email,
@@ -40,7 +40,7 @@ export async function getTenantById(tenantId: string): Promise<Tenant> {
     const result = results[0];
     return {
         tenantId: result.tenant_id,
-        name: result.name,
+        name: result.tenant_name,
         slug: result.slug,
         contactName: result.tenant_contact_name,
         contactEmail: result.tenant_email,
@@ -65,7 +65,7 @@ export async function getTenantBySlug(slug: string): Promise<Tenant> {
     const result = results[0];
     return {
         tenantId: result.tenant_id,
-        name: result.name,
+        name: result.tenant_name,
         slug: result.slug,
         contactName: result.tenant_contact_name,
         contactEmail: result.tenant_email,

@@ -25,7 +25,7 @@ export default function ImportantLinksCard(props: cardProps) {
                             fontSize="2xl"
                             color="orange"
                         >
-                            Printable Calendar
+                            Printable Club Calendar
                         </Link>
                     </List.Item>
                     {
