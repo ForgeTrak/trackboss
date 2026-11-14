@@ -13,7 +13,6 @@ describe('ImportantLinksCard', () => {
         renderWithProviders(
             <ImportantLinksCard
                 dashboardLinks={[]}
-                memberId={1}
                 jwt="token-abc"
             />,
         );
@@ -35,12 +34,35 @@ describe('ImportantLinksCard', () => {
                         },
                     ]
                 }
-                memberId={1}
                 jwt="x"
             />,
         );
 
         const rules = screen.getByRole('link', { name: /member rules/i });
         expect(rules).toHaveAttribute('href', 'https://example.com/rules');
+    });
+
+    it('renders the printable calendar link first with the encoded jwt', () => {
+        renderWithProviders(
+            <ImportantLinksCard
+                dashboardLinks={
+                    [
+                        {
+                            linkId: 2,
+                            tenantId: 't1',
+                            linkTitle: 'Member Rules',
+                            linkUrl: 'https://example.com/rules',
+                            linkDisplayOrder: 1,
+                        },
+                    ]
+                }
+                jwt="a.b+c"
+            />,
+        );
+
+        const links = screen.getAllByRole('link');
+        expect(links[0]).toHaveTextContent('Printable Calendar');
+        expect(links[0]).toHaveAttribute('href', 'http://vitest-api.test/api/event/calendar/excel?id=a.b%2Bc');
+        expect(links[1]).toHaveTextContent('Member Rules');
     });
 });
