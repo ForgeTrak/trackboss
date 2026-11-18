@@ -384,20 +384,6 @@ export class DeployStack extends Stack {
         certificate: forgeTrakCert,
     });
 
-    const trackbossApiDistribution = new cloudfront.Distribution(this, 'trackbossApiDistribution', {
-        defaultBehavior: {
-            origin: new origins.HttpOrigin(forgeTrakApiDomain, {
-                protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
-            }),
-            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-            cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-            originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-        },
-        domainNames: ['trackboss-api.hogbackmx.com'],
-        certificate: hogbackmxCert,
-    });
-
     new route53.ARecord(this, 'forgeTrakApiAlias', {
         zone: forgeTrakZone,
         recordName: 'api',
