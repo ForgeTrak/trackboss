@@ -395,7 +395,7 @@ export class DeployStack extends Stack {
             originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
         },
         domainNames: ['trackboss-api.hogbackmx.com'],
-        certificate: forgeTrakCert,
+        certificate: hogbackmxCert,
     });
 
     new route53.ARecord(this, 'forgeTrakApiAlias', {
