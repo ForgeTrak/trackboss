@@ -10,6 +10,8 @@ import {
     patchEvent,
 } from '../../database/event';
 import event from '../../api/event';
+import { httpOutputCalendar } from '../../excel/calendarHelper';
+import { getTenantById } from '../../database/tenant';
 import { createJsonRouterApp } from './testUtils';
 
 jest.mock('../../util/auth', () => ({
@@ -24,6 +26,17 @@ jest.mock('../../database/auditLog', () => ({
     getAuditLogById: jest.fn(),
     getAuditLogByTenant: jest.fn(),
 }));
+jest.mock('../../excel/calendarHelper', () => ({
+    httpOutputCalendar: jest.fn(async (_year: number, _events: any[], _club: string, res: any) => {
+        res.status(200).send('xlsx');
+    }),
+}));
+jest.mock('../../database/tenant', () => ({
+    getTenantById: jest.fn(async () => ({ tenantId: 'tenant-test', name: 'Test Club' })),
+}));
+
+const mockedHttpOutputCalendar = httpOutputCalendar as jest.MockedFunction<typeof httpOutputCalendar>;
+const mockedGetTenantById = getTenantById as jest.MockedFunction<typeof getTenantById>;
 
 const mockedCheckHeader = checkHeader as jest.MockedFunction<typeof checkHeader>;
 const mockedVerify = verify as jest.MockedFunction<typeof verify>;
@@ -345,6 +358,77 @@ describe('api/event', () => {
         mockedVerify.mockRejectedValue(new Error('Forbidden'));
         const res = await request(app).delete('/ev/13').set('Authorization', 'Bearer t');
         expect(res.status).toBe(403);
+    });
+
+    describe('GET /calendar/excel', () => {
+        it('returns 401 when no token is supplied', async () => {
+            mockedCheckHeader.mockReturnValue({ valid: false, reason: 'missing', token: '' });
+            const res = await request(app).get('/ev/calendar/excel');
+            expect(res.status).toBe(401);
+            expect(mockedCheckHeader).toHaveBeenCalledWith(undefined);
+            expect(mockedHttpOutputCalendar).not.toHaveBeenCalled();
+        });
+
+        it('returns 401 when the token fails verification', async () => {
+            mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 'bad' });
+            mockedVerify.mockRejectedValue(new Error('Authorization Failed'));
+            const res = await request(app).get('/ev/calendar/excel').query({ id: 'bad' });
+            expect(res.status).toBe(401);
+        });
+
+        it('returns 400 for a malformed year', async () => {
+            mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
+            mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
+            const res = await request(app).get('/ev/calendar/excel').query({ id: 't', year: 'abc' });
+            expect(res.status).toBe(400);
+            expect(mockedGetEventList).not.toHaveBeenCalled();
+        });
+
+        it('uses the query token and requested year to build the calendar', async () => {
+            const events = [{ eventId: 1, title: 'Race' }];
+            mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 'qtoken' });
+            mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
+            mockedGetEventList.mockResolvedValue(events as any);
+            const res = await request(app).get('/ev/calendar/excel').query({ id: 'qtoken', year: '2027' });
+            expect(res.status).toBe(200);
+            expect(mockedCheckHeader).toHaveBeenCalledWith('Bearer qtoken');
+            expect(mockedVerify).toHaveBeenCalledWith('qtoken');
+            expect(mockedGetEventList).toHaveBeenCalledWith('tenant-test', '2027-01-01');
+            expect(mockedGetTenantById).toHaveBeenCalledWith('tenant-test');
+            expect(mockedHttpOutputCalendar).toHaveBeenCalledWith(
+                2027,
+                events,
+                'Test Club',
+                expect.anything(),
+                'calendar-2027',
+            );
+        });
+
+        it('falls back to the Authorization header and defaults to the current year', async () => {
+            const year = new Date().getFullYear();
+            mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
+            mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
+            mockedGetEventList.mockResolvedValue([] as any);
+            const res = await request(app).get('/ev/calendar/excel').set('Authorization', 'Bearer t');
+            expect(res.status).toBe(200);
+            expect(mockedCheckHeader).toHaveBeenCalledWith('Bearer t');
+            expect(mockedGetEventList).toHaveBeenCalledWith('tenant-test', `${year}-01-01`);
+            expect(mockedHttpOutputCalendar).toHaveBeenCalledWith(
+                year,
+                [],
+                'Test Club',
+                expect.anything(),
+                `calendar-${year}`,
+            );
+        });
+
+        it('returns 500 when loading events fails', async () => {
+            mockedCheckHeader.mockReturnValue({ valid: true, reason: '', token: 't' });
+            mockedVerify.mockResolvedValue({ active_tenant_id: 'tenant-test' } as any);
+            mockedGetEventList.mockRejectedValue(new Error('internal server error'));
+            const res = await request(app).get('/ev/calendar/excel').query({ id: 't' });
+            expect(res.status).toBe(500);
+        });
     });
 
     it('DELETE /:eventID returns 500 when deleteEvent throws', async () => {

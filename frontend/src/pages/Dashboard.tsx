@@ -159,6 +159,7 @@ function Dashboard() {
                     }
                     <ImportantLinksCard
                         dashboardLinks={dashboardLinks}
+                        jwt={state.token}
                     />
                 </SimpleGrid>
             </Center>

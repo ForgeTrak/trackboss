@@ -8,7 +8,7 @@ describe('database/tenant', () => {
 
     const row = {
         tenant_id: 't-1',
-        name: 'Palmyra MX',
+        tenant_name: 'Palmyra MX',
         tenant_contact_name: 'Jane Doe',
         tenant_email: 'jane@example.com',
         tenant_phone: '555-1234',
